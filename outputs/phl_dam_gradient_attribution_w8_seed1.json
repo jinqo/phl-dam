@@ -1,0 +1,139 @@
+{
+  "experiment": "PHL-DAM gradient attribution",
+  "configuration": {
+    "scale": "pressure",
+    "writes": 8,
+    "seed": 1,
+    "steps": 4,
+    "batch_size": 16,
+    "sequence_length": 456
+  },
+  "history": [
+    {
+      "step": 1,
+      "loss": 10.092586517333984,
+      "total_grad_norm": 20.5574043124736,
+      "group_grad_norms": {
+        "context": 16.24120050746153,
+        "embedding": 0.6578748659847354,
+        "eviction_scorer": 0.08343893022238369,
+        "key": 0.11188223620939501,
+        "memory_projection": 0.8731695511414655,
+        "output": 7.2444436160871195,
+        "phl": 10.184342860510306,
+        "query": 0.1259104828926602,
+        "read_gate": 0.0357056387468567,
+        "value": 1.1811757079483052,
+        "write_gate": 0.021606625562129153
+      },
+      "dominant_group": "context",
+      "dominant_share": 0.7900414011708118
+    },
+    {
+      "step": 2,
+      "loss": 7.604370594024658,
+      "total_grad_norm": 11.903418596979083,
+      "group_grad_norms": {
+        "context": 8.133439616083104,
+        "embedding": 0.331990968841352,
+        "eviction_scorer": 0.006524202488373794,
+        "key": 0.5151235569723347,
+        "memory_projection": 0.4193768179750336,
+        "output": 6.837428237766846,
+        "phl": 5.247891025195364,
+        "query": 0.5828050679405408,
+        "read_gate": 0.05540351973525047,
+        "value": 0.593770277781306,
+        "write_gate": 0.031064199558386112
+      },
+      "dominant_group": "context",
+      "dominant_share": 0.6832860282799139
+    },
+    {
+      "step": 3,
+      "loss": 6.505125999450684,
+      "total_grad_norm": 104543458173.98701,
+      "group_grad_norms": {
+        "context": 67277716928.41623,
+        "embedding": 3144985695.373007,
+        "eviction_scorer": 65298805723.43392,
+        "key": 7684377021.054474,
+        "memory_projection": 0.5564741186771057,
+        "output": 5.944468127479668,
+        "phl": 3.392423477996503,
+        "query": 0.004313096661457296,
+        "read_gate": 0.12884612593606526,
+        "value": 13155011080.44893,
+        "write_gate": 43555878147.69386
+      },
+      "dominant_group": "context",
+      "dominant_share": 0.6435382768422384
+    },
+    {
+      "step": 4,
+      "loss": 6.204961776733398,
+      "total_grad_norm": 326201981.8805715,
+      "group_grad_norms": {
+        "context": 163291293.71226016,
+        "embedding": 7198843.811168568,
+        "eviction_scorer": 262869700.13006666,
+        "key": 28699447.616526697,
+        "memory_projection": 0.5003572022519797,
+        "output": 5.321371022204234,
+        "phl": 2.976250824918156,
+        "query": 0.13590680576052067,
+        "read_gate": 0.14557722435447495,
+        "value": 27851918.141333677,
+        "write_gate": 94826136.398437
+      },
+      "dominant_group": "eviction_scorer",
+      "dominant_share": 0.8058494881441526
+    }
+  ],
+  "slot_key_gradient_by_timestep": [
+    {
+      "timestep": 41,
+      "slot_key_grad_norm": 0.0030574388802051544
+    },
+    {
+      "timestep": 83,
+      "slot_key_grad_norm": 0.0027459580451250076
+    },
+    {
+      "timestep": 124,
+      "slot_key_grad_norm": 0.0024897775147110224
+    },
+    {
+      "timestep": 165,
+      "slot_key_grad_norm": 0.002236915985122323
+    },
+    {
+      "timestep": 207,
+      "slot_key_grad_norm": 0.0019643008708953857
+    },
+    {
+      "timestep": 248,
+      "slot_key_grad_norm": 0.0016302248695865273
+    },
+    {
+      "timestep": 290,
+      "slot_key_grad_norm": 0.0013189732562750578
+    },
+    {
+      "timestep": 331,
+      "slot_key_grad_norm": 0.0010186296422034502
+    },
+    {
+      "timestep": 372,
+      "slot_key_grad_norm": 0.0007062227232381701
+    },
+    {
+      "timestep": 414,
+      "slot_key_grad_norm": 0.0003969233948737383
+    },
+    {
+      "timestep": 455,
+      "slot_key_grad_norm": 4.179738971288316e-05
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Verification copies of reproduction bundles - these are unpacked duplicates of
+# the *_Reproduction.zip artifacts in outputs/, not separate work.
+work/*repro_check/
+work/repro_check/
+work/*reproduction/
+work/*repro_verified/
+work/*repro_final/
+work/*_staging/
+
+# Scratch job lists
+work/*_jobs.txt
+
+# Live run logs. These are appended to while sweeps are in flight, so a commit
+# would capture them mid-write. Logs for completed experiments are shipped
+# inside the corresponding outputs/*_Reproduction.zip bundle.
+work/*.log

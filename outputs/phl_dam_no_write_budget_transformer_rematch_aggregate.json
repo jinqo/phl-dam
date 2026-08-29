@@ -1,0 +1,132 @@
+{
+  "experiment": "PHL-DAM without write-budget penalty vs causal Transformer",
+  "intervention": {
+    "changed": "PHL-DAM write-budget coefficient",
+    "original_value": 0.05,
+    "ablation_value": 0.0,
+    "other_architecture_or_protocol_changes": false
+  },
+  "protocol": {
+    "seeds": [0, 1, 2, 3, 4, 5],
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "sequence_length": 176,
+    "bindings_per_sequence": 3,
+    "same_generator_streams": true,
+    "same_primary_objective": "all-token next-token CE + marked recall-token CE",
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false
+  },
+  "models": {
+    "phl_dam_no_write_budget": {
+      "parameters": 33034,
+      "recurrent_state_floats_per_sequence": 456,
+      "write_budget_weight": 0.0,
+      "seed_recall": [
+        0.9736666666666667,
+        1.0,
+        0.9995,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "successful_seeds": 6,
+      "mean_recall_accuracy": 0.9955277777777778,
+      "sample_sd_recall": 0.010711580787305063,
+      "min_recall_accuracy": 0.9736666666666667,
+      "max_recall_accuracy": 1.0,
+      "mean_retrieval_disabled_accuracy": 0.09988888888888887,
+      "mean_all_token_ce": 0.2337352122267087,
+      "sample_sd_all_token_ce": 0.0064361241674741965,
+      "mean_recall_token_ce": 0.015838621372977892,
+      "sample_sd_recall_token_ce": 0.031317318197236176,
+      "mean_address_top1_accuracy": 0.8666944444444443,
+      "mean_write_gate_elsewhere": 0.0421503744843005,
+      "mean_last_logged_write_budget_diagnostic": 8.490519455312702,
+      "mean_distance_accuracy": {
+        "29-63": 0.9949166666666667,
+        "64-95": 0.9959166666666667,
+        "96-169": 0.99575
+      },
+      "all_runs_finite": true
+    },
+    "causal_transformer": {
+      "parameters": 33074,
+      "kv_cache_floats_at_sequence_length": 16896,
+      "seed_recall": [
+        0.4588333333333333,
+        0.5426666666666666,
+        0.48433333333333334,
+        0.4568333333333333,
+        0.4055,
+        0.4766666666666667
+      ],
+      "successful_seeds": 6,
+      "mean_recall_accuracy": 0.47080555555555553,
+      "sample_sd_recall": 0.04468723614270715,
+      "min_recall_accuracy": 0.4055,
+      "max_recall_accuracy": 0.5426666666666666,
+      "mean_attention_disabled_accuracy": 0.08883333333333333,
+      "mean_all_token_ce": 0.2520225164294243,
+      "mean_recall_token_ce": 1.2264182911713917,
+      "mean_distance_accuracy": {
+        "29-63": 0.4028333333333334,
+        "64-95": 0.46324999999999994,
+        "96-169": 0.5463333333333334
+      },
+      "all_runs_finite": true
+    }
+  },
+  "paired_comparison": {
+    "seed_recall_difference_phl_minus_transformer": [
+      0.5148333333333334,
+      0.45733333333333337,
+      0.5151666666666668,
+      0.5431666666666667,
+      0.5945,
+      0.5233333333333333
+    ],
+    "mean_recall_advantage_percentage_points": 52.47222222222222,
+    "paired_difference_sample_sd_percentage_points": 4.459019158049431,
+    "paired_difference_approximate_95_percent_t_interval_percentage_points": [
+      47.79276859700505,
+      57.15167584743939
+    ],
+    "all_token_ce_advantage_nats": 0.0182873042027156,
+    "recall_token_ce_advantage_nats": 1.2105796697984138,
+    "parameter_difference_transformer_minus_phl": 40,
+    "runtime_state_reduction_phl_vs_transformer_percent": 97.30113636363636,
+    "paired_recall_winner_all_seeds": "phl_dam_no_write_budget"
+  },
+  "penalty_ablation_context": {
+    "regularized_phl_mean_recall": 0.974166666666667,
+    "no_penalty_phl_mean_recall": 0.9955277777777778,
+    "paired_mean_change_no_penalty_minus_regularized_percentage_points": 2.1361111111111126,
+    "paired_change_approximate_95_percent_t_interval_percentage_points": [
+      -2.410224431195181,
+      6.682446653417407
+    ],
+    "regularized_mean_write_gate_elsewhere": 0.0012363387673361107,
+    "no_penalty_mean_write_gate_elsewhere": 0.0421503744843005,
+    "interpretation": "Removing the penalty did not reduce recall in these six seeds, but substantially increased off-binding write activity. The recall change relative to regularized PHL-DAM is not resolved by six seeds because its paired interval includes zero."
+  },
+  "gate_3": {
+    "all_token_ce_within_0_01_of_best_conventional": true,
+    "recall_within_5_percentage_points_of_best_conventional": true,
+    "meaningful_advantage": {
+      "recall_advantage_at_least_5_percentage_points": true,
+      "all_token_ce_advantage_at_least_0_01_nats": true,
+      "runtime_state_reduction_at_matched_recall": "not directly tested; raw length-176 state is 97.30% lower while PHL-DAM recall is higher"
+    },
+    "overall": "pass"
+  },
+  "verdict": {
+    "winner_under_fixed_500_step_protocol": "phl_dam_no_write_budget",
+    "write_budget_penalty_required_for_transformer_advantage": false,
+    "summary": "The PHL-DAM advantage over the matched causal Transformer survives removal of the write-budget penalty and appears on all six paired seeds.",
+    "scope": "This establishes the ablation result on the fixed synthetic associative-recall task, not a universal architecture ranking."
+  }
+}

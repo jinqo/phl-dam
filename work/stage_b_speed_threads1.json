@@ -1,0 +1,91 @@
+{
+  "experiment": "PHL-DAM Stage B \u2014 Learned One-Seed Pilot",
+  "configuration": {
+    "seed": 0,
+    "bindings": 3,
+    "possible_values": 10,
+    "possible_keys": 32,
+    "slots": 8,
+    "d_model": 64,
+    "horizons": 4,
+    "horizon_width": 16,
+    "d_key": 24,
+    "d_value": 24,
+    "sequence_length": 176,
+    "delay_range": [
+      29,
+      169
+    ],
+    "oracle_controller_labels": false,
+    "oracle_slot_allocation": false,
+    "hard_allocation": false,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false,
+    "objective": "all-token next-token CE + marked recall-token CE + 0.05 position-agnostic write-budget penalty",
+    "training_steps": 10,
+    "batch_size": 16,
+    "eval_episodes": 16,
+    "learning_rate": 0.002
+  },
+  "gate": {
+    "threshold": 0.2,
+    "passed": false
+  },
+  "metrics": {
+    "episodes": 16,
+    "queries": 48,
+    "recall_accuracy": 0.041666666666666664,
+    "retrieval_disabled_accuracy": 0.08333333333333333,
+    "address_top1_accuracy": 0.9375,
+    "all_token_ce": 0.7365182042121887,
+    "recall_token_ce": 2.745410680770874,
+    "distance_accuracy": {
+      "29-63": 0.0625,
+      "64-95": 0.0625,
+      "96-169": 0.0
+    },
+    "distance_counts": {
+      "29-63": 16,
+      "64-95": 16,
+      "96-169": 16
+    },
+    "controller": {
+      "mean_write_gate_at_binding": 0.03986773143212,
+      "mean_write_gate_elsewhere": 0.013062827159903641,
+      "mean_read_gate_at_query": 0.6095828612645467,
+      "mean_read_gate_elsewhere": 0.7559479288972182,
+      "mean_final_occupancy_by_slot": [
+        0.27111947536468506,
+        0.2672232389450073,
+        0.2633264362812042,
+        0.25942909717559814,
+        0.25553128123283386,
+        0.2516328990459442,
+        0.24773402512073517,
+        0.24383464455604553
+      ]
+    },
+    "finite": true
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 8.1083984375,
+      "all_token_ce": 4.038902282714844,
+      "recall_ce": 3.9682366847991943,
+      "write_budget_penalty": 2.0251893997192383,
+      "gradient_norm": 14.58160400390625,
+      "elapsed_seconds": 1.2160132999997586
+    },
+    {
+      "step": 10,
+      "loss": 3.625201940536499,
+      "all_token_ce": 0.7896674275398254,
+      "recall_ce": 2.8335816860198975,
+      "write_budget_penalty": 0.039057403802871704,
+      "gradient_norm": 2.798346519470215,
+      "elapsed_seconds": 11.868263800002751
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "experiment": "PHL-DAM Attribution-002 — Parameter-Matched DAM-only",
+  "protocol": {
+    "seeds": [0, 1, 2],
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "identical_data_streams": true,
+    "identical_objective": true,
+    "slots": 8,
+    "d_key": 24,
+    "d_value": 24,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false
+  },
+  "capacity_match": {
+    "phl_dam_parameters": 33034,
+    "dam_only_matched_parameters": 33098,
+    "absolute_difference": 64,
+    "relative_difference_from_phl_dam": 0.00193739783253617,
+    "within_one_percent": true,
+    "added_non_phl_capacity": "residual 64->64->64 generic GELU FFN",
+    "phl_enabled_in_matched_model": false,
+    "phl_parameters_in_matched_model": 0,
+    "phl_state_floats_in_matched_model": 0
+  },
+  "models": {
+    "phl_dam": {
+      "parameters": 33034,
+      "recurrent_state_floats_per_sequence": 456,
+      "seed_recall": [0.864, 0.996166666666667, 0.997166666666667],
+      "successful_seeds": 3,
+      "mean_recall_accuracy": 0.952444444444445,
+      "sample_sd_recall": 0.0765967676525244,
+      "min_recall_accuracy": 0.864,
+      "mean_all_token_ce": 0.235309418559074,
+      "mean_retrieval_disabled_accuracy": 0.102277777777778,
+      "all_runs_finite": true
+    },
+    "dam_only_matched": {
+      "parameters": 33098,
+      "recurrent_state_floats_per_sequence": 392,
+      "seed_recall": [0.100166666666667, 0.9995, 0.999],
+      "successful_seeds": 2,
+      "mean_recall_accuracy": 0.699555555555556,
+      "sample_sd_recall": 0.519086064725872,
+      "min_recall_accuracy": 0.100166666666667,
+      "mean_all_token_ce": 0.266543700774511,
+      "mean_recall_token_ce": 0.775164636185393,
+      "mean_retrieval_disabled_accuracy": 0.0947222222222222,
+      "mean_address_top1_accuracy": 0.800833333333333,
+      "mean_distance_accuracy": {
+        "29-63": 0.701666666666667,
+        "64-95": 0.698666666666667,
+        "96-169": 0.698333333333333
+      },
+      "all_runs_finite": true
+    }
+  },
+  "comparison": {
+    "phl_dam_mean_recall_advantage_percentage_points": 25.2888888888889,
+    "phl_dam_all_token_ce_advantage_nats": 0.031234282215437,
+    "dam_only_matched_state_reduction_vs_phl_dam": 0.140350877192982,
+    "success_rate_phl_dam": "3/3",
+    "success_rate_dam_only_matched": "2/3"
+  },
+  "verdict": {
+    "parameter_count_explains_phl_advantage": false,
+    "phl_advantage_survives_this_match": true,
+    "interpretation": "PHL-DAM shows stronger controller-discovery robustness under the fixed budget; successful matched DAM seeds reach the same recall ceiling",
+    "remaining_caveat": "one generic capacity placement and only three seeds do not isolate the exact causal PHL mechanism"
+  }
+}

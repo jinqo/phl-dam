@@ -1,0 +1,492 @@
+{
+  "pattern": "phl_dam_004d_*.json",
+  "runs": 25,
+  "settings": [
+    "canonical_w16",
+    "canonical_w20",
+    "canonical_w24",
+    "canonical_w32",
+    "canonical_w8"
+  ],
+  "health": {
+    "total_runs": 25,
+    "finite_runs": 18,
+    "non_finite_runs": 7,
+    "non_finite_ids": [
+      "content_only_w16_pressure_seed0",
+      "content_only_w20_pressure_seed0",
+      "content_only_w20_pressure_seed3",
+      "content_only_w24_pressure_seed3",
+      "content_only_w32_pressure_seed3",
+      "content_only_w8_pressure_seed2",
+      "content_only_w8_pressure_seed3"
+    ],
+    "learned_runs": 4,
+    "breakthrough_steps": {
+      "content_only_w16_pressure_seed0": null,
+      "content_only_w16_pressure_seed1": null,
+      "content_only_w16_pressure_seed2": 250,
+      "content_only_w16_pressure_seed3": null,
+      "content_only_w16_pressure_seed4": null,
+      "content_only_w20_pressure_seed0": null,
+      "content_only_w20_pressure_seed1": null,
+      "content_only_w20_pressure_seed2": null,
+      "content_only_w20_pressure_seed3": null,
+      "content_only_w20_pressure_seed4": null,
+      "content_only_w24_pressure_seed0": null,
+      "content_only_w24_pressure_seed1": null,
+      "content_only_w24_pressure_seed2": 575,
+      "content_only_w24_pressure_seed3": null,
+      "content_only_w24_pressure_seed4": null,
+      "content_only_w32_pressure_seed0": null,
+      "content_only_w32_pressure_seed1": null,
+      "content_only_w32_pressure_seed2": null,
+      "content_only_w32_pressure_seed3": null,
+      "content_only_w32_pressure_seed4": null,
+      "content_only_w8_pressure_seed0": 200,
+      "content_only_w8_pressure_seed1": null,
+      "content_only_w8_pressure_seed2": null,
+      "content_only_w8_pressure_seed3": null,
+      "content_only_w8_pressure_seed4": 450
+    },
+    "final_recall_ce": {
+      "content_only_w16_pressure_seed0": NaN,
+      "content_only_w16_pressure_seed1": 2.3610434532165527,
+      "content_only_w16_pressure_seed2": 0.5628408193588257,
+      "content_only_w16_pressure_seed3": 2.316678285598755,
+      "content_only_w16_pressure_seed4": 2.3314499855041504,
+      "content_only_w20_pressure_seed0": NaN,
+      "content_only_w20_pressure_seed1": 2.332249164581299,
+      "content_only_w20_pressure_seed2": 2.3723442554473877,
+      "content_only_w20_pressure_seed3": 2.303459405899048,
+      "content_only_w20_pressure_seed4": 2.1862075328826904,
+      "content_only_w24_pressure_seed0": 2.295532464981079,
+      "content_only_w24_pressure_seed1": 2.349635124206543,
+      "content_only_w24_pressure_seed2": 1.5197014808654785,
+      "content_only_w24_pressure_seed3": 2.375678062438965,
+      "content_only_w24_pressure_seed4": 2.3527746200561523,
+      "content_only_w32_pressure_seed0": 2.293044328689575,
+      "content_only_w32_pressure_seed1": 2.3065035343170166,
+      "content_only_w32_pressure_seed2": 2.0644187927246094,
+      "content_only_w32_pressure_seed3": 2.3341457843780518,
+      "content_only_w32_pressure_seed4": 2.3034908771514893,
+      "content_only_w8_pressure_seed0": 0.20333370566368103,
+      "content_only_w8_pressure_seed1": 2.332108974456787,
+      "content_only_w8_pressure_seed2": NaN,
+      "content_only_w8_pressure_seed3": NaN,
+      "content_only_w8_pressure_seed4": 0.002958497265353799
+    }
+  },
+  "by_setting": {
+    "canonical_w16": {
+      "content_only": {
+        "recall": {
+          "n": 4,
+          "mean": 0.2654637574484913,
+          "median": 0.09655272657482594,
+          "sd": 0.34408158150957807,
+          "min": 0.08721804511278196,
+          "max": 0.7815315315315315
+        },
+        "residency": {
+          "n": 4,
+          "mean": 0.18506006006006007,
+          "median": 0.0,
+          "sd": 0.37012012012012013,
+          "min": 0.0,
+          "max": 0.7402402402402403
+        },
+        "recall_given_resident": {
+          "n": 1,
+          "mean": 0.9837728194726166,
+          "median": 0.9837728194726166,
+          "sd": 0.0,
+          "min": 0.9837728194726166,
+          "max": 0.9837728194726166
+        },
+        "all_token_ce": {
+          "n": 4,
+          "mean": 0.5800359646479288,
+          "median": 0.5806475753585497,
+          "sd": 0.005329049579820054,
+          "min": 0.5731337666511536,
+          "max": 0.5857149412234625
+        },
+        "recall_token_ce": {
+          "n": 4,
+          "mean": 1.9393698337177436,
+          "median": 2.318732112646103,
+          "sd": 0.7696218148235201,
+          "min": 0.785011554757754,
+          "max": 2.3350035548210144
+        },
+        "per_seed_recall": {
+          "1": 0.08721804511278196,
+          "2": 0.7815315315315315,
+          "3": 0.09947249434815374,
+          "4": 0.09363295880149813
+        }
+      }
+    },
+    "canonical_w20": {
+      "content_only": {
+        "recall": {
+          "n": 4,
+          "mean": 0.14107638490243515,
+          "median": 0.11712562811946856,
+          "sd": 0.0669995767170806,
+          "min": 0.09370424597364568,
+          "max": 0.23635003739715782
+        },
+        "residency": {
+          "n": 4,
+          "mean": 0.19169717511487133,
+          "median": 0.1912562165045406,
+          "sd": 0.1793390939716886,
+          "min": 0.0,
+          "max": 0.3842762674504041
+        },
+        "recall_given_resident": {
+          "n": 3,
+          "mean": 0.36869318125992007,
+          "median": 0.4406779661016949,
+          "sd": 0.2823086056578009,
+          "min": 0.05736137667304015,
+          "max": 0.6080402010050251
+        },
+        "all_token_ce": {
+          "n": 4,
+          "mean": 0.7474293646713097,
+          "median": 0.744662915666898,
+          "sd": 0.05010031889711978,
+          "min": 0.6898260513941447,
+          "max": 0.8105655759572983
+        },
+        "recall_token_ce": {
+          "n": 4,
+          "mean": 2.2999976923068366,
+          "median": 2.298221041758855,
+          "sd": 0.07037070699620787,
+          "min": 2.2182913025220237,
+          "max": 2.385257383187612
+        },
+        "per_seed_recall": {
+          "1": 0.09478324761204997,
+          "2": 0.13946800862688713,
+          "3": 0.09370424597364568,
+          "4": 0.23635003739715782
+        }
+      }
+    },
+    "canonical_w24": {
+      "content_only": {
+        "recall": {
+          "n": 5,
+          "mean": 0.2060184225955827,
+          "median": 0.12243401759530792,
+          "sd": 0.19471934541256616,
+          "min": 0.09224011713030747,
+          "max": 0.550817341862118
+        },
+        "residency": {
+          "n": 5,
+          "mean": 0.16809944696815624,
+          "median": 0.09663250366032211,
+          "sd": 0.22481703465670752,
+          "min": 0.0,
+          "max": 0.5479744136460555
+        },
+        "recall_given_resident": {
+          "n": 4,
+          "mean": 0.4243021459733522,
+          "median": 0.39724242424242423,
+          "sd": 0.44305611515950605,
+          "min": 0.0,
+          "max": 0.9027237354085603
+        },
+        "all_token_ce": {
+          "n": 5,
+          "mean": 0.9079491406679153,
+          "median": 0.7535603145758311,
+          "sd": 0.23324474619826638,
+          "min": 0.73873237768809,
+          "max": 1.2586740950743358
+        },
+        "recall_token_ce": {
+          "n": 5,
+          "mean": 2.1625028689702352,
+          "median": 2.331133762995402,
+          "sd": 0.3938592877483786,
+          "min": 1.4593552748362224,
+          "max": 2.3770578106244407
+        },
+        "per_seed_recall": {
+          "0": 0.12243401759530792,
+          "1": 0.09224011713030747,
+          "2": 0.550817341862118,
+          "3": 0.16372980910425844,
+          "4": 0.10087082728592163
+        }
+      }
+    },
+    "canonical_w32": {
+      "content_only": {
+        "recall": {
+          "n": 5,
+          "mean": 0.13707284295742334,
+          "median": 0.10533910533910534,
+          "sd": 0.0810630805947009,
+          "min": 0.08761766835626358,
+          "max": 0.2809734513274336
+        },
+        "residency": {
+          "n": 5,
+          "mean": 0.06523479461865057,
+          "median": 0.0,
+          "sd": 0.13218679855738116,
+          "min": 0.0,
+          "max": 0.3008849557522124
+        },
+        "recall_given_resident": {
+          "n": 2,
+          "mean": 0.3839635854341737,
+          "median": 0.3839635854341737,
+          "sd": 0.46219430641423215,
+          "min": 0.05714285714285714,
+          "max": 0.7107843137254902
+        },
+        "all_token_ce": {
+          "n": 5,
+          "mean": 0.9655914654334387,
+          "median": 0.8821817139784495,
+          "sd": 0.12029510904424513,
+          "min": 0.8767610092957815,
+          "max": 1.1274906794230144
+        },
+        "recall_token_ce": {
+          "n": 5,
+          "mean": 2.3164576013882954,
+          "median": 2.308555543422699,
+          "sd": 0.025463756276258222,
+          "min": 2.2915660540262857,
+          "max": 2.3588770627975464
+        },
+        "per_seed_recall": {
+          "0": 0.08761766835626358,
+          "1": 0.11461318051575932,
+          "2": 0.2809734513274336,
+          "3": 0.0968208092485549,
+          "4": 0.10533910533910534
+        }
+      }
+    },
+    "canonical_w8": {
+      "content_only": {
+        "recall": {
+          "n": 3,
+          "mean": 0.6830960055647307,
+          "median": 0.9494640122511485,
+          "sd": 0.504344537612133,
+          "min": 0.10141509433962265,
+          "max": 0.9984089101034208
+        },
+        "residency": {
+          "n": 3,
+          "mean": 0.6441962782791051,
+          "median": 0.9333843797856048,
+          "sd": 0.5588601831303573,
+          "min": 0.0,
+          "max": 0.9992044550517104
+        },
+        "recall_given_resident": {
+          "n": 2,
+          "mean": 0.9983713940109623,
+          "median": 0.9983713940109623,
+          "sd": 0.001177230465378621,
+          "min": 0.9975389663658737,
+          "max": 0.9992038216560509
+        },
+        "all_token_ce": {
+          "n": 3,
+          "mean": 0.37472711089584565,
+          "median": 0.38034924616416294,
+          "sd": 0.018953146476094355,
+          "min": 0.3535989622275035,
+          "max": 0.3902331242958705
+        },
+        "recall_token_ce": {
+          "n": 3,
+          "mean": 0.8493938646408625,
+          "median": 0.21823331279059252,
+          "sd": 1.2774840359326716,
+          "min": 0.010334486646267274,
+          "max": 2.319613794485728
+        },
+        "per_seed_recall": {
+          "0": 0.9494640122511485,
+          "1": 0.10141509433962265,
+          "4": 0.9984089101034208
+        }
+      }
+    }
+  },
+  "controller": {
+    "canonical_w16": {
+      "content_only_w16_pressure_seed1": {
+        "write_gate_at_binding": 0.057849468663334846,
+        "write_gate_elsewhere": 0.06446498849175193,
+        "write_selectivity": -0.006615519828417085,
+        "mean_occupied_slots": 7.132778234649122,
+        "eviction_decisions": 0
+      },
+      "content_only_w16_pressure_seed2": {
+        "write_gate_at_binding": 0.501261313756307,
+        "write_gate_elsewhere": 0.04540651675426599,
+        "write_selectivity": 0.455854797002041,
+        "mean_occupied_slots": 6.6843818530701755,
+        "eviction_decisions": 342
+      },
+      "content_only_w16_pressure_seed3": {
+        "write_gate_at_binding": 0.04749910471340021,
+        "write_gate_elsewhere": 0.10434076352552935,
+        "write_selectivity": -0.05684165881212914,
+        "mean_occupied_slots": 6.795298793859649,
+        "eviction_decisions": 0
+      },
+      "content_only_w16_pressure_seed4": {
+        "write_gate_at_binding": 0.03792406835903724,
+        "write_gate_elsewhere": 0.3139647454926462,
+        "write_selectivity": -0.27604067713360897,
+        "mean_occupied_slots": 6.68273711622807,
+        "eviction_decisions": 0
+      }
+    },
+    "canonical_w20": {
+      "content_only_w20_pressure_seed1": {
+        "write_gate_at_binding": 0.6316499471664428,
+        "write_gate_elsewhere": 0.6202108925635662,
+        "write_selectivity": 0.011439054602876642,
+        "mean_occupied_slots": 7.524659630847953,
+        "eviction_decisions": 1911
+      },
+      "content_only_w20_pressure_seed2": {
+        "write_gate_at_binding": 0.32099461754163106,
+        "write_gate_elsewhere": 0.3342399538839264,
+        "write_selectivity": -0.013245336342295355,
+        "mean_occupied_slots": 7.783956962719298,
+        "eviction_decisions": 242
+      },
+      "content_only_w20_pressure_seed3": {
+        "write_gate_at_binding": 0.09528553982575734,
+        "write_gate_elsewhere": 0.19100738811201276,
+        "write_selectivity": -0.09572184828625542,
+        "mean_occupied_slots": 7.058251096491228,
+        "eviction_decisions": 0
+      },
+      "content_only_w20_pressure_seed4": {
+        "write_gate_at_binding": 0.7638898571332295,
+        "write_gate_elsewhere": 0.05408176187346105,
+        "write_selectivity": 0.7098080952597685,
+        "mean_occupied_slots": 7.38562225877193,
+        "eviction_decisions": 3140
+      }
+    },
+    "canonical_w24": {
+      "content_only_w24_pressure_seed0": {
+        "write_gate_at_binding": 0.016720334792302713,
+        "write_gate_elsewhere": 0.0336545976223769,
+        "write_selectivity": -0.01693426283007419,
+        "mean_occupied_slots": 6.269062956871345,
+        "eviction_decisions": 0
+      },
+      "content_only_w24_pressure_seed1": {
+        "write_gate_at_binding": 0.5974849495622847,
+        "write_gate_elsewhere": 0.8181843286679115,
+        "write_selectivity": -0.22069937910562676,
+        "mean_occupied_slots": 7.8708310489766085,
+        "eviction_decisions": 6892
+      },
+      "content_only_w24_pressure_seed2": {
+        "write_gate_at_binding": 0.2998162938488854,
+        "write_gate_elsewhere": 0.019394813496389506,
+        "write_selectivity": 0.2804214803524959,
+        "mean_occupied_slots": 6.3296669407894735,
+        "eviction_decisions": 140
+      },
+      "content_only_w24_pressure_seed3": {
+        "write_gate_at_binding": 0.8897520038816664,
+        "write_gate_elsewhere": 0.11708643406997492,
+        "write_selectivity": 0.7726655698116915,
+        "mean_occupied_slots": 7.796772203947368,
+        "eviction_decisions": 9221
+      },
+      "content_only_w24_pressure_seed4": {
+        "write_gate_at_binding": 0.046243996255927615,
+        "write_gate_elsewhere": 0.548428229343744,
+        "write_selectivity": -0.5021842330878165,
+        "mean_occupied_slots": 7.6088381761695905,
+        "eviction_decisions": 338
+      }
+    },
+    "canonical_w32": {
+      "content_only_w32_pressure_seed0": {
+        "write_gate_at_binding": 0.031799399914840855,
+        "write_gate_elsewhere": 0.05860509062713047,
+        "write_selectivity": -0.026805690712289616,
+        "mean_occupied_slots": 6.498378106725146,
+        "eviction_decisions": 0
+      },
+      "content_only_w32_pressure_seed1": {
+        "write_gate_at_binding": 0.020485760333637398,
+        "write_gate_elsewhere": 0.06540640232697972,
+        "write_selectivity": -0.04492064199334232,
+        "mean_occupied_slots": 5.772763614766082,
+        "eviction_decisions": 0
+      },
+      "content_only_w32_pressure_seed2": {
+        "write_gate_at_binding": 0.6084807068109512,
+        "write_gate_elsewhere": 0.01907103972614936,
+        "write_selectivity": 0.5894096670848019,
+        "mean_occupied_slots": 7.213975694444445,
+        "eviction_decisions": 2645
+      },
+      "content_only_w32_pressure_seed3": {
+        "write_gate_at_binding": 0.12816389525930086,
+        "write_gate_elsewhere": 0.7526035488776441,
+        "write_selectivity": -0.6244396536183433,
+        "mean_occupied_slots": 7.793277138157895,
+        "eviction_decisions": 4668
+      },
+      "content_only_w32_pressure_seed4": {
+        "write_gate_at_binding": 0.03650773409754038,
+        "write_gate_elsewhere": 0.344191830113249,
+        "write_selectivity": -0.3076840960157086,
+        "mean_occupied_slots": 7.2708447551169595,
+        "eviction_decisions": 0
+      }
+    },
+    "canonical_w8": {
+      "content_only_w8_pressure_seed0": {
+        "write_gate_at_binding": 0.9355554580688477,
+        "write_gate_elsewhere": 0.005418597853609494,
+        "write_selectivity": 0.9301368602152381,
+        "mean_occupied_slots": 6.327405427631579,
+        "eviction_decisions": 63
+      },
+      "content_only_w8_pressure_seed1": {
+        "write_gate_at_binding": 0.015354477101936936,
+        "write_gate_elsewhere": 0.02843637711235455,
+        "write_selectivity": -0.013081900010417615,
+        "mean_occupied_slots": 5.775242141812866,
+        "eviction_decisions": 0
+      },
+      "content_only_w8_pressure_seed4": {
+        "write_gate_at_binding": 0.9973083188136419,
+        "write_gate_elsewhere": 0.013877081551722117,
+        "write_selectivity": 0.9834312372619198,
+        "mean_occupied_slots": 6.242804276315789,
+        "eviction_decisions": 2
+      }
+    }
+  }
+}

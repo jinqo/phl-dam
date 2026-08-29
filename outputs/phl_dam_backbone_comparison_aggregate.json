@@ -1,0 +1,95 @@
+{
+  "experiment": "PHL+DAM vs DAM-only vs fast-weight/delta",
+  "protocol": {
+    "seeds": [0, 1, 2],
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "bindings": 3,
+    "possible_values": 10,
+    "possible_keys": 32,
+    "sequence_length": 176,
+    "delay_range": [29, 169],
+    "objective": "all-token next-token CE + marked recall-token CE + 0.05 position-agnostic write-budget penalty",
+    "success_threshold": 0.20,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false
+  },
+  "models": {
+    "phl_dam": {
+      "active_parameters": 33034,
+      "recurrent_state_floats_per_sequence": 456,
+      "seed_recall": [0.864, 0.996166666666667, 0.997166666666667],
+      "successful_seeds": 3,
+      "mean_recall_accuracy": 0.952444444444445,
+      "sample_sd_recall": 0.0765967676525244,
+      "min_recall_accuracy": 0.864,
+      "mean_retrieval_disabled_accuracy": 0.102277777777778,
+      "mean_all_token_ce": 0.235309418559074,
+      "mean_recall_token_ce": 0.136611089277392,
+      "mean_distance_accuracy": {
+        "29-63": 0.949666666666667,
+        "64-95": 0.953666666666667,
+        "96-169": 0.954
+      },
+      "all_runs_finite": true
+    },
+    "dam_only": {
+      "active_parameters": 24778,
+      "recurrent_state_floats_per_sequence": 392,
+      "seed_recall": [0.998333333333333, 0.106, 0.999166666666667],
+      "successful_seeds": 2,
+      "mean_recall_accuracy": 0.701166666666667,
+      "sample_sd_recall": 0.515429621233049,
+      "min_recall_accuracy": 0.106,
+      "mean_retrieval_disabled_accuracy": 0.103,
+      "mean_all_token_ce": 0.261152619202932,
+      "mean_recall_token_ce": 0.77895549666509,
+      "mean_address_top1_accuracy": 0.7675,
+      "mean_distance_accuracy": {
+        "29-63": 0.699166666666667,
+        "64-95": 0.700166666666667,
+        "96-169": 0.704166666666667
+      },
+      "all_runs_finite": true
+    },
+    "fast_weight_delta": {
+      "active_parameters": 24779,
+      "recurrent_state_floats_per_sequence": 576,
+      "seed_recall": [1.0, 0.999666666666667, 0.103333333333333],
+      "successful_seeds": 2,
+      "mean_recall_accuracy": 0.701,
+      "sample_sd_recall": 0.517594543162031,
+      "min_recall_accuracy": 0.103333333333333,
+      "mean_retrieval_disabled_accuracy": 0.101611111111111,
+      "mean_all_token_ce": 0.249970839460691,
+      "mean_recall_token_ce": 0.779254061793909,
+      "mean_learned_retention": 0.999918937683105,
+      "mean_distance_accuracy": {
+        "29-63": 0.701333333333333,
+        "64-95": 0.697666666666667,
+        "96-169": 0.704
+      },
+      "all_runs_finite": true
+    }
+  },
+  "comparisons": {
+    "phl_dam_minus_dam_only_mean_recall_percentage_points": 25.1277777777778,
+    "phl_dam_minus_fast_weight_mean_recall_percentage_points": 25.1444444444445,
+    "phl_dam_minus_dam_only_all_token_ce_nats": -0.025843200643858,
+    "phl_dam_minus_fast_weight_all_token_ce_nats": -0.014661420901617,
+    "dam_only_state_reduction_vs_phl_dam": 0.140350877192982,
+    "fast_weight_state_increase_vs_phl_dam": 0.263157894736842,
+    "phl_dam_parameter_increase_vs_dam_only": 0.33319880539188
+  },
+  "verdict": {
+    "best_mean_recall": "phl_dam",
+    "best_seed_success_rate": "phl_dam",
+    "best_mean_all_token_ce": "phl_dam",
+    "smallest_recurrent_state": "dam_only",
+    "phl_contribution_status": "possible optimization-robustness benefit; not isolated from extra parameters",
+    "fast_weight_status": "matches DAM-only mean recall with one failed seed and larger recurrent state"
+  }
+}

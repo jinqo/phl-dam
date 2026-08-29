@@ -1,0 +1,96 @@
+{
+  "experiment": "PHL-DAM Stage C — Three-Seed Content-Only Screen",
+  "configuration": {
+    "seeds": [0, 1, 2],
+    "bindings": 3,
+    "possible_values": 10,
+    "possible_keys": 32,
+    "slots": 8,
+    "d_model": 64,
+    "horizons": 4,
+    "horizon_width": 16,
+    "d_key": 24,
+    "d_value": 24,
+    "sequence_length": 176,
+    "delay_range": [29, 169],
+    "oracle_controller_labels": false,
+    "oracle_slot_allocation": false,
+    "hard_allocation": false,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false,
+    "objective": "all-token next-token CE + marked recall-token CE + 0.05 position-agnostic write-budget penalty",
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "learning_rate": 0.002
+  },
+  "gates": {
+    "mean_recall_at_least_0_30": true,
+    "every_seed_recall_above_0_15": true,
+    "all_runs_finite": true,
+    "passed": true
+  },
+  "aggregate": {
+    "mean_recall_accuracy": 0.952444444444445,
+    "min_recall_accuracy": 0.864,
+    "max_recall_accuracy": 0.997166666666667,
+    "mean_retrieval_disabled_accuracy": 0.102277777777778,
+    "mean_retrieval_gain_percentage_points": 85.0166666666667,
+    "mean_address_top1_accuracy": 0.971777777777778,
+    "mean_all_token_ce": 0.235309418559075,
+    "mean_recall_token_ce": 0.136611089277392,
+    "mean_distance_accuracy": {
+      "29-63": 0.949666666666667,
+      "64-95": 0.953666666666667,
+      "96-169": 0.954
+    },
+    "total_eval_episodes": 6000,
+    "total_eval_queries": 18000
+  },
+  "seeds": [
+    {
+      "seed": 0,
+      "recall_accuracy": 0.864,
+      "retrieval_disabled_accuracy": 0.101833333333333,
+      "address_top1_accuracy": 0.924666666666667,
+      "all_token_ce": 0.24739757168293,
+      "recall_token_ce": 0.374784877181053,
+      "distance_accuracy": {
+        "29-63": 0.857,
+        "64-95": 0.869,
+        "96-169": 0.866
+      },
+      "finite": true
+    },
+    {
+      "seed": 1,
+      "recall_accuracy": 0.996166666666667,
+      "retrieval_disabled_accuracy": 0.102,
+      "address_top1_accuracy": 0.991,
+      "all_token_ce": 0.229544594526291,
+      "recall_token_ce": 0.0196161149330437,
+      "distance_accuracy": {
+        "29-63": 0.9965,
+        "64-95": 0.994,
+        "96-169": 0.998
+      },
+      "finite": true
+    },
+    {
+      "seed": 2,
+      "recall_accuracy": 0.997166666666667,
+      "retrieval_disabled_accuracy": 0.103,
+      "address_top1_accuracy": 0.999666666666667,
+      "all_token_ce": 0.228986089468002,
+      "recall_token_ce": 0.015432275718078,
+      "distance_accuracy": {
+        "29-63": 0.9955,
+        "64-95": 0.998,
+        "96-169": 0.998
+      },
+      "finite": true
+    }
+  ]
+}

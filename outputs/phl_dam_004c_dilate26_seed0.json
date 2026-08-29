@@ -1,0 +1,2546 @@
+{
+  "experiment": "PHL-DAM-004B - Learned temporal lease under memory pressure",
+  "model": "content_only",
+  "configuration": {
+    "scale": "dilate26",
+    "seed": 0,
+    "trained_arm": "content_only",
+    "slots": 8,
+    "d_model": 64,
+    "horizons": 4,
+    "horizon_width": 16,
+    "d_key": 24,
+    "d_value": 24,
+    "lease_bins": [
+      "due",
+      "near",
+      "short",
+      "medium",
+      "far",
+      "never"
+    ],
+    "lease_state_present": false,
+    "lease_transported_through_phl_horizons": false,
+    "phl_enabled": true,
+    "promotion": false,
+    "read_to_write_feedback": false,
+    "hard_allocation": true,
+    "straight_through_eviction": true,
+    "eviction_temperature": 0.5,
+    "write_budget_weight": 0.0,
+    "timing_supervision_weight": 0.0,
+    "timing_supervision_equal_across_arms": true,
+    "lease_bin_edges": [
+      [
+        0,
+        74
+      ],
+      [
+        75,
+        114
+      ],
+      [
+        117,
+        161
+      ],
+      [
+        164,
+        213
+      ],
+      [
+        216,
+        270
+      ]
+    ],
+    "objective": "all-token next-token CE + marked recall-token CE",
+    "future_use_labels_to_learned_arms": false,
+    "future_use_labels_at_evaluation": false,
+    "oracle_uses_generator_truth": true,
+    "sequence_length": 451,
+    "delay_range": [
+      75,
+      270
+    ],
+    "training_pressure_levels": [
+      8,
+      12,
+      16
+    ],
+    "training_query_condition": "canonical",
+    "training_steps": 800,
+    "batch_size": 16,
+    "eval_episodes_per_setting": 256,
+    "eval_settings": [
+      [
+        "canonical",
+        8
+      ],
+      [
+        "canonical",
+        12
+      ],
+      [
+        "canonical",
+        16
+      ],
+      [
+        "spec",
+        12
+      ]
+    ],
+    "learning_rate": 0.002,
+    "optimizer": "AdamW(weight_decay=1e-4)",
+    "tag_primary_probability": 0.65,
+    "residency_write_threshold": 0.5,
+    "access_read_threshold": 0.5
+  },
+  "accounting": {
+    "total_parameters": 38641,
+    "eviction_policy_parameters": 447,
+    "content_parameters": 38194,
+    "recurrent_state_floats": 496
+  },
+  "metrics": {
+    "canonical_w8": {
+      "random": {
+        "arm": "random",
+        "writes": 8,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 1499,
+        "recall": 0.628418945963976,
+        "residency": 0.6210807204803203,
+        "recall_given_resident": 0.9366272824919442,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.4029260203242302,
+        "recall_token_ce": 1.373056061565876,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.6366906474820144,
+            "queries": 556
+          },
+          "medium": {
+            "recall": 0.6430317848410758,
+            "queries": 409
+          },
+          "short": {
+            "recall": 0.6086142322097379,
+            "queries": 534
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.6624068157614483,
+            "queries": 939
+          },
+          "5-8": {
+            "recall": 0.5714285714285714,
+            "queries": 560
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.6040688575899843,
+            "queries": 1278
+          },
+          "repeat-use": {
+            "recall": 0.7692307692307693,
+            "queries": 221
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.628418945963976,
+            "queries": 1499
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.12323943661971831,
+            "queries": 568
+          },
+          "resident": {
+            "recall": 0.9366272824919442,
+            "queries": 931
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.6210807204803203,
+            "queries": 1499
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.625,
+            "queries": 56
+          }
+        },
+        "eviction": {
+          "decisions": 3,
+          "fraction_future_needed_evicted": 0.3333333333333333,
+          "fraction_dead_evicted": 0.6666666666666666,
+          "wrong_protection_rate": 0.3333333333333333,
+          "protection_decisions": 3,
+          "contrast_decisions": 2,
+          "contrast_correct_rate": 0.5,
+          "mean_normalised_rank_of_soonest_needed": 0.21428571428571427,
+          "score_auroc_future_needed_vs_never": 0.5368421052631579
+        },
+        "controller": {
+          "mean_occupied_slots": 6.791045939578714,
+          "mean_write_gate_at_binding": 0.6214739941060543,
+          "mean_write_gate_elsewhere": 0.03292568556073019
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "fifo": {
+        "arm": "fifo",
+        "writes": 8,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 1499,
+        "recall": 0.2801867911941294,
+        "residency": 0.5830553702468312,
+        "recall_given_resident": 0.38215102974828374,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.3967028707265854,
+        "recall_token_ce": 2.0732363164424896,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.2823741007194245,
+            "queries": 556
+          },
+          "medium": {
+            "recall": 0.3105134474327628,
+            "queries": 409
+          },
+          "short": {
+            "recall": 0.2546816479400749,
+            "queries": 534
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.31203407880724177,
+            "queries": 939
+          },
+          "5-8": {
+            "recall": 0.22678571428571428,
+            "queries": 560
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.24569640062597808,
+            "queries": 1278
+          },
+          "repeat-use": {
+            "recall": 0.4796380090497738,
+            "queries": 221
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.2801867911941294,
+            "queries": 1499
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.1376,
+            "queries": 625
+          },
+          "resident": {
+            "recall": 0.38215102974828374,
+            "queries": 874
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5830553702468312,
+            "queries": 1499
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.2857142857142857,
+            "queries": 56
+          }
+        },
+        "eviction": {
+          "decisions": 212,
+          "fraction_future_needed_evicted": 0.1320754716981132,
+          "fraction_dead_evicted": 0.8679245283018868,
+          "wrong_protection_rate": 0.1320754716981132,
+          "protection_decisions": 212,
+          "contrast_decisions": 148,
+          "contrast_correct_rate": 0.8108108108108109,
+          "mean_normalised_rank_of_soonest_needed": 0.45077220077220065,
+          "score_auroc_future_needed_vs_never": 0.5342237097587401
+        },
+        "controller": {
+          "mean_occupied_slots": 6.637714800443459,
+          "mean_write_gate_at_binding": 0.6214739941060543,
+          "mean_write_gate_elsewhere": 0.03292568556073019
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "lru": {
+        "arm": "lru",
+        "writes": 8,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 1499,
+        "recall": 0.5310206804536357,
+        "residency": 0.5737158105403602,
+        "recall_given_resident": 0.8232558139534883,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.3983135186135769,
+        "recall_token_ce": 1.6418730318546295,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.5089928057553957,
+            "queries": 556
+          },
+          "medium": {
+            "recall": 0.5452322738386308,
+            "queries": 409
+          },
+          "short": {
+            "recall": 0.5430711610486891,
+            "queries": 534
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.6017039403620873,
+            "queries": 939
+          },
+          "5-8": {
+            "recall": 0.4125,
+            "queries": 560
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.5,
+            "queries": 1278
+          },
+          "repeat-use": {
+            "recall": 0.7104072398190046,
+            "queries": 221
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5310206804536357,
+            "queries": 1499
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.13771517996870108,
+            "queries": 639
+          },
+          "resident": {
+            "recall": 0.8232558139534883,
+            "queries": 860
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5737158105403602,
+            "queries": 1499
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.44642857142857145,
+            "queries": 56
+          }
+        },
+        "eviction": {
+          "decisions": 21,
+          "fraction_future_needed_evicted": 0.23809523809523808,
+          "fraction_dead_evicted": 0.7619047619047619,
+          "wrong_protection_rate": 0.23809523809523808,
+          "protection_decisions": 21,
+          "contrast_decisions": 18,
+          "contrast_correct_rate": 0.7222222222222222,
+          "mean_normalised_rank_of_soonest_needed": 0.4841269841269841,
+          "score_auroc_future_needed_vs_never": 0.4766214177978884
+        },
+        "controller": {
+          "mean_occupied_slots": 6.626030695676275,
+          "mean_write_gate_at_binding": 0.6214739941060543,
+          "mean_write_gate_elsewhere": 0.03292568556073019
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "oracle": {
+        "arm": "oracle",
+        "writes": 8,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 1499,
+        "recall": 0.2494996664442962,
+        "residency": 0.7211474316210807,
+        "recall_given_resident": 0.3108233117483811,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.3981409762054682,
+        "recall_token_ce": 2.1553530246019363,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.2697841726618705,
+            "queries": 556
+          },
+          "medium": {
+            "recall": 0.2665036674816626,
+            "queries": 409
+          },
+          "short": {
+            "recall": 0.2153558052434457,
+            "queries": 534
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.24920127795527156,
+            "queries": 939
+          },
+          "5-8": {
+            "recall": 0.25,
+            "queries": 560
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.21752738654147105,
+            "queries": 1278
+          },
+          "repeat-use": {
+            "recall": 0.4343891402714932,
+            "queries": 221
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.2494996664442962,
+            "queries": 1499
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.09090909090909091,
+            "queries": 418
+          },
+          "resident": {
+            "recall": 0.3108233117483811,
+            "queries": 1081
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.7211474316210807,
+            "queries": 1499
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.26785714285714285,
+            "queries": 56
+          }
+        },
+        "eviction": {
+          "decisions": 13,
+          "fraction_future_needed_evicted": 0.0,
+          "fraction_dead_evicted": 1.0,
+          "wrong_protection_rate": 0.0,
+          "protection_decisions": 13,
+          "contrast_decisions": 11,
+          "contrast_correct_rate": 1.0,
+          "mean_normalised_rank_of_soonest_needed": 0.9350649350649349,
+          "score_auroc_future_needed_vs_never": 1.0
+        },
+        "controller": {
+          "mean_occupied_slots": 6.485960019401331,
+          "mean_write_gate_at_binding": 0.6214739941060543,
+          "mean_write_gate_elsewhere": 0.03292568556073019
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "content_only": {
+        "arm": "content_only",
+        "writes": 8,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 1499,
+        "recall": 0.5316877918612408,
+        "residency": 0.5390260173448966,
+        "recall_given_resident": 0.8824257425742574,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.4013991914689541,
+        "recall_token_ce": 1.5711092129349709,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.5161870503597122,
+            "queries": 556
+          },
+          "medium": {
+            "recall": 0.5599022004889975,
+            "queries": 409
+          },
+          "short": {
+            "recall": 0.5262172284644194,
+            "queries": 534
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.6347177848775293,
+            "queries": 939
+          },
+          "5-8": {
+            "recall": 0.35892857142857143,
+            "queries": 560
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.5023474178403756,
+            "queries": 1278
+          },
+          "repeat-use": {
+            "recall": 0.7013574660633484,
+            "queries": 221
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5316877918612408,
+            "queries": 1499
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.12156295224312591,
+            "queries": 691
+          },
+          "resident": {
+            "recall": 0.8824257425742574,
+            "queries": 808
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5390260173448966,
+            "queries": 1499
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.30357142857142855,
+            "queries": 56
+          }
+        },
+        "eviction": {
+          "decisions": 3,
+          "fraction_future_needed_evicted": 0.0,
+          "fraction_dead_evicted": 1.0,
+          "wrong_protection_rate": 0.0,
+          "protection_decisions": 3,
+          "contrast_decisions": 3,
+          "contrast_correct_rate": 1.0,
+          "mean_normalised_rank_of_soonest_needed": 0.23809523809523805,
+          "score_auroc_future_needed_vs_never": 0.29411764705882354
+        },
+        "controller": {
+          "mean_occupied_slots": 6.8137385670731705,
+          "mean_write_gate_at_binding": 0.6214739941060543,
+          "mean_write_gate_elsewhere": 0.03292568556073019
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": 0.1279296875,
+          "live_vs_never_auroc": 0.5647940884887426,
+          "labelled_writes": 2048,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      }
+    },
+    "canonical_w12": {
+      "random": {
+        "arm": "random",
+        "writes": 12,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 2297,
+        "recall": 0.5084893339138006,
+        "residency": 0.4884632128863735,
+        "recall_given_resident": 0.8975044563279857,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5977770388126373,
+        "recall_token_ce": 1.6647410839796066,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.47423887587822017,
+            "queries": 854
+          },
+          "medium": {
+            "recall": 0.5232198142414861,
+            "queries": 646
+          },
+          "short": {
+            "recall": 0.533249686323714,
+            "queries": 797
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.5582417582417583,
+            "queries": 910
+          },
+          "5-8": {
+            "recall": 0.4785202863961814,
+            "queries": 838
+          },
+          "9-16": {
+            "recall": 0.47176684881602915,
+            "queries": 549
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.47917737789203085,
+            "queries": 1945
+          },
+          "repeat-use": {
+            "recall": 0.6704545454545454,
+            "queries": 352
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5373263888888888,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.4794759825327511,
+            "queries": 1145
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.13702127659574467,
+            "queries": 1175
+          },
+          "resident": {
+            "recall": 0.8975044563279857,
+            "queries": 1122
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5138888888888888,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.462882096069869,
+            "queries": 1145
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.6451612903225806,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 117,
+          "fraction_future_needed_evicted": 0.3418803418803419,
+          "fraction_dead_evicted": 0.6581196581196581,
+          "wrong_protection_rate": 0.3418803418803419,
+          "protection_decisions": 117,
+          "contrast_decisions": 102,
+          "contrast_correct_rate": 0.6078431372549019,
+          "mean_normalised_rank_of_soonest_needed": 0.5042016806722688,
+          "score_auroc_future_needed_vs_never": 0.5019837847162325
+        },
+        "controller": {
+          "mean_occupied_slots": 7.154240576496674,
+          "mean_write_gate_at_binding": 0.6205836534500122,
+          "mean_write_gate_elsewhere": 0.04056494735639568
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "fifo": {
+        "arm": "fifo",
+        "writes": 12,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 2297,
+        "recall": 0.2868959512407488,
+        "residency": 0.45407052677405313,
+        "recall_given_resident": 0.49089165867689355,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5794565416872501,
+        "recall_token_ce": 2.085509814321995,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.2927400468384075,
+            "queries": 854
+          },
+          "medium": {
+            "recall": 0.30030959752321984,
+            "queries": 646
+          },
+          "short": {
+            "recall": 0.2697616060225847,
+            "queries": 797
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.3934065934065934,
+            "queries": 910
+          },
+          "5-8": {
+            "recall": 0.22673031026252982,
+            "queries": 838
+          },
+          "9-16": {
+            "recall": 0.20218579234972678,
+            "queries": 549
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.2416452442159383,
+            "queries": 1945
+          },
+          "repeat-use": {
+            "recall": 0.5369318181818182,
+            "queries": 352
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.3038194444444444,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.2698689956331878,
+            "queries": 1145
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.11722488038277512,
+            "queries": 1254
+          },
+          "resident": {
+            "recall": 0.49089165867689355,
+            "queries": 1043
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4817708333333333,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.4262008733624454,
+            "queries": 1145
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.20967741935483872,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 1028,
+          "fraction_future_needed_evicted": 0.35116731517509725,
+          "fraction_dead_evicted": 0.6488326848249028,
+          "wrong_protection_rate": 0.346078431372549,
+          "protection_decisions": 1020,
+          "contrast_decisions": 853,
+          "contrast_correct_rate": 0.5861664712778429,
+          "mean_normalised_rank_of_soonest_needed": 0.41032022565123655,
+          "score_auroc_future_needed_vs_never": 0.4720082222928992
+        },
+        "controller": {
+          "mean_occupied_slots": 7.0070762888026605,
+          "mean_write_gate_at_binding": 0.6205836534500122,
+          "mean_write_gate_elsewhere": 0.04056494735639568
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "lru": {
+        "arm": "lru",
+        "writes": 12,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 2297,
+        "recall": 0.4262080975185024,
+        "residency": 0.44318676534610363,
+        "recall_given_resident": 0.8035363457760314,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5874129272997379,
+        "recall_token_ce": 1.8477022722363472,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.41217798594847777,
+            "queries": 854
+          },
+          "medium": {
+            "recall": 0.42569659442724456,
+            "queries": 646
+          },
+          "short": {
+            "recall": 0.44165621079046424,
+            "queries": 797
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.512087912087912,
+            "queries": 910
+          },
+          "5-8": {
+            "recall": 0.39856801909307876,
+            "queries": 838
+          },
+          "9-16": {
+            "recall": 0.32604735883424407,
+            "queries": 549
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.38046272493573263,
+            "queries": 1945
+          },
+          "repeat-use": {
+            "recall": 0.6789772727272727,
+            "queries": 352
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4661458333333333,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.3860262008733624,
+            "queries": 1145
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.12587959343236904,
+            "queries": 1279
+          },
+          "resident": {
+            "recall": 0.8035363457760314,
+            "queries": 1018
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4826388888888889,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.4034934497816594,
+            "queries": 1145
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3548387096774194,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 185,
+          "fraction_future_needed_evicted": 0.4756756756756757,
+          "fraction_dead_evicted": 0.5243243243243243,
+          "wrong_protection_rate": 0.47282608695652173,
+          "protection_decisions": 184,
+          "contrast_decisions": 156,
+          "contrast_correct_rate": 0.4423076923076923,
+          "mean_normalised_rank_of_soonest_needed": 0.35668789808917195,
+          "score_auroc_future_needed_vs_never": 0.37217541832692885
+        },
+        "controller": {
+          "mean_occupied_slots": 7.000511017184036,
+          "mean_write_gate_at_binding": 0.6205836534500122,
+          "mean_write_gate_elsewhere": 0.04056494735639568
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "oracle": {
+        "arm": "oracle",
+        "writes": 12,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 2297,
+        "recall": 0.2886373530692207,
+        "residency": 0.6983021332172399,
+        "recall_given_resident": 0.38840399002493764,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5735558681190014,
+        "recall_token_ce": 2.0973529294133186,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.3044496487119438,
+            "queries": 854
+          },
+          "medium": {
+            "recall": 0.3157894736842105,
+            "queries": 646
+          },
+          "short": {
+            "recall": 0.24968632371392724,
+            "queries": 797
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.3395604395604396,
+            "queries": 910
+          },
+          "5-8": {
+            "recall": 0.2398568019093079,
+            "queries": 838
+          },
+          "9-16": {
+            "recall": 0.2786885245901639,
+            "queries": 549
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.24627249357326478,
+            "queries": 1945
+          },
+          "repeat-use": {
+            "recall": 0.5227272727272727,
+            "queries": 352
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.2821180555555556,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.29519650655021834,
+            "queries": 1145
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.05772005772005772,
+            "queries": 693
+          },
+          "resident": {
+            "recall": 0.38840399002493764,
+            "queries": 1604
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.71875,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.6777292576419214,
+            "queries": 1145
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3709677419354839,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 537,
+          "fraction_future_needed_evicted": 0.10986964618249534,
+          "fraction_dead_evicted": 0.8901303538175046,
+          "wrong_protection_rate": 0.0020876826722338203,
+          "protection_decisions": 479,
+          "contrast_decisions": 437,
+          "contrast_correct_rate": 0.9977116704805492,
+          "mean_normalised_rank_of_soonest_needed": 0.9780663780663768,
+          "score_auroc_future_needed_vs_never": 0.9472671772290788
+        },
+        "controller": {
+          "mean_occupied_slots": 6.893552522172949,
+          "mean_write_gate_at_binding": 0.6205836534500122,
+          "mean_write_gate_elsewhere": 0.04056494735639568
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "content_only": {
+        "arm": "content_only",
+        "writes": 12,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 2297,
+        "recall": 0.4453635176316935,
+        "residency": 0.4305616020896822,
+        "recall_given_resident": 0.884732052578362,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.595075361430645,
+        "recall_token_ce": 1.7930116206407547,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.43559718969555034,
+            "queries": 854
+          },
+          "medium": {
+            "recall": 0.4613003095975232,
+            "queries": 646
+          },
+          "short": {
+            "recall": 0.44291091593475534,
+            "queries": 797
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.512087912087912,
+            "queries": 910
+          },
+          "5-8": {
+            "recall": 0.44630071599045346,
+            "queries": 838
+          },
+          "9-16": {
+            "recall": 0.3333333333333333,
+            "queries": 549
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.41439588688946016,
+            "queries": 1945
+          },
+          "repeat-use": {
+            "recall": 0.6164772727272727,
+            "queries": 352
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4722222222222222,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.4183406113537118,
+            "queries": 1145
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.11314984709480122,
+            "queries": 1308
+          },
+          "resident": {
+            "recall": 0.884732052578362,
+            "queries": 989
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4626736111111111,
+            "queries": 1152
+          },
+          ">8 live": {
+            "recall": 0.3982532751091703,
+            "queries": 1145
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3870967741935484,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 45,
+          "fraction_future_needed_evicted": 0.37777777777777777,
+          "fraction_dead_evicted": 0.6222222222222222,
+          "wrong_protection_rate": 0.37777777777777777,
+          "protection_decisions": 45,
+          "contrast_decisions": 37,
+          "contrast_correct_rate": 0.5405405405405406,
+          "mean_normalised_rank_of_soonest_needed": 0.4131274131274131,
+          "score_auroc_future_needed_vs_never": 0.46147753456221197
+        },
+        "controller": {
+          "mean_occupied_slots": 7.148420177383592,
+          "mean_write_gate_at_binding": 0.6205836534500122,
+          "mean_write_gate_elsewhere": 0.04056494735639568
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": 0.1376953125,
+          "live_vs_never_auroc": 0.5466604014991112,
+          "labelled_writes": 3072,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      }
+    },
+    "canonical_w16": {
+      "random": {
+        "arm": "random",
+        "writes": 16,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 3188,
+        "recall": 0.3864491844416562,
+        "residency": 0.3635508155583438,
+        "recall_given_resident": 0.8421052631578947,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.7892903722822666,
+        "recall_token_ce": 1.909146785736084,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.3687821612349914,
+            "queries": 1166
+          },
+          "medium": {
+            "recall": 0.37703141928494044,
+            "queries": 923
+          },
+          "short": {
+            "recall": 0.41310282074613286,
+            "queries": 1099
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.4777365491651206,
+            "queries": 1078
+          },
+          "5-8": {
+            "recall": 0.39705882352941174,
+            "queries": 816
+          },
+          "9-16": {
+            "recall": 0.30370942812983,
+            "queries": 1294
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.35801554979637173,
+            "queries": 2701
+          },
+          "repeat-use": {
+            "recall": 0.5441478439425051,
+            "queries": 487
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4765258215962441,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.3725561187545257,
+            "queries": 2762
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.12617052735337606,
+            "queries": 2029
+          },
+          "resident": {
+            "recall": 0.8421052631578947,
+            "queries": 1159
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4765258215962441,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.3461259956553222,
+            "queries": 2762
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3898305084745763,
+            "queries": 59
+          }
+        },
+        "eviction": {
+          "decisions": 580,
+          "fraction_future_needed_evicted": 0.40344827586206894,
+          "fraction_dead_evicted": 0.596551724137931,
+          "wrong_protection_rate": 0.38761061946902653,
+          "protection_decisions": 565,
+          "contrast_decisions": 505,
+          "contrast_correct_rate": 0.5663366336633663,
+          "mean_normalised_rank_of_soonest_needed": 0.5112637362637363,
+          "score_auroc_future_needed_vs_never": 0.5100359494425782
+        },
+        "controller": {
+          "mean_occupied_slots": 7.338847699556541,
+          "mean_write_gate_at_binding": 0.6237440258264542,
+          "mean_write_gate_elsewhere": 0.04889186442583457
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "fifo": {
+        "arm": "fifo",
+        "writes": 16,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 3188,
+        "recall": 0.29109159347553326,
+        "residency": 0.32465495608531997,
+        "recall_given_resident": 0.6541062801932367,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.7659157738089561,
+        "recall_token_ce": 2.086031176149845,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.29588336192109777,
+            "queries": 1166
+          },
+          "medium": {
+            "recall": 0.27518959913326113,
+            "queries": 923
+          },
+          "short": {
+            "recall": 0.29936305732484075,
+            "queries": 1099
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.46567717996289426,
+            "queries": 1078
+          },
+          "5-8": {
+            "recall": 0.24142156862745098,
+            "queries": 816
+          },
+          "9-16": {
+            "recall": 0.17697063369397217,
+            "queries": 1294
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.24583487597186227,
+            "queries": 2701
+          },
+          "repeat-use": {
+            "recall": 0.5420944558521561,
+            "queries": 487
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.41784037558685444,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.2715423606082549,
+            "queries": 2762
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.11658151416627961,
+            "queries": 2153
+          },
+          "resident": {
+            "recall": 0.6541062801932367,
+            "queries": 1035
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4953051643192488,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.2983345401882694,
+            "queries": 2762
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.2033898305084746,
+            "queries": 59
+          }
+        },
+        "eviction": {
+          "decisions": 2151,
+          "fraction_future_needed_evicted": 0.4537424453742445,
+          "fraction_dead_evicted": 0.5462575546257554,
+          "wrong_protection_rate": 0.4431279620853081,
+          "protection_decisions": 2110,
+          "contrast_decisions": 1901,
+          "contrast_correct_rate": 0.5081536033666492,
+          "mean_normalised_rank_of_soonest_needed": 0.388406649992645,
+          "score_auroc_future_needed_vs_never": 0.4832338766521512
+        },
+        "controller": {
+          "mean_occupied_slots": 7.220248406319291,
+          "mean_write_gate_at_binding": 0.6237440258264542,
+          "mean_write_gate_elsewhere": 0.04889186442583457
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "lru": {
+        "arm": "lru",
+        "writes": 16,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 3188,
+        "recall": 0.33626097867001253,
+        "residency": 0.3136762860727729,
+        "recall_given_resident": 0.816,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.7820238284766674,
+        "recall_token_ce": 2.0384679287672043,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.32246998284734135,
+            "queries": 1166
+          },
+          "medium": {
+            "recall": 0.3250270855904659,
+            "queries": 923
+          },
+          "short": {
+            "recall": 0.36032757051865333,
+            "queries": 1099
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.4647495361781076,
+            "queries": 1078
+          },
+          "5-8": {
+            "recall": 0.3321078431372549,
+            "queries": 816
+          },
+          "9-16": {
+            "recall": 0.23183925811437403,
+            "queries": 1294
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.2972972972972973,
+            "queries": 2701
+          },
+          "repeat-use": {
+            "recall": 0.5523613963039015,
+            "queries": 487
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.44835680751173707,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.31897175959449675,
+            "queries": 2762
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.1170018281535649,
+            "queries": 2188
+          },
+          "resident": {
+            "recall": 0.816,
+            "queries": 1000
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4694835680751174,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.28964518464880523,
+            "queries": 2762
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.23728813559322035,
+            "queries": 59
+          }
+        },
+        "eviction": {
+          "decisions": 685,
+          "fraction_future_needed_evicted": 0.45255474452554745,
+          "fraction_dead_evicted": 0.5474452554744526,
+          "wrong_protection_rate": 0.44933920704845814,
+          "protection_decisions": 681,
+          "contrast_decisions": 605,
+          "contrast_correct_rate": 0.49421487603305786,
+          "mean_normalised_rank_of_soonest_needed": 0.4564860426929395,
+          "score_auroc_future_needed_vs_never": 0.4550312937612529
+        },
+        "controller": {
+          "mean_occupied_slots": 7.215146895787139,
+          "mean_write_gate_at_binding": 0.6237440258264542,
+          "mean_write_gate_elsewhere": 0.04889186442583457
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "oracle": {
+        "arm": "oracle",
+        "writes": 16,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 3188,
+        "recall": 0.3205771643663739,
+        "residency": 0.6217063989962359,
+        "recall_given_resident": 0.45963673057517657,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.7555401846766472,
+        "recall_token_ce": 2.0491912811994553,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.3259005145797599,
+            "queries": 1166
+          },
+          "medium": {
+            "recall": 0.3250270855904659,
+            "queries": 923
+          },
+          "short": {
+            "recall": 0.3111919927206551,
+            "queries": 1099
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.45454545454545453,
+            "queries": 1078
+          },
+          "5-8": {
+            "recall": 0.30392156862745096,
+            "queries": 816
+          },
+          "9-16": {
+            "recall": 0.21947449768160743,
+            "queries": 1294
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.268789337282488,
+            "queries": 2701
+          },
+          "repeat-use": {
+            "recall": 0.6078028747433265,
+            "queries": 487
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.2981220657276995,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.32404055032585083,
+            "queries": 2762
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.09203980099502487,
+            "queries": 1206
+          },
+          "resident": {
+            "recall": 0.45963673057517657,
+            "queries": 1982
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.6995305164319249,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.6097031136857349,
+            "queries": 2762
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.2711864406779661,
+            "queries": 59
+          }
+        },
+        "eviction": {
+          "decisions": 1491,
+          "fraction_future_needed_evicted": 0.2307176391683434,
+          "fraction_dead_evicted": 0.7692823608316566,
+          "wrong_protection_rate": 0.0,
+          "protection_decisions": 1147,
+          "contrast_decisions": 1060,
+          "contrast_correct_rate": 1.0,
+          "mean_normalised_rank_of_soonest_needed": 0.9826007326007349,
+          "score_auroc_future_needed_vs_never": 0.9084794258574982
+        },
+        "controller": {
+          "mean_occupied_slots": 7.127555085920178,
+          "mean_write_gate_at_binding": 0.6237440258264542,
+          "mean_write_gate_elsewhere": 0.04889186442583457
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "content_only": {
+        "arm": "content_only",
+        "writes": 16,
+        "condition": "canonical",
+        "episodes": 256,
+        "queries": 3188,
+        "recall": 0.3713927227101631,
+        "residency": 0.3312421580928482,
+        "recall_given_resident": 0.9185606060606061,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.7910657003521919,
+        "recall_token_ce": 1.9699624925851822,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.3730703259005146,
+            "queries": 1166
+          },
+          "medium": {
+            "recall": 0.35861321776814736,
+            "queries": 923
+          },
+          "short": {
+            "recall": 0.38034576888080074,
+            "queries": 1099
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.43692022263450836,
+            "queries": 1078
+          },
+          "5-8": {
+            "recall": 0.36764705882352944,
+            "queries": 816
+          },
+          "9-16": {
+            "recall": 0.31916537867078826,
+            "queries": 1294
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.3424657534246575,
+            "queries": 2701
+          },
+          "repeat-use": {
+            "recall": 0.5318275154004107,
+            "queries": 487
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4507042253521127,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.3591600289645185,
+            "queries": 2762
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.10037523452157598,
+            "queries": 2132
+          },
+          "resident": {
+            "recall": 0.9185606060606061,
+            "queries": 1056
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.41784037558685444,
+            "queries": 426
+          },
+          ">8 live": {
+            "recall": 0.31788559015206375,
+            "queries": 2762
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3050847457627119,
+            "queries": 59
+          }
+        },
+        "eviction": {
+          "decisions": 233,
+          "fraction_future_needed_evicted": 0.43776824034334766,
+          "fraction_dead_evicted": 0.5622317596566524,
+          "wrong_protection_rate": 0.42543859649122806,
+          "protection_decisions": 228,
+          "contrast_decisions": 215,
+          "contrast_correct_rate": 0.5488372093023256,
+          "mean_normalised_rank_of_soonest_needed": 0.494805194805195,
+          "score_auroc_future_needed_vs_never": 0.50473513334094
+        },
+        "controller": {
+          "mean_occupied_slots": 7.328558065410199,
+          "mean_write_gate_at_binding": 0.6237440258264542,
+          "mean_write_gate_elsewhere": 0.04889186442583457
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": 0.131103515625,
+          "live_vs_never_auroc": 0.5405362452875702,
+          "labelled_writes": 4096,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      }
+    },
+    "spec_w12": {
+      "random": {
+        "arm": "random",
+        "writes": 12,
+        "condition": "spec",
+        "episodes": 256,
+        "queries": 1416,
+        "recall": 0.510593220338983,
+        "residency": 0.5028248587570622,
+        "recall_given_resident": 0.9129213483146067,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5253577157855034,
+        "recall_token_ce": 1.6449982300400734,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.47900763358778625,
+            "queries": 524
+          },
+          "medium": {
+            "recall": 0.5518134715025906,
+            "queries": 386
+          },
+          "short": {
+            "recall": 0.5118577075098815,
+            "queries": 506
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.5836363636363636,
+            "queries": 550
+          },
+          "5-8": {
+            "recall": 0.4600389863547758,
+            "queries": 513
+          },
+          "9-16": {
+            "recall": 0.4702549575070821,
+            "queries": 353
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.48626144879267275,
+            "queries": 1201
+          },
+          "repeat-use": {
+            "recall": 0.6465116279069767,
+            "queries": 215
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.510593220338983,
+            "queries": 1416
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.10369318181818182,
+            "queries": 704
+          },
+          "resident": {
+            "recall": 0.9129213483146067,
+            "queries": 712
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.5028248587570622,
+            "queries": 1416
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.6129032258064516,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 69,
+          "fraction_future_needed_evicted": 0.21739130434782608,
+          "fraction_dead_evicted": 0.782608695652174,
+          "wrong_protection_rate": 0.21739130434782608,
+          "protection_decisions": 69,
+          "contrast_decisions": 57,
+          "contrast_correct_rate": 0.7368421052631579,
+          "mean_normalised_rank_of_soonest_needed": 0.47619047619047605,
+          "score_auroc_future_needed_vs_never": 0.5240804944226711
+        },
+        "controller": {
+          "mean_occupied_slots": 7.125614952882484,
+          "mean_write_gate_at_binding": 0.5995156293114027,
+          "mean_write_gate_elsewhere": 0.036197196921346396
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "fifo": {
+        "arm": "fifo",
+        "writes": 12,
+        "condition": "spec",
+        "episodes": 256,
+        "queries": 1416,
+        "recall": 0.3036723163841808,
+        "residency": 0.4929378531073446,
+        "recall_given_resident": 0.5100286532951289,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.502167971804738,
+        "recall_token_ce": 2.0326845943927765,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.2767175572519084,
+            "queries": 524
+          },
+          "medium": {
+            "recall": 0.3393782383419689,
+            "queries": 386
+          },
+          "short": {
+            "recall": 0.30434782608695654,
+            "queries": 506
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.4218181818181818,
+            "queries": 550
+          },
+          "5-8": {
+            "recall": 0.24561403508771928,
+            "queries": 513
+          },
+          "9-16": {
+            "recall": 0.20396600566572237,
+            "queries": 353
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.2622814321398834,
+            "queries": 1201
+          },
+          "repeat-use": {
+            "recall": 0.5348837209302325,
+            "queries": 215
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.3036723163841808,
+            "queries": 1416
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.10306406685236769,
+            "queries": 718
+          },
+          "resident": {
+            "recall": 0.5100286532951289,
+            "queries": 698
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4929378531073446,
+            "queries": 1416
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.3225806451612903,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 568,
+          "fraction_future_needed_evicted": 0.1795774647887324,
+          "fraction_dead_evicted": 0.8204225352112676,
+          "wrong_protection_rate": 0.1795774647887324,
+          "protection_decisions": 568,
+          "contrast_decisions": 434,
+          "contrast_correct_rate": 0.7649769585253456,
+          "mean_normalised_rank_of_soonest_needed": 0.4581961816984859,
+          "score_auroc_future_needed_vs_never": 0.5391751135043817
+        },
+        "controller": {
+          "mean_occupied_slots": 6.982789980598669,
+          "mean_write_gate_at_binding": 0.5995156293114027,
+          "mean_write_gate_elsewhere": 0.036197196921346396
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "lru": {
+        "arm": "lru",
+        "writes": 12,
+        "condition": "spec",
+        "episodes": 256,
+        "queries": 1416,
+        "recall": 0.4675141242937853,
+        "residency": 0.4795197740112994,
+        "recall_given_resident": 0.833578792341679,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5118993483483791,
+        "recall_token_ce": 1.7433831840753555,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.4541984732824427,
+            "queries": 524
+          },
+          "medium": {
+            "recall": 0.49740932642487046,
+            "queries": 386
+          },
+          "short": {
+            "recall": 0.45849802371541504,
+            "queries": 506
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.6,
+            "queries": 550
+          },
+          "5-8": {
+            "recall": 0.40545808966861596,
+            "queries": 513
+          },
+          "9-16": {
+            "recall": 0.35127478753541075,
+            "queries": 353
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.43297252289758537,
+            "queries": 1201
+          },
+          "repeat-use": {
+            "recall": 0.6604651162790698,
+            "queries": 215
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4675141242937853,
+            "queries": 1416
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.13025780189959293,
+            "queries": 737
+          },
+          "resident": {
+            "recall": 0.833578792341679,
+            "queries": 679
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4795197740112994,
+            "queries": 1416
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.46774193548387094,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 136,
+          "fraction_future_needed_evicted": 0.2647058823529412,
+          "fraction_dead_evicted": 0.7352941176470589,
+          "wrong_protection_rate": 0.2647058823529412,
+          "protection_decisions": 136,
+          "contrast_decisions": 113,
+          "contrast_correct_rate": 0.6814159292035398,
+          "mean_normalised_rank_of_soonest_needed": 0.4513274336283185,
+          "score_auroc_future_needed_vs_never": 0.44428523425499233
+        },
+        "controller": {
+          "mean_occupied_slots": 6.9729074279379155,
+          "mean_write_gate_at_binding": 0.5995156293114027,
+          "mean_write_gate_elsewhere": 0.036197196921346396
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "oracle": {
+        "arm": "oracle",
+        "writes": 12,
+        "condition": "spec",
+        "episodes": 256,
+        "queries": 1416,
+        "recall": 0.2711864406779661,
+        "residency": 0.6991525423728814,
+        "recall_given_resident": 0.3595959595959596,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5000037755817175,
+        "recall_token_ce": 2.1544426679611206,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.24618320610687022,
+            "queries": 524
+          },
+          "medium": {
+            "recall": 0.2694300518134715,
+            "queries": 386
+          },
+          "short": {
+            "recall": 0.2984189723320158,
+            "queries": 506
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.2818181818181818,
+            "queries": 550
+          },
+          "5-8": {
+            "recall": 0.25146198830409355,
+            "queries": 513
+          },
+          "9-16": {
+            "recall": 0.28328611898017,
+            "queries": 353
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.23480432972522897,
+            "queries": 1201
+          },
+          "repeat-use": {
+            "recall": 0.4744186046511628,
+            "queries": 215
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.2711864406779661,
+            "queries": 1416
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.06572769953051644,
+            "queries": 426
+          },
+          "resident": {
+            "recall": 0.3595959595959596,
+            "queries": 990
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.6991525423728814,
+            "queries": 1416
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.45161290322580644,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 37,
+          "fraction_future_needed_evicted": 0.0,
+          "fraction_dead_evicted": 1.0,
+          "wrong_protection_rate": 0.0,
+          "protection_decisions": 37,
+          "contrast_decisions": 32,
+          "contrast_correct_rate": 1.0,
+          "mean_normalised_rank_of_soonest_needed": 0.9732142857142858,
+          "score_auroc_future_needed_vs_never": 1.0
+        },
+        "controller": {
+          "mean_occupied_slots": 6.8854628603104215,
+          "mean_write_gate_at_binding": 0.5995156293114027,
+          "mean_write_gate_elsewhere": 0.036197196921346396
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": null,
+          "live_vs_never_auroc": null,
+          "labelled_writes": 0,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      },
+      "content_only": {
+        "arm": "content_only",
+        "writes": 12,
+        "condition": "spec",
+        "episodes": 256,
+        "queries": 1416,
+        "recall": 0.4752824858757062,
+        "residency": 0.4569209039548023,
+        "recall_given_resident": 0.9227202472952086,
+        "retrieval_disabled_recall": null,
+        "all_token_ce": 0.5227394960820675,
+        "recall_token_ce": 1.7180401980876923,
+        "recall_by_delay": {
+          "long": {
+            "recall": 0.48282442748091603,
+            "queries": 524
+          },
+          "medium": {
+            "recall": 0.5025906735751295,
+            "queries": 386
+          },
+          "short": {
+            "recall": 0.44664031620553357,
+            "queries": 506
+          }
+        },
+        "recall_by_intervening_writes": {
+          "0-4": {
+            "recall": 0.5690909090909091,
+            "queries": 550
+          },
+          "5-8": {
+            "recall": 0.46588693957115007,
+            "queries": 513
+          },
+          "9-16": {
+            "recall": 0.34277620396600567,
+            "queries": 353
+          }
+        },
+        "recall_by_query_occurrence": {
+          "first-use": {
+            "recall": 0.44712739383846795,
+            "queries": 1201
+          },
+          "repeat-use": {
+            "recall": 0.6325581395348837,
+            "queries": 215
+          }
+        },
+        "recall_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4752824858757062,
+            "queries": 1416
+          }
+        },
+        "recall_by_residency": {
+          "evicted": {
+            "recall": 0.0988296488946684,
+            "queries": 769
+          },
+          "resident": {
+            "recall": 0.9227202472952086,
+            "queries": 647
+          }
+        },
+        "residency_by_live_pressure_bucket": {
+          "<=8 live": {
+            "recall": 0.4569209039548023,
+            "queries": 1416
+          }
+        },
+        "recall_contrast_anchor": {
+          "contrast-anchor": {
+            "recall": 0.45161290322580644,
+            "queries": 62
+          }
+        },
+        "eviction": {
+          "decisions": 15,
+          "fraction_future_needed_evicted": 0.13333333333333333,
+          "fraction_dead_evicted": 0.8666666666666667,
+          "wrong_protection_rate": 0.13333333333333333,
+          "protection_decisions": 15,
+          "contrast_decisions": 10,
+          "contrast_correct_rate": 0.8,
+          "mean_normalised_rank_of_soonest_needed": 0.5571428571428572,
+          "score_auroc_future_needed_vs_never": 0.45406445406445406
+        },
+        "controller": {
+          "mean_occupied_slots": 7.1174646618625275,
+          "mean_write_gate_at_binding": 0.5995156293114027,
+          "mean_write_gate_elsewhere": 0.036197196921346396
+        },
+        "lease": null,
+        "timing_head": {
+          "class_accuracy": 0.09309895833333333,
+          "live_vs_never_auroc": 0.5422572416828905,
+          "labelled_writes": 3072,
+          "note": "measured with generator truth; never supplied to the model at eval"
+        }
+      }
+    }
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "writes": 8,
+      "loss": 9.523494720458984,
+      "all_token_ce": 4.784807205200195,
+      "recall_ce": 4.738687515258789,
+      "timing_ce": 0.0,
+      "gradient_norm": 13.353933334350586,
+      "elapsed_seconds": 4.847019900000305
+    },
+    {
+      "step": 25,
+      "writes": 12,
+      "loss": 3.2866322994232178,
+      "all_token_ce": 0.8809338212013245,
+      "recall_ce": 2.405698537826538,
+      "timing_ce": 0.0,
+      "gradient_norm": 181.99951171875,
+      "elapsed_seconds": 134.56242980000388
+    },
+    {
+      "step": 50,
+      "writes": 12,
+      "loss": 3.037388801574707,
+      "all_token_ce": 0.6406964659690857,
+      "recall_ce": 2.3966922760009766,
+      "timing_ce": 0.0,
+      "gradient_norm": 1.2808101177215576,
+      "elapsed_seconds": 265.0282603999949
+    },
+    {
+      "step": 75,
+      "writes": 12,
+      "loss": 2.8962562084198,
+      "all_token_ce": 0.5689628720283508,
+      "recall_ce": 2.3272933959960938,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.6168336868286133,
+      "elapsed_seconds": 388.81317839999974
+    },
+    {
+      "step": 100,
+      "writes": 8,
+      "loss": 2.7159669399261475,
+      "all_token_ce": 0.391488254070282,
+      "recall_ce": 2.3244786262512207,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.8940134048461914,
+      "elapsed_seconds": 517.0017580999993
+    },
+    {
+      "step": 125,
+      "writes": 8,
+      "loss": 2.6948578357696533,
+      "all_token_ce": 0.3924809396266937,
+      "recall_ce": 2.3023769855499268,
+      "timing_ce": 0.0,
+      "gradient_norm": 1.4183130264282227,
+      "elapsed_seconds": 656.2401456999942
+    },
+    {
+      "step": 150,
+      "writes": 12,
+      "loss": 2.8691141605377197,
+      "all_token_ce": 0.5599868297576904,
+      "recall_ce": 2.3091273307800293,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.9534821510314941,
+      "elapsed_seconds": 789.1355507999979
+    },
+    {
+      "step": 175,
+      "writes": 12,
+      "loss": 2.8455135822296143,
+      "all_token_ce": 0.5471468567848206,
+      "recall_ce": 2.2983667850494385,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.9614150524139404,
+      "elapsed_seconds": 921.280024599997
+    },
+    {
+      "step": 200,
+      "writes": 8,
+      "loss": 2.7036497592926025,
+      "all_token_ce": 0.37295103073120117,
+      "recall_ce": 2.3306987285614014,
+      "timing_ce": 0.0,
+      "gradient_norm": 1.2460602521896362,
+      "elapsed_seconds": 1054.2679342000047
+    },
+    {
+      "step": 225,
+      "writes": 16,
+      "loss": 3.0508971214294434,
+      "all_token_ce": 0.7517739534378052,
+      "recall_ce": 2.2991230487823486,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.7649121284484863,
+      "elapsed_seconds": 1182.8667721999955
+    },
+    {
+      "step": 250,
+      "writes": 12,
+      "loss": 2.869119167327881,
+      "all_token_ce": 0.5404000878334045,
+      "recall_ce": 2.328719139099121,
+      "timing_ce": 0.0,
+      "gradient_norm": 1.6808301210403442,
+      "elapsed_seconds": 1308.9341296000057
+    },
+    {
+      "step": 275,
+      "writes": 8,
+      "loss": 2.667663097381592,
+      "all_token_ce": 0.3705207109451294,
+      "recall_ce": 2.297142267227173,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.8274396061897278,
+      "elapsed_seconds": 1432.5248730000021
+    },
+    {
+      "step": 300,
+      "writes": 16,
+      "loss": 3.035551071166992,
+      "all_token_ce": 0.7270538806915283,
+      "recall_ce": 2.308497190475464,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.7045317888259888,
+      "elapsed_seconds": 1558.3920058999938
+    },
+    {
+      "step": 325,
+      "writes": 16,
+      "loss": 3.044283866882324,
+      "all_token_ce": 0.7247174978256226,
+      "recall_ce": 2.319566249847412,
+      "timing_ce": 0.0,
+      "gradient_norm": 0.7386969923973083,
+      "elapsed_seconds": 1683.2216538999928
+    },
+    {
+      "step": 350,
+      "writes": 12,
+      "loss": 2.769890308380127,
+      "all_token_ce": 0.5526281595230103,
+      "recall_ce": 2.2172622680664062,
+      "timing_ce": 0.0,
+      "gradient_norm": 213.3792724609375,
+      "elapsed_seconds": 1804.9676399000018
+    },
+    {
+      "step": 375,
+      "writes": 8,
+      "loss": 2.8030307292938232,
+      "all_token_ce": 0.5752525329589844,
+      "recall_ce": 2.227778196334839,
+      "timing_ce": 0.0,
+      "gradient_norm": 2461.841796875,
+      "elapsed_seconds": 1922.6707581999945
+    },
+    {
+      "step": 400,
+      "writes": 12,
+      "loss": 2.9322669506073,
+      "all_token_ce": 0.7297280430793762,
+      "recall_ce": 2.2025389671325684,
+      "timing_ce": 0.0,
+      "gradient_norm": 735.2429809570312,
+      "elapsed_seconds": 2041.8348760999943
+    },
+    {
+      "step": 425,
+      "writes": 12,
+      "loss": 2.9532992839813232,
+      "all_token_ce": 0.7107953429222107,
+      "recall_ce": 2.2425038814544678,
+      "timing_ce": 0.0,
+      "gradient_norm": 2982.1474609375,
+      "elapsed_seconds": 2161.3461040999973
+    },
+    {
+      "step": 450,
+      "writes": 8,
+      "loss": 2.609837770462036,
+      "all_token_ce": 0.4869767129421234,
+      "recall_ce": 2.12286114692688,
+      "timing_ce": 0.0,
+      "gradient_norm": 10015.662109375,
+      "elapsed_seconds": 2283.312671599997
+    },
+    {
+      "step": 475,
+      "writes": 8,
+      "loss": 2.5758979320526123,
+      "all_token_ce": 0.4851859509944916,
+      "recall_ce": 2.090712070465088,
+      "timing_ce": 0.0,
+      "gradient_norm": 8740.2001953125,
+      "elapsed_seconds": 2401.466467499995
+    },
+    {
+      "step": 500,
+      "writes": 12,
+      "loss": 2.774697780609131,
+      "all_token_ce": 0.6591895818710327,
+      "recall_ce": 2.1155080795288086,
+      "timing_ce": 0.0,
+      "gradient_norm": 9241.5712890625,
+      "elapsed_seconds": 2518.701837200002
+    },
+    {
+      "step": 525,
+      "writes": 16,
+      "loss": 2.9123520851135254,
+      "all_token_ce": 0.7957025766372681,
+      "recall_ce": 2.1166493892669678,
+      "timing_ce": 0.0,
+      "gradient_norm": 2850.634765625,
+      "elapsed_seconds": 2635.434456300005
+    },
+    {
+      "step": 550,
+      "writes": 12,
+      "loss": 2.5408034324645996,
+      "all_token_ce": 0.5758626461029053,
+      "recall_ce": 1.9649406671524048,
+      "timing_ce": 0.0,
+      "gradient_norm": 381.2109069824219,
+      "elapsed_seconds": 2747.2775609999953
+    },
+    {
+      "step": 575,
+      "writes": 12,
+      "loss": 2.53703236579895,
+      "all_token_ce": 0.6092584729194641,
+      "recall_ce": 1.9277739524841309,
+      "timing_ce": 0.0,
+      "gradient_norm": 382.8367919921875,
+      "elapsed_seconds": 2860.072899299994
+    },
+    {
+      "step": 600,
+      "writes": 12,
+      "loss": 2.449460983276367,
+      "all_token_ce": 0.6290220022201538,
+      "recall_ce": 1.820439100265503,
+      "timing_ce": 0.0,
+      "gradient_norm": 1276.845947265625,
+      "elapsed_seconds": 2973.1925921999937
+    },
+    {
+      "step": 625,
+      "writes": 12,
+      "loss": 2.476741313934326,
+      "all_token_ce": 0.6046571135520935,
+      "recall_ce": 1.872084140777588,
+      "timing_ce": 0.0,
+      "gradient_norm": 14788.111328125,
+      "elapsed_seconds": 3085.5936043999973
+    },
+    {
+      "step": 650,
+      "writes": 12,
+      "loss": 2.3964104652404785,
+      "all_token_ce": 0.6446241140365601,
+      "recall_ce": 1.751786231994629,
+      "timing_ce": 0.0,
+      "gradient_norm": 143490.875,
+      "elapsed_seconds": 3197.8129810999963
+    },
+    {
+      "step": 675,
+      "writes": 8,
+      "loss": 2.2337534427642822,
+      "all_token_ce": 0.4451170563697815,
+      "recall_ce": 1.788636326789856,
+      "timing_ce": 0.0,
+      "gradient_norm": 320.6854248046875,
+      "elapsed_seconds": 3309.8194141999993
+    },
+    {
+      "step": 700,
+      "writes": 8,
+      "loss": 2.21394419670105,
+      "all_token_ce": 0.4077964127063751,
+      "recall_ce": 1.806147813796997,
+      "timing_ce": 0.0,
+      "gradient_norm": 2742.5341796875,
+      "elapsed_seconds": 3422.235115699994
+    },
+    {
+      "step": 725,
+      "writes": 8,
+      "loss": 2.20776104927063,
+      "all_token_ce": 0.4198836386203766,
+      "recall_ce": 1.7878773212432861,
+      "timing_ce": 0.0,
+      "gradient_norm": 2239.2490234375,
+      "elapsed_seconds": 3531.9221178000007
+    },
+    {
+      "step": 750,
+      "writes": 12,
+      "loss": 2.2829108238220215,
+      "all_token_ce": 0.5612935423851013,
+      "recall_ce": 1.721617341041565,
+      "timing_ce": 0.0,
+      "gradient_norm": 1173.837158203125,
+      "elapsed_seconds": 3641.5123502999922
+    },
+    {
+      "step": 775,
+      "writes": 12,
+      "loss": 2.3541672229766846,
+      "all_token_ce": 0.5554292798042297,
+      "recall_ce": 1.79873788356781,
+      "timing_ce": 0.0,
+      "gradient_norm": 5963.60693359375,
+      "elapsed_seconds": 3750.689265299996
+    },
+    {
+      "step": 800,
+      "writes": 16,
+      "loss": 2.808149814605713,
+      "all_token_ce": 0.8055812120437622,
+      "recall_ce": 2.002568483352661,
+      "timing_ce": 0.0,
+      "gradient_norm": 2066.637939453125,
+      "elapsed_seconds": 3860.1885676999955
+    }
+  ],
+  "finite": true
+}

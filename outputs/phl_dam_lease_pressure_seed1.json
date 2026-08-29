@@ -1,0 +1,118 @@
+{
+  "experiment": "PHL-DAM Lease-001 \u2014 Retention-only memory-pressure pilot",
+  "configuration": {
+    "seed": 1,
+    "slots": 8,
+    "writes_per_episode": 32,
+    "delay_classes": {
+      "near": [
+        5,
+        9
+      ],
+      "medium": [
+        14,
+        22
+      ],
+      "far": [
+        32,
+        48
+      ]
+    },
+    "never_queried_class": true,
+    "causal_cue_only_at_inference": true,
+    "future_query_metadata_visible_to_learned_policy": false,
+    "exact_content_store": true,
+    "query_consumes_binding": true,
+    "training_steps": 500,
+    "training_batch_size": 256,
+    "eval_episodes": 2000,
+    "lease_predictor_parameters": 548,
+    "lease_influence": true,
+    "promotion": false
+  },
+  "gates": {
+    "prediction_accuracy_at_least_0_85": true,
+    "oracle_over_best_heuristic_at_least_0_10": true,
+    "phl_over_static_at_least_0_05": true,
+    "phl_over_best_heuristic_at_least_0_05": true
+  },
+  "metrics": {
+    "prediction": {
+      "top1_accuracy": 0.999343752861023,
+      "cross_entropy": 0.005468463990837336,
+      "expected_calibration_error": 0.004077449906617403,
+      "examples": 64000
+    },
+    "retention": {
+      "random": {
+        "hits": 35321,
+        "queries": 53706,
+        "hit_rate": 0.6576732581089636
+      },
+      "fifo": {
+        "hits": 36932,
+        "queries": 53706,
+        "hit_rate": 0.6876699065281346
+      },
+      "static_learned": {
+        "hits": 43078,
+        "queries": 53706,
+        "hit_rate": 0.8021077719435444
+      },
+      "randomized_lease": {
+        "hits": 41244,
+        "queries": 53706,
+        "hit_rate": 0.7679588872751648
+      },
+      "phl_transported_lease": {
+        "hits": 46722,
+        "queries": 53706,
+        "hit_rate": 0.8699586638364428
+      },
+      "oracle_next_use": {
+        "hits": 46781,
+        "queries": 53706,
+        "hit_rate": 0.8710572375526012
+      }
+    }
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 1.3438372611999512,
+      "accuracy": 0.44921875,
+      "gradient_norm": 0.6864985823631287
+    },
+    {
+      "step": 100,
+      "loss": 0.08463218063116074,
+      "accuracy": 0.99609375,
+      "gradient_norm": 0.14757627248764038
+    },
+    {
+      "step": 200,
+      "loss": 0.023786935955286026,
+      "accuracy": 0.99609375,
+      "gradient_norm": 0.05171941593289375
+    },
+    {
+      "step": 300,
+      "loss": 0.008137091062963009,
+      "accuracy": 1.0,
+      "gradient_norm": 0.017448585480451584
+    },
+    {
+      "step": 400,
+      "loss": 0.01035104040056467,
+      "accuracy": 0.99609375,
+      "gradient_norm": 0.027938462793827057
+    },
+    {
+      "step": 500,
+      "loss": 0.004138218238949776,
+      "accuracy": 1.0,
+      "gradient_norm": 0.011536934413015842
+    }
+  ],
+  "finite": true
+}

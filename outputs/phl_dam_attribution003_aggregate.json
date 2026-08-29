@@ -1,0 +1,104 @@
+{
+  "experiment": "PHL-DAM Attribution-003 — Wider-Seed Confirmation",
+  "protocol": {
+    "seeds": [0, 1, 2, 3, 4, 5],
+    "models": ["phl_dam", "dam_only_parameter_matched"],
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "success_threshold": 0.20,
+    "same_streams": true,
+    "same_objective": true,
+    "slots": 8,
+    "d_key": 24,
+    "d_value": 24,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false
+  },
+  "models": {
+    "phl_dam": {
+      "parameters": 33034,
+      "recurrent_state_floats_per_sequence": 456,
+      "seed_recall": [
+        0.864,
+        0.996166666666667,
+        0.997166666666667,
+        0.993333333333333,
+        0.9945,
+        0.999833333333333
+      ],
+      "successful_seeds": 6,
+      "mean_recall_accuracy": 0.974166666666667,
+      "sample_sd_recall": 0.0540171783375951,
+      "min_recall_accuracy": 0.864,
+      "max_recall_accuracy": 0.999833333333333,
+      "mean_retrieval_disabled_accuracy": 0.100888888888889,
+      "mean_all_token_ce": 0.233189291020234,
+      "mean_recall_token_ce": 0.0766697603636421,
+      "mean_address_top1_accuracy": 0.974777777777778,
+      "mean_distance_accuracy": {
+        "29-63": 0.973166666666667,
+        "64-95": 0.974666666666667,
+        "96-169": 0.974666666666667
+      },
+      "all_runs_finite": true
+    },
+    "dam_only_parameter_matched": {
+      "parameters": 33098,
+      "recurrent_state_floats_per_sequence": 392,
+      "seed_recall": [
+        0.100166666666667,
+        0.9995,
+        0.999,
+        0.994666666666667,
+        0.102166666666667,
+        0.0923333333333333
+      ],
+      "successful_seeds": 3,
+      "mean_recall_accuracy": 0.547972222222222,
+      "sample_sd_recall": 0.492690272513706,
+      "min_recall_accuracy": 0.0923333333333333,
+      "max_recall_accuracy": 0.9995,
+      "mean_retrieval_disabled_accuracy": 0.0968055555555556,
+      "mean_all_token_ce": 0.27152008275191,
+      "mean_recall_token_ce": 1.16622759901329,
+      "mean_address_top1_accuracy": 0.606138888888889,
+      "mean_distance_accuracy": {
+        "29-63": 0.550416666666667,
+        "64-95": 0.546416666666667,
+        "96-169": 0.547083333333333
+      },
+      "all_runs_finite": true
+    }
+  },
+  "paired_comparison": {
+    "seed_recall_difference_phl_minus_matched": [
+      0.763833333333333,
+      -0.00333333333333308,
+      -0.00183333333333302,
+      -0.00133333333333407,
+      0.892333333333333,
+      0.9075
+    ],
+    "mean_recall_advantage_percentage_points": 42.6194444444444,
+    "paired_difference_sample_sd": 0.471894567045868,
+    "paired_difference_approximate_95_percent_t_interval_percentage_points": [
+      -6.9028532672429,
+      92.1417421561318
+    ],
+    "all_token_ce_advantage_nats": 0.038330791731676,
+    "success_rate_phl_dam": "6/6",
+    "success_rate_matched": "3/6",
+    "discordant_success_pairs_favoring_phl": 3,
+    "discordant_success_pairs_favoring_matched": 0
+  },
+  "verdict": {
+    "wider_seed_confirmation": true,
+    "confirmed_effect": "PHL-DAM improves controller-discovery robustness under the fixed 500-step protocol",
+    "not_confirmed": "a higher content-memory capacity ceiling",
+    "before_leases_status": "content-only PHL-DAM baseline is stable enough to freeze for lease experiments",
+    "statistical_caveat": "six paired seeds remain a small bimodal sample; the approximate paired 95% interval includes zero"
+  }
+}

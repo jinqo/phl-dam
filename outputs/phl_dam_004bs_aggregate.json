@@ -1,0 +1,1472 @@
+{
+  "experiment": "PHL-DAM-004B aggregate",
+  "protocol": {
+    "slots": 8,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "arms": [
+      "random",
+      "fifo",
+      "lru",
+      "oracle",
+      "content_only",
+      "static_priority",
+      "phl_lease",
+      "learned_utility"
+    ],
+    "learned_arms": [
+      "content_only",
+      "static_priority",
+      "phl_lease",
+      "learned_utility"
+    ],
+    "fixed_policy_arms": [
+      "random",
+      "fifo",
+      "lru",
+      "oracle"
+    ],
+    "eval_settings": [
+      "canonical_w8",
+      "canonical_w12",
+      "canonical_w16",
+      "spec_w12"
+    ],
+    "scale": "compact",
+    "within_run_contrasts_share_content_weights": true,
+    "across_run_contrasts_share_content_weights": false
+  },
+  "settings": {
+    "canonical_w8": {
+      "random": {
+        "mean_recall_over_all_runs": 0.5378817253604126,
+        "sd_recall_over_all_runs": 0.36772231819784873,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.7299099699899967,
+            "1": 0.10837950138504156,
+            "2": 0.29829931972789114
+          },
+          "static_priority": {
+            "0": 0.8822940980326776,
+            "1": 0.1018005540166205,
+            "2": 0.9132653061224489
+          },
+          "phl_lease": {
+            "0": 0.5471823941313771,
+            "1": 0.1018005540166205,
+            "2": 0.830952380952381
+          },
+          "learned_utility": {
+            "0": 0.8922974324774925,
+            "1": 0.1018005540166205,
+            "2": 0.9465986394557823
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "fifo": {
+        "mean_recall_over_all_runs": 0.4377538861516348,
+        "sd_recall_over_all_runs": 0.288672505956588,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.6738912970990331,
+            "1": 0.10560941828254848,
+            "2": 0.254421768707483
+          },
+          "static_priority": {
+            "0": 0.7212404134711571,
+            "1": 0.1018005540166205,
+            "2": 0.6040816326530613
+          },
+          "phl_lease": {
+            "0": 0.5305101700566855,
+            "1": 0.1018005540166205,
+            "2": 0.4595238095238095
+          },
+          "learned_utility": {
+            "0": 0.7769256418806268,
+            "1": 0.10249307479224377,
+            "2": 0.8207482993197279
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "lru": {
+        "mean_recall_over_all_runs": 0.47753321739654636,
+        "sd_recall_over_all_runs": 0.3261384558974591,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.6485495165055019,
+            "1": 0.10422437673130194,
+            "2": 0.23605442176870747
+          },
+          "static_priority": {
+            "0": 0.7872624208069356,
+            "1": 0.10214681440443213,
+            "2": 0.7935374149659864
+          },
+          "phl_lease": {
+            "0": 0.46115371790596865,
+            "1": 0.1018005540166205,
+            "2": 0.6989795918367347
+          },
+          "learned_utility": {
+            "0": 0.8146048682894298,
+            "1": 0.10249307479224377,
+            "2": 0.8795918367346939
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "oracle": {
+        "mean_recall_over_all_runs": 0.46545916262125336,
+        "sd_recall_over_all_runs": 0.3211904711398476,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.8392797599199733,
+            "1": 0.10041551246537396,
+            "2": 0.24047619047619048
+          },
+          "static_priority": {
+            "0": 0.742914304768256,
+            "1": 0.10214681440443213,
+            "2": 0.6193877551020408
+          },
+          "phl_lease": {
+            "0": 0.5595198399466489,
+            "1": 0.1018005540166205,
+            "2": 0.4673469387755102
+          },
+          "learned_utility": {
+            "0": 0.820273424474825,
+            "1": 0.10249307479224377,
+            "2": 0.8894557823129252
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "content_only": {
+        "mean_recall": 0.3385902854714844,
+        "sd_recall": 0.3966987020276075,
+        "per_seed_recall": {
+          "0": 0.796598866288763,
+          "1": 0.10318559556786704,
+          "2": 0.11598639455782313
+        },
+        "mean_residency": 0.2780655910246726,
+        "mean_recall_given_resident": 0.6507057242074605,
+        "mean_all_token_ce": 0.9042518958449364,
+        "mean_recall_token_ce": 1.778586666720609
+      },
+      "static_priority": {
+        "mean_recall": 0.6038687344539163,
+        "sd_recall": 0.4434867247300207,
+        "per_seed_recall": {
+          "0": 0.7659219739913304,
+          "1": 0.10214681440443213,
+          "2": 0.9435374149659864
+        },
+        "mean_residency": 0.571217125285148,
+        "mean_recall_given_resident": 0.9491874897071908,
+        "mean_all_token_ce": 0.8436757624149323,
+        "mean_recall_token_ce": 1.1194346856791526
+      },
+      "phl_lease": {
+        "mean_recall": 0.48939709278745913,
+        "sd_recall": 0.4159924996899109,
+        "per_seed_recall": {
+          "0": 0.43747915971990664,
+          "1": 0.1018005540166205,
+          "2": 0.9289115646258503
+        },
+        "mean_residency": 0.3655364713407871,
+        "mean_recall_given_resident": 0.9092672275667588,
+        "mean_all_token_ce": 0.9156616435696682,
+        "mean_recall_token_ce": 1.4519588495604694
+      },
+      "learned_utility": {
+        "mean_recall": 0.6121665495230361,
+        "sd_recall": 0.4449270099963532,
+        "per_seed_recall": {
+          "0": 0.8136045348449483,
+          "1": 0.10214681440443213,
+          "2": 0.9207482993197279
+        },
+        "mean_residency": 0.50857269883612,
+        "mean_recall_given_resident": 0.9801661598000271,
+        "mean_all_token_ce": 0.8364220298826694,
+        "mean_recall_token_ce": 1.0941122993826866
+      },
+      "paired": {
+        "content_only_minus_random_within_run": {
+          "per_seed": [
+            0.06668889629876629,
+            -0.005193905817174521,
+            -0.18231292517006803
+          ],
+          "mean": -0.040272644896158755,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_fifo_within_run": {
+          "per_seed": [
+            0.12270756918972991,
+            -0.002423822714681445,
+            -0.1384353741496599
+          ],
+          "mean": -0.006050542558203809,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_lru_within_run": {
+          "per_seed": [
+            0.14804934978326112,
+            -0.001038781163434907,
+            -0.12006802721088435
+          ],
+          "mean": 0.008980847136313955,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_oracle_within_run": {
+          "per_seed": [
+            -0.042680893631210304,
+            0.002770083102493076,
+            -0.12448979591836735
+          ],
+          "mean": -0.0548002021490282,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_random_within_run": {
+          "per_seed": [
+            -0.11637212404134711,
+            0.00034626038781163104,
+            0.030272108843537482
+          ],
+          "mean": -0.028584584936666,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_fifo_within_run": {
+          "per_seed": [
+            0.04468156052017336,
+            0.00034626038781163104,
+            0.33945578231292517
+          ],
+          "mean": 0.1281612010736367,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "static_priority_minus_lru_within_run": {
+          "per_seed": [
+            -0.021340446815605207,
+            0.0,
+            0.15000000000000002
+          ],
+          "mean": 0.0428865177281316,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_oracle_within_run": {
+          "per_seed": [
+            0.0230076692230744,
+            0.0,
+            0.3241496598639456
+          ],
+          "mean": 0.11571910969567334,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "phl_lease_minus_random_within_run": {
+          "per_seed": [
+            -0.10970323441147051,
+            0.0,
+            0.09795918367346934
+          ],
+          "mean": -0.003914683579333722,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_fifo_within_run": {
+          "per_seed": [
+            -0.09303101033677891,
+            0.0,
+            0.46938775510204084
+          ],
+          "mean": 0.1254522482550873,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_lru_within_run": {
+          "per_seed": [
+            -0.02367455818606201,
+            0.0,
+            0.2299319727891156
+          ],
+          "mean": 0.0687524715343512,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_oracle_within_run": {
+          "per_seed": [
+            -0.12204068022674225,
+            0.0,
+            0.46156462585034014
+          ],
+          "mean": 0.1131746485411993,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_random_within_run": {
+          "per_seed": [
+            -0.07869289763254417,
+            0.00034626038781163104,
+            -0.02585034013605436
+          ],
+          "mean": -0.034732325793595635,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_fifo_within_run": {
+          "per_seed": [
+            0.036678892964321475,
+            -0.0003462603878116449,
+            0.09999999999999998
+          ],
+          "mean": 0.0454442108588366,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "learned_utility_minus_lru_within_run": {
+          "per_seed": [
+            -0.0010003334444814715,
+            -0.0003462603878116449,
+            0.041156462585034026
+          ],
+          "mean": 0.013269956250913637,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_oracle_within_run": {
+          "per_seed": [
+            -0.006668889629876662,
+            -0.0003462603878116449,
+            0.03129251700680269
+          ],
+          "mean": 0.008092455663038128,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_content_only_across_runs": {
+          "per_seed": [
+            -0.35911970656885633,
+            -0.001385041551246538,
+            0.8129251700680272
+          ],
+          "mean": 0.1508068073159748,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_static_priority_across_runs": {
+          "per_seed": [
+            -0.3284428142714238,
+            -0.00034626038781163104,
+            -0.014625850340136082
+          ],
+          "mean": -0.11447164166645718,
+          "seed_wins": 0,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_learned_utility_across_runs": {
+          "per_seed": [
+            -0.3761253751250417,
+            -0.00034626038781163104,
+            0.008163265306122436
+          ],
+          "mean": -0.12276945673557697,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        }
+      }
+    },
+    "canonical_w12": {
+      "random": {
+        "mean_recall_over_all_runs": 0.46146879343034297,
+        "sd_recall_over_all_runs": 0.32121920240030394,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.5284167794316644,
+            "1": 0.08939566704675028,
+            "2": 0.2528991971454059
+          },
+          "static_priority": {
+            "0": 0.7925124041497519,
+            "1": 0.1039908779931585,
+            "2": 0.8126672613737734
+          },
+          "phl_lease": {
+            "0": 0.38272440234551197,
+            "1": 0.10353477765108324,
+            "2": 0.7453166815343444
+          },
+          "learned_utility": {
+            "0": 0.7972485340550293,
+            "1": 0.10376282782212087,
+            "2": 0.8251561106155219
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "fifo": {
+        "mean_recall_over_all_runs": 0.38699609333692103,
+        "sd_recall_over_all_runs": 0.2552037512201017,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.5015787099684258,
+            "1": 0.09258836944127707,
+            "2": 0.21342551293487957
+          },
+          "static_priority": {
+            "0": 0.645466847090663,
+            "1": 0.10330672748004562,
+            "2": 0.6068242640499554
+          },
+          "phl_lease": {
+            "0": 0.37483085250338294,
+            "1": 0.1039908779931585,
+            "2": 0.4527207850133809
+          },
+          "learned_utility": {
+            "0": 0.7090663058186739,
+            "1": 0.10353477765108324,
+            "2": 0.7366190900981266
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "lru": {
+        "mean_recall_over_all_runs": 0.41258212359802804,
+        "sd_recall_over_all_runs": 0.28328615634752474,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.4720342805593144,
+            "1": 0.0944127708095781,
+            "2": 0.2087421944692239
+          },
+          "static_priority": {
+            "0": 0.7025259359494813,
+            "1": 0.10307867730900798,
+            "2": 0.701828724353256
+          },
+          "phl_lease": {
+            "0": 0.33130356337392874,
+            "1": 0.10376282782212087,
+            "2": 0.6289027653880463
+          },
+          "learned_utility": {
+            "0": 0.7370320252593595,
+            "1": 0.10353477765108324,
+            "2": 0.7638269402319358
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "oracle": {
+        "mean_recall_over_all_runs": 0.4482341597957755,
+        "sd_recall_over_all_runs": 0.30547383382565274,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.7065854758682905,
+            "1": 0.09281641961231471,
+            "2": 0.22948260481712757
+          },
+          "static_priority": {
+            "0": 0.7248534055029319,
+            "1": 0.10330672748004562,
+            "2": 0.6761819803746655
+          },
+          "phl_lease": {
+            "0": 0.4700045105999098,
+            "1": 0.10376282782212087,
+            "2": 0.502007136485281
+          },
+          "learned_utility": {
+            "0": 0.8114569237708615,
+            "1": 0.10353477765108324,
+            "2": 0.8548171275646744
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "content_only": {
+        "mean_recall": 0.2695552013897359,
+        "sd_recall": 0.2690982355042105,
+        "per_seed_recall": {
+          "0": 0.5791610284167794,
+          "1": 0.0919042189281642,
+          "2": 0.13760035682426405
+        },
+        "mean_residency": 0.20044841774244407,
+        "mean_recall_given_resident": 0.7098478820745828,
+        "mean_all_token_ce": 1.2589540195961793,
+        "mean_recall_token_ce": 2.0610393546521664
+      },
+      "static_priority": {
+        "mean_recall": 0.5484214162491083,
+        "sd_recall": 0.3917440928376909,
+        "per_seed_recall": {
+          "0": 0.7036535859269283,
+          "1": 0.10285062713797036,
+          "2": 0.8387600356824264
+        },
+        "mean_residency": 0.5051798130602455,
+        "mean_recall_given_resident": 0.9535157409061058,
+        "mean_all_token_ce": 1.1872879068056743,
+        "mean_recall_token_ce": 1.299237037387987
+      },
+      "phl_lease": {
+        "mean_recall": 0.4046537280853715,
+        "sd_recall": 0.37693851058022126,
+        "per_seed_recall": {
+          "0": 0.2830401443391971,
+          "1": 0.10353477765108324,
+          "2": 0.8273862622658341
+        },
+        "mean_residency": 0.2996453686681096,
+        "mean_recall_given_resident": 0.8616346435543505,
+        "mean_all_token_ce": 1.271830049653848,
+        "mean_recall_token_ce": 1.6907742054512103
+      },
+      "learned_utility": {
+        "mean_recall": 0.5562409102050493,
+        "sd_recall": 0.3929313305770261,
+        "per_seed_recall": {
+          "0": 0.7437979251240415,
+          "1": 0.10467502850627138,
+          "2": 0.8202497769848349
+        },
+        "mean_residency": 0.44454802192824855,
+        "mean_recall_given_resident": 0.9843669768272212,
+        "mean_all_token_ce": 1.1577921733260155,
+        "mean_recall_token_ce": 1.2817688661937912
+      },
+      "paired": {
+        "content_only_minus_random_within_run": {
+          "per_seed": [
+            0.05074424898511498,
+            0.002508551881413912,
+            -0.11529884032114182
+          ],
+          "mean": -0.020682013151537643,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "content_only_minus_fifo_within_run": {
+          "per_seed": [
+            0.07758231844835362,
+            -0.00068415051311288,
+            -0.07582515611061552
+          ],
+          "mean": 0.0003576706082084047,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_lru_within_run": {
+          "per_seed": [
+            0.10712674785746501,
+            -0.002508551881413912,
+            -0.07114183764495985
+          ],
+          "mean": 0.01115878611036375,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_oracle_within_run": {
+          "per_seed": [
+            -0.12742444745151105,
+            -0.0009122006841505159,
+            -0.09188224799286351
+          ],
+          "mean": -0.07340629870950836,
+          "seed_wins": 0,
+          "seeds": 3
+        },
+        "static_priority_minus_random_within_run": {
+          "per_seed": [
+            -0.0888588182228236,
+            -0.001140250855188138,
+            0.026092774308652977
+          ],
+          "mean": -0.02130209825645292,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_fifo_within_run": {
+          "per_seed": [
+            0.05818673883626524,
+            -0.00045610034207525796,
+            0.23193577163247103
+          ],
+          "mean": 0.09655547004222033,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_lru_within_run": {
+          "per_seed": [
+            0.001127649977446965,
+            -0.00022805017103762204,
+            0.13693131132917036
+          ],
+          "mean": 0.04594363704519324,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_oracle_within_run": {
+          "per_seed": [
+            -0.021199819576003587,
+            -0.00045610034207525796,
+            0.16257805530776093
+          ],
+          "mean": 0.046974045129894025,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_random_within_run": {
+          "per_seed": [
+            -0.09968425800631486,
+            0.0,
+            0.08206958073148973
+          ],
+          "mean": -0.005871559091608376,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_fifo_within_run": {
+          "per_seed": [
+            -0.09179070816418583,
+            -0.00045610034207525796,
+            0.3746654772524532
+          ],
+          "mean": 0.0941395562487307,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_lru_within_run": {
+          "per_seed": [
+            -0.048263419034731636,
+            -0.00022805017103763592,
+            0.19848349687778777
+          ],
+          "mean": 0.0499973425573395,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_oracle_within_run": {
+          "per_seed": [
+            -0.18696436626071267,
+            -0.00022805017103763592,
+            0.32537912578055317
+          ],
+          "mean": 0.04606223644960095,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_random_within_run": {
+          "per_seed": [
+            -0.05345060893098774,
+            0.000912200684150502,
+            -0.004906333630686932
+          ],
+          "mean": -0.019148247292508056,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_fifo_within_run": {
+          "per_seed": [
+            0.03473161930536761,
+            0.001140250855188138,
+            0.08363068688670827
+          ],
+          "mean": 0.03983418568242134,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "learned_utility_minus_lru_within_run": {
+          "per_seed": [
+            0.006765899864682012,
+            0.001140250855188138,
+            0.056422836752899164
+          ],
+          "mean": 0.021442995824256437,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "learned_utility_minus_oracle_within_run": {
+          "per_seed": [
+            -0.06765899864682001,
+            0.001140250855188138,
+            -0.034567350579839506
+          ],
+          "mean": -0.033695366123823796,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_content_only_across_runs": {
+          "per_seed": [
+            -0.2961208840775823,
+            0.011630558722919043,
+            0.68978590544157
+          ],
+          "mean": 0.1350985266956356,
+          "seed_wins": 2,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_static_priority_across_runs": {
+          "per_seed": [
+            -0.4206134415877312,
+            0.00068415051311288,
+            -0.011373773416592292
+          ],
+          "mean": -0.14376768816373686,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_learned_utility_across_runs": {
+          "per_seed": [
+            -0.4607577807848444,
+            -0.001140250855188138,
+            0.007136485280999194
+          ],
+          "mean": -0.15158718211967778,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        }
+      }
+    },
+    "canonical_w16": {
+      "random": {
+        "mean_recall_over_all_runs": 0.3827763329017477,
+        "sd_recall_over_all_runs": 0.25596704015538585,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.41736066623959,
+            "1": 0.0975103734439834,
+            "2": 0.2378570275939971
+          },
+          "static_priority": {
+            "0": 0.6378923766816144,
+            "1": 0.0968720076603894,
+            "2": 0.6693561400677748
+          },
+          "phl_lease": {
+            "0": 0.2908392056374119,
+            "1": 0.0968720076603894,
+            "2": 0.6409553009520735
+          },
+          "learned_utility": {
+            "0": 0.6426969891095452,
+            "1": 0.09639323332269391,
+            "2": 0.6687106664515088
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "fifo": {
+        "mean_recall_over_all_runs": 0.34556536546190025,
+        "sd_recall_over_all_runs": 0.2260997588920124,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.42408712363869316,
+            "1": 0.0991062879029684,
+            "2": 0.17072777150233984
+          },
+          "static_priority": {
+            "0": 0.5663036515054453,
+            "1": 0.09591445898499841,
+            "2": 0.5914152009036631
+          },
+          "phl_lease": {
+            "0": 0.3166239590006406,
+            "1": 0.0955952760932014,
+            "2": 0.4344037437469743
+          },
+          "learned_utility": {
+            "0": 0.6226777706598334,
+            "1": 0.09607405043089691,
+            "2": 0.6338550911731483
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "lru": {
+        "mean_recall_over_all_runs": 0.3534475320791068,
+        "sd_recall_over_all_runs": 0.2351087240546362,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.38933376040999357,
+            "1": 0.0968720076603894,
+            "2": 0.18734871712118767
+          },
+          "static_priority": {
+            "0": 0.58263933376041,
+            "1": 0.09575486753909991,
+            "2": 0.6112635146038405
+          },
+          "phl_lease": {
+            "0": 0.2842729019859065,
+            "1": 0.09575486753909991,
+            "2": 0.5304179441665322
+          },
+          "learned_utility": {
+            "0": 0.6305253042921204,
+            "1": 0.09639323332269391,
+            "2": 0.6407939325480071
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "oracle": {
+        "mean_recall_over_all_runs": 0.40205417430373497,
+        "sd_recall_over_all_runs": 0.2627498908751182,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.5860025624599615,
+            "1": 0.0992658793488669,
+            "2": 0.23043408100693885
+          },
+          "static_priority": {
+            "0": 0.6515054452274183,
+            "1": 0.09591445898499841,
+            "2": 0.6354687752138132
+          },
+          "phl_lease": {
+            "0": 0.4050288276745676,
+            "1": 0.09591445898499841,
+            "2": 0.4958851056963047
+          },
+          "learned_utility": {
+            "0": 0.7176489429852658,
+            "1": 0.09607405043089691,
+            "2": 0.7155075036307891
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "content_only": {
+        "mean_recall": 0.26401436321905536,
+        "sd_recall": 0.19946813810824954,
+        "per_seed_recall": {
+          "0": 0.48590647021140293,
+          "1": 0.0995850622406639,
+          "2": 0.20655155720509924
+        },
+        "mean_residency": 0.20712867409030244,
+        "mean_recall_given_resident": 0.7855497841665842,
+        "mean_all_token_ce": 1.5697917751967907,
+        "mean_recall_token_ce": 2.1749344480534396
+      },
+      "static_priority": {
+        "mean_recall": 0.45529979425742767,
+        "sd_recall": 0.31396538428265,
+        "per_seed_recall": {
+          "0": 0.5936899423446509,
+          "1": 0.09591445898499841,
+          "2": 0.6762949814426336
+        },
+        "mean_residency": 0.40084760968184235,
+        "mean_recall_given_resident": 0.9559421196784408,
+        "mean_all_token_ce": 1.5036144045492013,
+        "mean_recall_token_ce": 1.6038462432722251
+      },
+      "phl_lease": {
+        "mean_recall": 0.3366554539459672,
+        "sd_recall": 0.3112619615635301,
+        "per_seed_recall": {
+          "0": 0.22549647661755284,
+          "1": 0.09623364187679541,
+          "2": 0.6882362433435534
+        },
+        "mean_residency": 0.2440255097155116,
+        "mean_recall_given_resident": 0.8124545198047464,
+        "mean_all_token_ce": 1.5583057266970475,
+        "mean_recall_token_ce": 1.869716150065263
+      },
+      "learned_utility": {
+        "mean_recall": 0.4617171232721206,
+        "sd_recall": 0.3162287669206537,
+        "per_seed_recall": {
+          "0": 0.6281229980781551,
+          "1": 0.0970315991062879,
+          "2": 0.6599967726319187
+        },
+        "mean_residency": 0.3539613703406252,
+        "mean_recall_given_resident": 0.975404480734116,
+        "mean_all_token_ce": 1.4675845329960187,
+        "mean_recall_token_ce": 1.6180409801503022
+      },
+      "paired": {
+        "content_only_minus_random_within_run": {
+          "per_seed": [
+            0.06854580397181292,
+            0.0020746887966804906,
+            -0.03130547038889786
+          ],
+          "mean": 0.013105007459865184,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "content_only_minus_fifo_within_run": {
+          "per_seed": [
+            0.061819346572709766,
+            0.0004787743376954978,
+            0.0358237857027594
+          ],
+          "mean": 0.03270730220438822,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "content_only_minus_lru_within_run": {
+          "per_seed": [
+            0.09657270980140936,
+            0.0027130545802744876,
+            0.01920284008391157
+          ],
+          "mean": 0.03949620148853181,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "content_only_minus_oracle_within_run": {
+          "per_seed": [
+            -0.10009609224855859,
+            0.00031918289179699855,
+            -0.02388252380183961
+          ],
+          "mean": -0.04121981105286707,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_random_within_run": {
+          "per_seed": [
+            -0.04420243433696347,
+            -0.0009575486753909956,
+            0.006938841374858784
+          ],
+          "mean": -0.012740380545831894,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_fifo_within_run": {
+          "per_seed": [
+            0.02738629083920563,
+            0.0,
+            0.0848797805389705
+          ],
+          "mean": 0.03742202379272538,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_lru_within_run": {
+          "per_seed": [
+            0.011050608584240895,
+            0.00015959144589849927,
+            0.06503146683879302
+          ],
+          "mean": 0.025413888956310804,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "static_priority_minus_oracle_within_run": {
+          "per_seed": [
+            -0.05781550288276738,
+            0.0,
+            0.04082620622882038
+          ],
+          "mean": -0.005663098884648998,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_random_within_run": {
+          "per_seed": [
+            -0.06534272901985905,
+            -0.0006383657835939971,
+            0.04728094239147984
+          ],
+          "mean": -0.006233384137324401,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_fifo_within_run": {
+          "per_seed": [
+            -0.09112748238308777,
+            0.000638365783594011,
+            0.25383249959657905
+          ],
+          "mean": 0.054447794332361764,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "phl_lease_minus_lru_within_run": {
+          "per_seed": [
+            -0.058776425368353646,
+            0.0004787743376954978,
+            0.15781829917702117
+          ],
+          "mean": 0.033173549382121005,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "phl_lease_minus_oracle_within_run": {
+          "per_seed": [
+            -0.17953235105701476,
+            0.00031918289179699855,
+            0.1923511376472487
+          ],
+          "mean": 0.0043793231606769805,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "learned_utility_minus_random_within_run": {
+          "per_seed": [
+            -0.014573991031390121,
+            0.0006383657835939971,
+            -0.00871389381959009
+          ],
+          "mean": -0.0075498396891287385,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "learned_utility_minus_fifo_within_run": {
+          "per_seed": [
+            0.005445227418321652,
+            0.0009575486753909956,
+            0.026141681458770383
+          ],
+          "mean": 0.010848152517494344,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "learned_utility_minus_lru_within_run": {
+          "per_seed": [
+            -0.0024023062139653106,
+            0.0006383657835939971,
+            0.0192028400839116
+          ],
+          "mean": 0.005812966551180095,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "learned_utility_minus_oracle_within_run": {
+          "per_seed": [
+            -0.08952594490711074,
+            0.0009575486753909956,
+            -0.05551073099887038
+          ],
+          "mean": -0.048026375743530046,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_content_only_across_runs": {
+          "per_seed": [
+            -0.2604099935938501,
+            -0.0033514203638684847,
+            0.48168468613845417
+          ],
+          "mean": 0.07264109072691187,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_static_priority_across_runs": {
+          "per_seed": [
+            -0.36819346572709805,
+            0.00031918289179699855,
+            0.01194126190091982
+          ],
+          "mean": -0.11864434031146041,
+          "seed_wins": 2,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_learned_utility_across_runs": {
+          "per_seed": [
+            -0.40262652146060224,
+            -0.0007979572294924964,
+            0.028239470711634684
+          ],
+          "mean": -0.12506166932615334,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        }
+      }
+    },
+    "spec_w12": {
+      "random": {
+        "mean_recall_over_all_runs": 0.5053357770962265,
+        "sd_recall_over_all_runs": 0.3553279331134229,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.6059479553903345,
+            "1": 0.10555972952667167,
+            "2": 0.30426851514045966
+          },
+          "static_priority": {
+            "0": 0.8609665427509293,
+            "1": 0.0980465815176559,
+            "2": 0.8894564027727107
+          },
+          "phl_lease": {
+            "0": 0.3992565055762082,
+            "1": 0.09879789631855748,
+            "2": 0.813206858810653
+          },
+          "learned_utility": {
+            "0": 0.8728624535315985,
+            "1": 0.10030052592036064,
+            "2": 0.9153593578985771
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "fifo": {
+        "mean_recall_over_all_runs": 0.40606806641926946,
+        "sd_recall_over_all_runs": 0.2729009182146416,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.5724907063197026,
+            "1": 0.094290007513148,
+            "2": 0.2564757387814666
+          },
+          "static_priority": {
+            "0": 0.6881040892193309,
+            "1": 0.09917355371900827,
+            "2": 0.5877417001094491
+          },
+          "phl_lease": {
+            "0": 0.39479553903345727,
+            "1": 0.09842223891810668,
+            "2": 0.4290404961692813
+          },
+          "learned_utility": {
+            "0": 0.7672862453531598,
+            "1": 0.09842223891810668,
+            "2": 0.7865742429770157
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "lru": {
+        "mean_recall_over_all_runs": 0.4434144994165026,
+        "sd_recall_over_all_runs": 0.3070062697912352,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.5397769516728624,
+            "1": 0.09842223891810668,
+            "2": 0.2579350601970084
+          },
+          "static_priority": {
+            "0": 0.7643122676579925,
+            "1": 0.09917355371900827,
+            "2": 0.7336738416636264
+          },
+          "phl_lease": {
+            "0": 0.3446096654275093,
+            "1": 0.09879789631855748,
+            "2": 0.6596132798248814
+          },
+          "learned_utility": {
+            "0": 0.7944237918215613,
+            "1": 0.09842223891810668,
+            "2": 0.8318132068588107
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "oracle": {
+        "mean_recall_over_all_runs": 0.43358648992723087,
+        "sd_recall_over_all_runs": 0.3080013585656665,
+        "recall_by_trained_arm": {
+          "content_only": {
+            "0": 0.7226765799256506,
+            "1": 0.09954921111945905,
+            "2": 0.22400583728566217
+          },
+          "static_priority": {
+            "0": 0.7256505576208179,
+            "1": 0.09879789631855748,
+            "2": 0.5855527179861364
+          },
+          "phl_lease": {
+            "0": 0.42379182156133827,
+            "1": 0.09842223891810668,
+            "2": 0.41262313024443636
+          },
+          "learned_utility": {
+            "0": 0.8397769516728625,
+            "1": 0.09842223891810668,
+            "2": 0.8737686975556366
+          }
+        },
+        "note": "one value per trained model; spread across trained arms measures content-path divergence, not policy quality"
+      },
+      "content_only": {
+        "mean_recall": 0.30845847520355346,
+        "sd_recall": 0.3216390178442826,
+        "per_seed_recall": {
+          "0": 0.6788104089219331,
+          "1": 0.09917355371900827,
+          "2": 0.14739146296971908
+        },
+        "mean_residency": 0.24262638071561904,
+        "mean_recall_given_resident": 0.6815021747431345,
+        "mean_all_token_ce": 1.0840661451220512,
+        "mean_recall_token_ce": 1.9229804873466492
+      },
+      "static_priority": {
+        "mean_recall": 0.5930308076810952,
+        "sd_recall": 0.43547653000052555,
+        "per_seed_recall": {
+          "0": 0.7579925650557621,
+          "1": 0.09917355371900827,
+          "2": 0.9219263042685152
+        },
+        "mean_residency": 0.5560295788356803,
+        "mean_recall_given_resident": 0.9533533306479052,
+        "mean_all_token_ce": 1.0261257383972406,
+        "mean_recall_token_ce": 1.1641108317611117
+      },
+      "phl_lease": {
+        "mean_recall": 0.43201743685413413,
+        "sd_recall": 0.4241839975772436,
+        "per_seed_recall": {
+          "0": 0.28773234200743497,
+          "1": 0.09879789631855748,
+          "2": 0.90952207223641
+        },
+        "mean_residency": 0.3210750334427825,
+        "mean_recall_given_resident": 0.8613908889947188,
+        "mean_all_token_ce": 1.110835837200284,
+        "mean_recall_token_ce": 1.5970118533199031
+      },
+      "learned_utility": {
+        "mean_recall": 0.6027254925524723,
+        "sd_recall": 0.4385071721726709,
+        "per_seed_recall": {
+          "0": 0.8118959107806691,
+          "1": 0.09879789631855748,
+          "2": 0.8974826705581904
+        },
+        "mean_residency": 0.4937541224247701,
+        "mean_recall_given_resident": 0.9814649498418846,
+        "mean_all_token_ce": 0.9994687164823214,
+        "mean_recall_token_ce": 1.129174461743484
+      },
+      "paired": {
+        "content_only_minus_random_within_run": {
+          "per_seed": [
+            0.07286245353159859,
+            -0.006386175807663402,
+            -0.15687705217074058
+          ],
+          "mean": -0.030133591482268463,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "content_only_minus_fifo_within_run": {
+          "per_seed": [
+            0.10631970260223056,
+            0.004883546205860262,
+            -0.10908427581174754
+          ],
+          "mean": 0.0007063243321144275,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "content_only_minus_lru_within_run": {
+          "per_seed": [
+            0.13903345724907068,
+            0.0007513148009015841,
+            -0.11054359722728932
+          ],
+          "mean": 0.009747058274227649,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "content_only_minus_oracle_within_run": {
+          "per_seed": [
+            -0.04386617100371748,
+            -0.0003756574004507851,
+            -0.07661437431594309
+          ],
+          "mean": -0.04028540090670379,
+          "seed_wins": 0,
+          "seeds": 3
+        },
+        "static_priority_minus_random_within_run": {
+          "per_seed": [
+            -0.10297397769516725,
+            0.0011269722013523692,
+            0.03246990149580453
+          ],
+          "mean": -0.023125701332670116,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_fifo_within_run": {
+          "per_seed": [
+            0.06988847583643121,
+            0.0,
+            0.33418460415906603
+          ],
+          "mean": 0.13469102666516575,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "static_priority_minus_lru_within_run": {
+          "per_seed": [
+            -0.00631970260223047,
+            0.0,
+            0.18825246260488882
+          ],
+          "mean": 0.060644253334219446,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "static_priority_minus_oracle_within_run": {
+          "per_seed": [
+            0.0323420074349442,
+            0.0003756574004507851,
+            0.3363735862823788
+          ],
+          "mean": 0.12303041703925792,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "phl_lease_minus_random_within_run": {
+          "per_seed": [
+            -0.1115241635687732,
+            0.0,
+            0.096315213425757
+          ],
+          "mean": -0.00506965004767207,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_fifo_within_run": {
+          "per_seed": [
+            -0.1070631970260223,
+            0.000375657400450799,
+            0.4804815760671287
+          ],
+          "mean": 0.12459801214718574,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "phl_lease_minus_lru_within_run": {
+          "per_seed": [
+            -0.056877323420074344,
+            0.0,
+            0.24990879241152864
+          ],
+          "mean": 0.06434382299715143,
+          "seed_wins": 1,
+          "seeds": 3
+        },
+        "phl_lease_minus_oracle_within_run": {
+          "per_seed": [
+            -0.1360594795539033,
+            0.000375657400450799,
+            0.49689894199197365
+          ],
+          "mean": 0.12040503994617373,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "learned_utility_minus_random_within_run": {
+          "per_seed": [
+            -0.06096654275092939,
+            -0.0015026296018031543,
+            -0.01787668734038672
+          ],
+          "mean": -0.026781953231039754,
+          "seed_wins": 0,
+          "seeds": 3
+        },
+        "learned_utility_minus_fifo_within_run": {
+          "per_seed": [
+            0.044609665427509326,
+            0.000375657400450799,
+            0.1109084275811747
+          ],
+          "mean": 0.05196458346971161,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "learned_utility_minus_lru_within_run": {
+          "per_seed": [
+            0.01747211895910783,
+            0.000375657400450799,
+            0.06566946369937976
+          ],
+          "mean": 0.02783908001964613,
+          "seed_wins": 3,
+          "seeds": 3
+        },
+        "learned_utility_minus_oracle_within_run": {
+          "per_seed": [
+            -0.027881040892193343,
+            0.000375657400450799,
+            0.023713973002553845
+          ],
+          "mean": -0.001263803496396233,
+          "seed_wins": 2,
+          "seeds": 3
+        },
+        "phl_lease_minus_content_only_across_runs": {
+          "per_seed": [
+            -0.39107806691449815,
+            -0.0003756574004507851,
+            0.762130609266691
+          ],
+          "mean": 0.12355896165058067,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_static_priority_across_runs": {
+          "per_seed": [
+            -0.4702602230483271,
+            -0.0003756574004507851,
+            -0.012404232032105167
+          ],
+          "mean": -0.16101337082696102,
+          "seed_wins": 0,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        },
+        "phl_lease_minus_learned_utility_across_runs": {
+          "per_seed": [
+            -0.5241635687732342,
+            0.0,
+            0.012039401678219597
+          ],
+          "mean": -0.17070805569833822,
+          "seed_wins": 1,
+          "seeds": 3,
+          "note": "independently trained; content weights are not shared"
+        }
+      }
+    }
+  }
+}

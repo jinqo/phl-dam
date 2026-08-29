@@ -1,0 +1,120 @@
+{
+  "experiment": "PHL-DAM continual learning - disjoint-key task sequence",
+  "mode": "memory",
+  "configuration": {
+    "scale": "compact",
+    "regime": "conflicting",
+    "seed": 2,
+    "tasks": 4,
+    "keys_per_task": 16,
+    "steps_per_task": 400,
+    "batch_size": 16,
+    "writes_per_episode": 8,
+    "eval_episodes_per_task": 192,
+    "learning_rate": 0.002,
+    "trains_after_first_task": false,
+    "carries_memory_across_episodes": false,
+    "lease_state_present": false
+  },
+  "accuracy_after_each_task": [
+    [
+      1.0
+    ],
+    [
+      1.0,
+      0.0
+    ],
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "final_accuracy_per_task": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "peak_accuracy_per_task": [
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "forgetting_per_task": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "mean_forgetting": 0.0,
+  "retention_old_tasks": 0.3333333333333333,
+  "plasticity_last_task": 0.0,
+  "mean_final_accuracy": 0.25,
+  "training_history": [
+    {
+      "task": 0,
+      "step": 50,
+      "loss": 0.6723958253860474,
+      "recall_ce": 0.01967426761984825,
+      "gradient_norm": 0.2090487778186798
+    },
+    {
+      "task": 0,
+      "step": 100,
+      "loss": 0.5818902850151062,
+      "recall_ce": 0.0048568663187325,
+      "gradient_norm": 0.13921824097633362
+    },
+    {
+      "task": 0,
+      "step": 150,
+      "loss": 0.5823326706886292,
+      "recall_ce": 0.0029182336293160915,
+      "gradient_norm": 0.24064819514751434
+    },
+    {
+      "task": 0,
+      "step": 200,
+      "loss": 0.5829391479492188,
+      "recall_ce": 0.002196748275309801,
+      "gradient_norm": 0.21477168798446655
+    },
+    {
+      "task": 0,
+      "step": 250,
+      "loss": 0.5720704197883606,
+      "recall_ce": 0.0015016394900158048,
+      "gradient_norm": 0.3884904384613037
+    },
+    {
+      "task": 0,
+      "step": 300,
+      "loss": 0.5816946029663086,
+      "recall_ce": 0.0013416748261079192,
+      "gradient_norm": 0.5993474125862122
+    },
+    {
+      "task": 0,
+      "step": 350,
+      "loss": 0.529565691947937,
+      "recall_ce": 0.0009943509940057993,
+      "gradient_norm": 0.36270764470100403
+    },
+    {
+      "task": 0,
+      "step": 400,
+      "loss": 0.5696335434913635,
+      "recall_ce": 0.000814280821941793,
+      "gradient_norm": 0.2145833671092987
+    }
+  ],
+  "elapsed_seconds": 892.5138913000119,
+  "finite": true
+}

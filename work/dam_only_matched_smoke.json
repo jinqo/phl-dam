@@ -1,0 +1,74 @@
+{
+  "experiment": "PHL-DAM content-only backbone attribution",
+  "model": "dam_only_matched",
+  "configuration": {
+    "seed": 0,
+    "bindings": 3,
+    "possible_values": 10,
+    "possible_keys": 32,
+    "d_model": 64,
+    "d_key": 24,
+    "d_value": 24,
+    "phl_enabled": false,
+    "explicit_slots": true,
+    "delta_rule": false,
+    "generic_ffn_width": 64,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false,
+    "hard_allocation": false,
+    "objective": "all-token next-token CE + marked recall-token CE + 0.05 position-agnostic write-budget penalty",
+    "training_steps": 10,
+    "batch_size": 8,
+    "eval_episodes": 32,
+    "learning_rate": 0.002,
+    "active_parameters": 33098,
+    "recurrent_state_floats_per_sequence": 392
+  },
+  "metrics": {
+    "episodes": 32,
+    "queries": 96,
+    "recall_accuracy": 0.08333333333333333,
+    "retrieval_disabled_accuracy": 0.08333333333333333,
+    "all_token_ce": 0.6316003948450089,
+    "recall_token_ce": 2.675268769264221,
+    "distance_accuracy": {
+      "29-63": 0.0625,
+      "64-95": 0.09375,
+      "96-169": 0.09375
+    },
+    "distance_counts": {
+      "29-63": 32,
+      "64-95": 32,
+      "96-169": 32
+    },
+    "controller": {
+      "mean_write_gate_at_binding": 0.038395229106148086,
+      "mean_write_gate_elsewhere": 0.018233312003185294,
+      "mean_read_gate_at_query": 0.6566868126392365,
+      "mean_read_gate_elsewhere": 0.8269017169930343
+    },
+    "finite": true,
+    "address_top1_accuracy": 0.84375
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 7.6626715660095215,
+      "all_token_ce": 3.4659347534179688,
+      "recall_ce": 4.071933269500732,
+      "write_budget_penalty": 2.496067523956299,
+      "gradient_norm": 14.161185264587402,
+      "elapsed_seconds": 0.8921818999951938
+    },
+    {
+      "step": 10,
+      "loss": 3.4256114959716797,
+      "all_token_ce": 0.6580114960670471,
+      "recall_ce": 2.7669363021850586,
+      "write_budget_penalty": 0.01327315904200077,
+      "gradient_norm": 3.2120232582092285,
+      "elapsed_seconds": 8.42665369999304
+    }
+  ]
+}

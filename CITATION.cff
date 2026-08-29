@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "PHL-DAM: staged empirical investigation of a slot-memory sequence architecture"
+message: "If you use this work, cite it as below."
+type: software
+authors:
+  - given-names: Liam
+    family-names: Pattiata
+    email: liampattiata@gmail.com
+abstract: >-
+  A preregistered, staged investigation of PHL-DAM, a recurrent sequence model
+  combining a multi-timescale context state with a bank of eight explicit
+  key-value memory slots addressed by content. Includes parameter-matched
+  comparisons against a causal Transformer, diagonal and selective state-space
+  models, and an NTM/DNC-style differentiable memory; an attribution study that
+  rejected the architecture's temporal-lease mechanism; a diagnosed and fixed
+  gradient instability; and a write-pressure ladder locating where the
+  controller stops learning.
+keywords:
+  - associative recall
+  - memory-augmented neural networks
+  - sequence models
+  - continual learning
+license: AGPL-3.0-or-later
+date-released: 2026-08-29

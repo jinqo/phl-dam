@@ -1,0 +1,120 @@
+{
+  "experiment": "PHL-DAM continual learning - disjoint-key task sequence",
+  "mode": "memory",
+  "configuration": {
+    "scale": "compact",
+    "regime": "disjoint",
+    "seed": 1,
+    "tasks": 4,
+    "keys_per_task": 16,
+    "steps_per_task": 400,
+    "batch_size": 16,
+    "writes_per_episode": 8,
+    "eval_episodes_per_task": 192,
+    "learning_rate": 0.002,
+    "trains_after_first_task": false,
+    "carries_memory_across_episodes": false,
+    "lease_state_present": false
+  },
+  "accuracy_after_each_task": [
+    [
+      0.5902222222222222
+    ],
+    [
+      0.5902222222222222,
+      0.34291010194624655
+    ],
+    [
+      0.5902222222222222,
+      0.34291010194624655,
+      0.32850678733031674
+    ],
+    [
+      0.5902222222222222,
+      0.34291010194624655,
+      0.32850678733031674,
+      0.34763181411974975
+    ]
+  ],
+  "final_accuracy_per_task": [
+    0.5902222222222222,
+    0.34291010194624655,
+    0.32850678733031674,
+    0.34763181411974975
+  ],
+  "peak_accuracy_per_task": [
+    0.5902222222222222,
+    0.34291010194624655,
+    0.32850678733031674,
+    0.34763181411974975
+  ],
+  "forgetting_per_task": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "mean_forgetting": 0.0,
+  "retention_old_tasks": 0.42054637049959515,
+  "plasticity_last_task": 0.34763181411974975,
+  "mean_final_accuracy": 0.4023177314046338,
+  "training_history": [
+    {
+      "task": 0,
+      "step": 50,
+      "loss": 3.1927947998046875,
+      "recall_ce": 2.3594894409179688,
+      "gradient_norm": 1.1702868938446045
+    },
+    {
+      "task": 0,
+      "step": 100,
+      "loss": 3.147737979888916,
+      "recall_ce": 2.3895301818847656,
+      "gradient_norm": 1.8010808229446411
+    },
+    {
+      "task": 0,
+      "step": 150,
+      "loss": 3.0943472385406494,
+      "recall_ce": 2.322777509689331,
+      "gradient_norm": 1.371485948562622
+    },
+    {
+      "task": 0,
+      "step": 200,
+      "loss": 3.037092447280884,
+      "recall_ce": 2.3395564556121826,
+      "gradient_norm": 1.5695663690567017
+    },
+    {
+      "task": 0,
+      "step": 250,
+      "loss": 3.0317654609680176,
+      "recall_ce": 2.2607104778289795,
+      "gradient_norm": 0.8076188564300537
+    },
+    {
+      "task": 0,
+      "step": 300,
+      "loss": 2.4085419178009033,
+      "recall_ce": 1.6135717630386353,
+      "gradient_norm": 613.1873779296875
+    },
+    {
+      "task": 0,
+      "step": 350,
+      "loss": 2.467576265335083,
+      "recall_ce": 1.615548849105835,
+      "gradient_norm": 7662.802734375
+    },
+    {
+      "task": 0,
+      "step": 400,
+      "loss": 2.5452253818511963,
+      "recall_ce": 1.7214792966842651,
+      "gradient_norm": 18905.6875
+    }
+  ],
+  "elapsed_seconds": 976.4738416000037,
+  "finite": true
+}

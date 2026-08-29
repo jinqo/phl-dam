@@ -1,0 +1,216 @@
+{
+  "experiment": "PHL-DAM-004B scale ladder - why the full-scale run is a null",
+  "question": "Is the full-scale null caused by the eviction machinery, the lease, or by the content controller's reach on a 456-token task?",
+  "method": "Identical 004B model and phl_lease arm on progressively more Stage-B-like versions of the 004 task. Stage B (3 bindings, 176 tokens) reaches its recall breakthrough near step 300.",
+  "arm": "phl_lease",
+  "seed": 0,
+  "steps": 500,
+  "batch_size": 16,
+  "rungs": {
+    "A": {
+      "configuration": "rung=A T=176 writes=3 steps=500 delay=29-110",
+      "recall": 0.9918,
+      "residency": 0.9852,
+      "recall_given_resident": 0.995,
+      "recall_token_ce": 0.0199,
+      "mean_write_gate_at_binding": 0.996,
+      "mean_write_gate_elsewhere": 0.0399,
+      "breakthrough_step": 150,
+      "training_history": [
+        {
+          "step": 1,
+          "recall_ce": 4.7827
+        },
+        {
+          "step": 25,
+          "recall_ce": 2.3614
+        },
+        {
+          "step": 50,
+          "recall_ce": 2.3881
+        },
+        {
+          "step": 75,
+          "recall_ce": 2.3256
+        },
+        {
+          "step": 100,
+          "recall_ce": 2.4319
+        },
+        {
+          "step": 125,
+          "recall_ce": 2.2945
+        },
+        {
+          "step": 150,
+          "recall_ce": 0.5261
+        },
+        {
+          "step": 175,
+          "recall_ce": 0.0577
+        },
+        {
+          "step": 200,
+          "recall_ce": 0.3656
+        },
+        {
+          "step": 225,
+          "recall_ce": 0.4081
+        },
+        {
+          "step": 250,
+          "recall_ce": 0.2296
+        },
+        {
+          "step": 275,
+          "recall_ce": 0.0316
+        },
+        {
+          "step": 300,
+          "recall_ce": 0.0337
+        },
+        {
+          "step": 325,
+          "recall_ce": 0.0104
+        },
+        {
+          "step": 350,
+          "recall_ce": 0.1946
+        },
+        {
+          "step": 375,
+          "recall_ce": 0.0065
+        },
+        {
+          "step": 400,
+          "recall_ce": 0.0053
+        },
+        {
+          "step": 425,
+          "recall_ce": 0.0046
+        },
+        {
+          "step": 450,
+          "recall_ce": 0.0034
+        },
+        {
+          "step": 475,
+          "recall_ce": 0.0039
+        },
+        {
+          "step": 500,
+          "recall_ce": 0.3223
+        }
+      ]
+    },
+    "B": {
+      "configuration": "rung=B T=176 writes=8 steps=500 delay=29-110",
+      "recall": 0.894,
+      "residency": 0.9111,
+      "recall_given_resident": 0.955,
+      "recall_token_ce": 0.5001,
+      "mean_write_gate_at_binding": 0.6519,
+      "mean_write_gate_elsewhere": 0.0185,
+      "breakthrough_step": 150,
+      "training_history": [
+        {
+          "step": 1,
+          "recall_ce": 4.7621
+        },
+        {
+          "step": 25,
+          "recall_ce": 2.4958
+        },
+        {
+          "step": 50,
+          "recall_ce": 2.3494
+        },
+        {
+          "step": 75,
+          "recall_ce": 2.3502
+        },
+        {
+          "step": 100,
+          "recall_ce": 2.3474
+        },
+        {
+          "step": 125,
+          "recall_ce": 2.0501
+        },
+        {
+          "step": 150,
+          "recall_ce": 1.7416
+        },
+        {
+          "step": 175,
+          "recall_ce": 1.6079
+        },
+        {
+          "step": 200,
+          "recall_ce": 1.0686
+        },
+        {
+          "step": 225,
+          "recall_ce": 0.7868
+        },
+        {
+          "step": 250,
+          "recall_ce": 0.723
+        },
+        {
+          "step": 275,
+          "recall_ce": 0.8723
+        },
+        {
+          "step": 300,
+          "recall_ce": 0.7792
+        },
+        {
+          "step": 325,
+          "recall_ce": 0.5679
+        },
+        {
+          "step": 350,
+          "recall_ce": 0.6743
+        },
+        {
+          "step": 375,
+          "recall_ce": 0.7985
+        },
+        {
+          "step": 400,
+          "recall_ce": 0.5756
+        },
+        {
+          "step": 425,
+          "recall_ce": 0.7638
+        },
+        {
+          "step": 450,
+          "recall_ce": 0.557
+        },
+        {
+          "step": 475,
+          "recall_ce": 0.5586
+        },
+        {
+          "step": 500,
+          "recall_ce": 0.5655
+        }
+      ]
+    }
+  },
+  "full_scale_reference": {
+    "sequence_length": 456,
+    "writes": [
+      16,
+      24,
+      32
+    ],
+    "steps": 600,
+    "breakthrough_step": null,
+    "final_recall_token_ce": 2.31,
+    "note": "no breakthrough in any of six runs across four arms and two seeds"
+  },
+  "conclusion": "Sequence length, not capacity and not the lease: at 176 tokens the same model breaks through by step ~200 and reaches 99.18% recall with three writes and 89.40% with eight; at 456 tokens it never leaves chance within 600 updates."
+}

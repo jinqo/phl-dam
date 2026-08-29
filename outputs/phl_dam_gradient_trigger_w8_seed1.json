@@ -1,0 +1,165 @@
+{
+  "found": true,
+  "experiment": "PHL-DAM gradient trigger localisation",
+  "configuration": {
+    "scale": "pressure",
+    "writes": 8,
+    "seed": 1,
+    "batch_size": 16,
+    "threshold": 1000000.0,
+    "sequence_length": 456
+  },
+  "spike_step": 3,
+  "spike_gradient_norm": 104543461376.0,
+  "trace": [
+    {
+      "step": 1,
+      "loss": 10.092586517333984,
+      "gradient_norm": 20.557405471801758
+    },
+    {
+      "step": 2,
+      "loss": 7.604370594024658,
+      "gradient_norm": 11.903419494628906
+    },
+    {
+      "step": 3,
+      "loss": 6.505125999450684,
+      "gradient_norm": 104543461376.0
+    }
+  ],
+  "per_episode_gradient": [
+    {
+      "index": 0,
+      "gradient_norm": 890280833.8048277
+    },
+    {
+      "index": 1,
+      "gradient_norm": 224877236580.99826
+    },
+    {
+      "index": 2,
+      "gradient_norm": 114953088.62020959
+    },
+    {
+      "index": 3,
+      "gradient_norm": 1078874567.2613382
+    },
+    {
+      "index": 4,
+      "gradient_norm": 908446568.8201643
+    },
+    {
+      "index": 5,
+      "gradient_norm": 218590011.5126236
+    },
+    {
+      "index": 6,
+      "gradient_norm": 3042267.506462955
+    },
+    {
+      "index": 7,
+      "gradient_norm": 1199218747.70984
+    },
+    {
+      "index": 8,
+      "gradient_norm": 2318370.627059606
+    },
+    {
+      "index": 9,
+      "gradient_norm": 835038523.1202826
+    },
+    {
+      "index": 10,
+      "gradient_norm": 1454903.7910309802
+    },
+    {
+      "index": 11,
+      "gradient_norm": 4365221.500447576
+    },
+    {
+      "index": 12,
+      "gradient_norm": 36811897587.667694
+    },
+    {
+      "index": 13,
+      "gradient_norm": 575176.6084746409
+    },
+    {
+      "index": 14,
+      "gradient_norm": 508784031.7865866
+    },
+    {
+      "index": 15,
+      "gradient_norm": 608676.6290850529
+    }
+  ],
+  "worst_episode": {
+    "index": 1,
+    "gradient_norm": 224877236580.99826
+  },
+  "prefix_profile": [
+    {
+      "upto": 23,
+      "gradient_norm": 1.6618676467078999
+    },
+    {
+      "upto": 46,
+      "gradient_norm": 853606.983458796
+    },
+    {
+      "upto": 91,
+      "gradient_norm": 924752853.2922758
+    },
+    {
+      "upto": 137,
+      "gradient_norm": 12988373425.917635
+    },
+    {
+      "upto": 182,
+      "gradient_norm": 34662901899.72754
+    },
+    {
+      "upto": 228,
+      "gradient_norm": 38940509032.603745
+    },
+    {
+      "upto": 274,
+      "gradient_norm": 35026928303.14162
+    },
+    {
+      "upto": 319,
+      "gradient_norm": 36740372781.995445
+    },
+    {
+      "upto": 365,
+      "gradient_norm": 35871941671.82746
+    },
+    {
+      "upto": 410,
+      "gradient_norm": 29315432881.37287
+    },
+    {
+      "upto": 456,
+      "gradient_norm": 32397244508.98987
+    }
+  ],
+  "first_large_jump": {
+    "from": 23,
+    "to": 46,
+    "ratio": 513643.18039993185
+  },
+  "worst_episode_signature": {
+    "occupancy_min": 0.004031586926430464,
+    "occupancy_max": 0.9978525042533875,
+    "occupancy_mean": 0.8228901624679565,
+    "write_strength_max": 0.12186602503061295,
+    "write_strength_mean": 0.09786737710237503,
+    "allocation_entropy_min": 9.589760156814009e-05,
+    "allocation_entropy_max": 2.0782077312469482,
+    "allocation_margin_min": 2.0772218704223633e-05,
+    "steps_with_tiny_margin": 7,
+    "steps_with_tiny_occupancy": 0
+  },
+  "batch_mean_gradient": 16715980322.372774
+}

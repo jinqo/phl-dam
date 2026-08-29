@@ -1,0 +1,62 @@
+{
+  "experiment": "Clean PHL-DAM vs Transformer rematch",
+  "model": "causal_transformer",
+  "configuration": {
+    "seed": 0,
+    "d_model": 48,
+    "layers": 1,
+    "heads": 4,
+    "ffn_width": 195,
+    "sequence_length": 176,
+    "fixed_sinusoidal_positions": true,
+    "dropout": 0.0,
+    "causal": true,
+    "active_parameters": 33074,
+    "kv_cache_floats_at_sequence_length": 16896,
+    "primary_objective": "all-token next-token CE + marked recall-token CE",
+    "architecture_specific_regularizer": null,
+    "training_steps": 10,
+    "batch_size": 8,
+    "eval_episodes": 32,
+    "learning_rate": 0.002,
+    "lease_state_present": false,
+    "promotion": false
+  },
+  "metrics": {
+    "episodes": 32,
+    "queries": 96,
+    "recall_accuracy": 0.010416666666666666,
+    "attention_disabled_accuracy": 0.08333333333333333,
+    "all_token_ce": 0.9447615593671799,
+    "recall_token_ce": 3.4725257754325867,
+    "distance_accuracy": {
+      "29-63": 0.0,
+      "64-95": 0.03125,
+      "96-169": 0.0
+    },
+    "distance_counts": {
+      "29-63": 32,
+      "64-95": 32,
+      "96-169": 32
+    },
+    "finite": true
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 8.032747268676758,
+      "all_token_ce": 4.156584739685059,
+      "recall_ce": 3.8761627674102783,
+      "gradient_norm": 6.604921817779541,
+      "elapsed_seconds": 0.035260100004961714
+    },
+    {
+      "step": 10,
+      "loss": 4.550996780395508,
+      "all_token_ce": 1.0127999782562256,
+      "recall_ce": 3.5381968021392822,
+      "gradient_norm": 2.856102228164673,
+      "elapsed_seconds": 0.2778379999945173
+    }
+  ]
+}

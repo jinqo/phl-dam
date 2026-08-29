@@ -1,0 +1,146 @@
+{
+  "experiment": "PHL-DAM Lease-001 — Retention-only memory-pressure pilot",
+  "question": "Can PHL predict when a memory will matter and preserve the right memories under limited capacity?",
+  "protocol": {
+    "seeds": [0, 1, 2, 3, 4, 5],
+    "slots": 8,
+    "writes_per_episode": 32,
+    "eval_episodes_per_seed": 2000,
+    "total_eval_queries": 322420,
+    "delay_classes": {
+      "near": [5, 9],
+      "medium": [14, 22],
+      "far": [32, 48],
+      "never": null
+    },
+    "causal_cue_only_at_inference": true,
+    "future_query_metadata_visible_to_learned_policy": false,
+    "exact_content_store": true,
+    "query_consumes_binding": true,
+    "lease_predictor_parameters": 548,
+    "shared_predictor_for_static_and_transported_policies": true,
+    "promotion": false
+  },
+  "prediction": {
+    "seed_top1_accuracy": [
+      0.9995625019073486,
+      0.999343752861023,
+      0.9994687438011169,
+      0.9994375109672546,
+      0.9995156526565552,
+      0.9994218945503235
+    ],
+    "mean_top1_accuracy": 0.9994583427906036,
+    "sample_sd_top1_accuracy": 0.00007633480778917227,
+    "mean_cross_entropy": 0.005194087357570727,
+    "mean_expected_calibration_error": 0.003937955402458708,
+    "accuracy_gate_at_least_0_85": true
+  },
+  "retention": {
+    "random": {
+      "mean_hit_rate": 0.6572493718506125,
+      "sample_sd": 0.002199214635194877
+    },
+    "fifo": {
+      "mean_hit_rate": 0.690075839938891,
+      "sample_sd": 0.002495137343443566
+    },
+    "static_learned": {
+      "mean_hit_rate": 0.7997137636411553,
+      "sample_sd": 0.003929079866417732
+    },
+    "randomized_lease": {
+      "mean_hit_rate": 0.7712174352753348,
+      "sample_sd": 0.006636994792808532
+    },
+    "phl_transported_lease": {
+      "seed_hit_rate": [
+        0.8716329495920421,
+        0.8699586638364428,
+        0.8690986324850021,
+        0.8722065483703318,
+        0.871565946840764,
+        0.8721867495671922
+      ],
+      "mean_hit_rate": 0.8711082484486292,
+      "sample_sd": 0.001281743156069577,
+      "min_hit_rate": 0.8690986324850021,
+      "max_hit_rate": 0.8722065483703318
+    },
+    "oracle_next_use": {
+      "mean_hit_rate": 0.872209291850892,
+      "sample_sd": 0.001265665683914055
+    }
+  },
+  "paired_comparisons": {
+    "phl_minus_static": {
+      "seed_difference": [
+        0.07808948995939058,
+        0.06785089189289839,
+        0.07174795990609983,
+        0.07363204395278045,
+        0.06813235868534118,
+        0.06891416444833298
+      ],
+      "mean_percentage_points": 7.13944848074739,
+      "approximate_95_percent_t_interval_percentage_points": [
+        6.721501026774328,
+        7.557395934720453
+      ],
+      "winning_seeds": 6
+    },
+    "phl_minus_randomized_lease": {
+      "mean_percentage_points": 9.989081317329446,
+      "approximate_95_percent_t_interval_percentage_points": [
+        9.310727373435582,
+        10.66743526122331
+      ],
+      "winning_seeds": 6
+    },
+    "phl_minus_fifo": {
+      "mean_percentage_points": 18.103240850973826,
+      "approximate_95_percent_t_interval_percentage_points": [
+        17.91933677816757,
+        18.287144923780083
+      ],
+      "winning_seeds": 6
+    },
+    "oracle_minus_phl": {
+      "mean_percentage_points": 0.11010434022628024,
+      "approximate_95_percent_t_interval_percentage_points": [
+        0.099597255892897,
+        0.12061142455966347
+      ]
+    }
+  },
+  "preregistered_gates": {
+    "prediction_accuracy_at_least_85_percent": {
+      "observed_percent": 99.94583427906036,
+      "passed": true
+    },
+    "phl_over_static_at_least_5_percentage_points": {
+      "observed_percentage_points": 7.13944848074739,
+      "passed": true,
+      "per_seed_passes": "6/6"
+    },
+    "phl_over_best_non_oracle_control_at_least_5_percentage_points": {
+      "best_control": "static_learned",
+      "observed_percentage_points": 7.13944848074739,
+      "passed": true,
+      "per_seed_passes": "6/6"
+    },
+    "oracle_over_best_fifo_random_or_randomized_heuristic_at_least_10_percentage_points": {
+      "best_heuristic": "randomized_lease",
+      "observed_percentage_points": 10.09918565755572,
+      "aggregate_passed": true,
+      "per_seed_passes": "4/6",
+      "assessment": "borderline feasibility pass; not a robust all-seed margin"
+    }
+  },
+  "verdict": {
+    "answer": "yes, in this controlled cue-rich retention pilot",
+    "supported": "PHL predicts a future-use horizon from causal context and transported relevance preserves more useful bindings than parameter-identical static priority, randomized timing, FIFO, or random eviction under 4x write pressure.",
+    "not_yet_supported": "end-to-end lease learning from language-model loss, ambiguous or absent timing cues, repeated-use memories, or natural-code workloads",
+    "next_falsification": "repeat with ambiguous and unknown-delay cues, including a persistent lease component, then integrate the lease into learned PHL-DAM content storage"
+  }
+}

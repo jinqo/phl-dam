@@ -1,0 +1,119 @@
+{
+  "experiment": "Clean PHL-DAM vs Transformer rematch",
+  "protocol": {
+    "seeds": [0, 1, 2, 3, 4, 5],
+    "training_steps_per_seed": 500,
+    "batch_size": 16,
+    "eval_episodes_per_seed": 2000,
+    "eval_queries_per_seed": 6000,
+    "sequence_length": 176,
+    "bindings_per_sequence": 3,
+    "same_generator_streams": true,
+    "same_primary_objective": "all-token next-token CE + marked recall-token CE",
+    "success_threshold": 0.20,
+    "lease_state_present": false,
+    "lease_influence": false,
+    "promotion": false
+  },
+  "models": {
+    "phl_dam": {
+      "parameters": 33034,
+      "recurrent_state_floats_per_sequence": 456,
+      "architecture_specific_regularizer": "0.05 * position-agnostic write-budget penalty",
+      "seed_recall": [
+        0.864,
+        0.996166666666667,
+        0.997166666666667,
+        0.993333333333333,
+        0.9945,
+        0.999833333333333
+      ],
+      "successful_seeds": 6,
+      "mean_recall_accuracy": 0.974166666666667,
+      "sample_sd_recall": 0.0540171783375951,
+      "min_recall_accuracy": 0.864,
+      "max_recall_accuracy": 0.999833333333333,
+      "mean_memory_disabled_accuracy": 0.100888888888889,
+      "mean_all_token_ce": 0.233189291020234,
+      "mean_recall_token_ce": 0.0766697603636421,
+      "mean_distance_accuracy": {
+        "29-63": 0.973166666666667,
+        "64-95": 0.974666666666667,
+        "96-169": 0.974666666666667
+      },
+      "all_runs_finite": true
+    },
+    "causal_transformer": {
+      "architecture": "one-layer pre-norm causal decoder, d_model=48, 4 heads, FFN width=195, fixed sinusoidal positions, dropout=0",
+      "parameters": 33074,
+      "kv_cache_floats_at_sequence_length": 16896,
+      "architecture_specific_regularizer": null,
+      "seed_recall": [
+        0.4588333333333333,
+        0.5426666666666666,
+        0.48433333333333334,
+        0.4568333333333333,
+        0.4055,
+        0.4766666666666667
+      ],
+      "successful_seeds": 6,
+      "mean_recall_accuracy": 0.47080555555555553,
+      "sample_sd_recall": 0.04468723614270715,
+      "min_recall_accuracy": 0.4055,
+      "max_recall_accuracy": 0.5426666666666666,
+      "mean_memory_disabled_accuracy": 0.08883333333333333,
+      "sample_sd_memory_disabled": 0.015814901552368612,
+      "mean_all_token_ce": 0.2520225164294243,
+      "sample_sd_all_token_ce": 0.007447241134497123,
+      "mean_recall_token_ce": 1.2264182911713917,
+      "sample_sd_recall_token_ce": 0.15743602689420907,
+      "mean_distance_accuracy": {
+        "29-63": 0.4028333333333334,
+        "64-95": 0.46324999999999994,
+        "96-169": 0.5463333333333334
+      },
+      "all_runs_finite": true
+    }
+  },
+  "paired_comparison": {
+    "seed_recall_difference_phl_minus_transformer": [
+      0.4051666666666667,
+      0.45350000000000035,
+      0.5128333333333337,
+      0.5364999999999996,
+      0.589,
+      0.5231666666666663
+    ],
+    "mean_recall_advantage_percentage_points": 50.3361111111111,
+    "paired_difference_sample_sd_percentage_points": 6.487290280632203,
+    "paired_difference_approximate_95_percent_t_interval_percentage_points": [
+      43.52811748167356,
+      57.14410474054865
+    ],
+    "all_token_ce_advantage_nats": 0.018833225409190302,
+    "parameter_difference_transformer_minus_phl": 40,
+    "parameter_difference_percent_of_phl": 0.12108736453351092,
+    "runtime_state_reduction_phl_vs_transformer_percent": 97.30113636363636,
+    "memory_ablation_drop_percentage_points": {
+      "phl_dam": 87.32777777777779,
+      "causal_transformer": 38.19722222222222
+    },
+    "paired_recall_winner_all_seeds": "phl_dam"
+  },
+  "gate_3": {
+    "all_token_ce_within_0_01_of_best_conventional": true,
+    "recall_within_5_percentage_points_of_best_conventional": true,
+    "meaningful_advantage": {
+      "recall_advantage_at_least_5_percentage_points": true,
+      "all_token_ce_advantage_at_least_0_01_nats": true,
+      "runtime_state_reduction_at_matched_recall": "not directly tested; raw length-176 state is 97.30% lower while PHL-DAM recall is higher"
+    },
+    "overall": "pass"
+  },
+  "verdict": {
+    "winner_under_fixed_500_step_protocol": "phl_dam",
+    "summary": "PHL-DAM wins all six paired seeds, with higher recall, lower all-token CE, and much smaller length-176 inference state.",
+    "scope": "This establishes sample efficiency and state efficiency on the preregistered synthetic associative-recall task; it does not establish a universal architecture ranking.",
+    "regularizer_disclosure": "The primary predictive objective is matched. PHL-DAM also uses its preregistered architecture-specific position-agnostic write-budget penalty; the Transformer has no controller and no analogous term."
+  }
+}

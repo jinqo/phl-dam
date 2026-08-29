@@ -1,0 +1,4978 @@
+{
+  "experiment": "PHL-DAM-004A - Oracle future-relevance upper bound",
+  "configuration": {
+    "scale": "compact",
+    "slots": 8,
+    "writes_per_episode": 8,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "episodes_per_seed": 2000,
+    "sequence_length": 176,
+    "delay_range": [
+      29,
+      104
+    ],
+    "query_conditions": [
+      "canonical",
+      "spec"
+    ],
+    "query_budget": {
+      "canonical": [
+        5,
+        8
+      ],
+      "spec": [
+        4,
+        8
+      ]
+    },
+    "exact_content_store": true,
+    "query_consumes_binding": false,
+    "tag_primary_probability": 0.65,
+    "contrast_fraction": 0.15,
+    "access_definition": "slot written, or query whose key is the key held by the slot",
+    "oracle_uses_generator_truth": true,
+    "learned_components": false,
+    "lease_state_present": false,
+    "promotion": false
+  },
+  "gate": {
+    "rule": "oracle future relevance minus LRU >= 5 pp mean recall",
+    "threshold": 0.05,
+    "passed_by_condition": {
+      "canonical": false,
+      "spec": false
+    }
+  },
+  "conditions": {
+    "canonical": {
+      "runs": [
+        {
+          "seed": 0,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.827,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 2,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 187,
+              "2": 109,
+              "3": 68,
+              "4": 319,
+              "5": 549,
+              "6": 428,
+              "7": 264,
+              "8": 76
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.8055,
+            "mean_live_items_per_episode": 4.9695,
+            "contrast_episode_fraction": 0.146
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04800000041723251,
+              "short": 0.08756250143051147,
+              "medium": 0.15931250154972076,
+              "far": 0.20793749392032623,
+              "persistent": 0.11837500333786011,
+              "never": 0.3788124918937683
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6878812313079834,
+            "bayes_optimal_live_vs_never_auroc": 0.8489133256067287,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.13960899147361
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11611,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2299
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3604
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5708
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7164
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4447
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9939
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1672
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5630
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5981
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11611
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 409,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0305,
+              "live_retained_at_end_per_episode": 4.9695,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11611,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2299
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3604
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5708
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7164
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4447
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9939
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1672
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5630
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5981
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11611
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 409,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0305,
+              "live_retained_at_end_per_episode": 4.9695,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11611,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2299
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3604
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5708
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7164
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4447
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9939
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1672
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5630
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5981
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11611
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 409,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0305,
+              "live_retained_at_end_per_episode": 4.9695,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11611,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2299
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3604
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5708
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7164
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4447
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9939
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1672
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5630
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5981
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11611
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 409,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0305,
+              "live_retained_at_end_per_episode": 4.9695,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11611,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2299
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3604
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5708
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7164
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4447
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9939
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1672
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5630
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5981
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11611
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 409,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0305,
+              "live_retained_at_end_per_episode": 4.9695,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 1,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.8075,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 212,
+              "2": 95,
+              "3": 66,
+              "4": 328,
+              "5": 489,
+              "6": 478,
+              "7": 266,
+              "8": 66
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.8165,
+            "mean_live_items_per_episode": 4.963,
+            "contrast_episode_fraction": 0.15
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04774999991059303,
+              "short": 0.08006250113248825,
+              "medium": 0.15687499940395355,
+              "far": 0.21718749403953552,
+              "persistent": 0.1185000017285347,
+              "never": 0.37962499260902405
+            },
+            "bayes_optimal_tag_class_accuracy": 0.687962532043457,
+            "bayes_optimal_live_vs_never_auroc": 0.8501017204735933,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.56442878019428
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11633,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2356
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3417
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5860
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7287
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9926
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1707
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5761
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5872
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11633
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 430,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.037,
+              "live_retained_at_end_per_episode": 4.963,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11633,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2356
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3417
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5860
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7287
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9926
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1707
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5761
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5872
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11633
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 430,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.037,
+              "live_retained_at_end_per_episode": 4.963,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11633,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2356
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3417
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5860
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7287
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9926
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1707
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5761
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5872
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11633
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 430,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.037,
+              "live_retained_at_end_per_episode": 4.963,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11633,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2356
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3417
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5860
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7287
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9926
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1707
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5761
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5872
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11633
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 430,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.037,
+              "live_retained_at_end_per_episode": 4.963,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11633,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2356
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3417
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5860
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7287
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9926
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1707
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5761
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5872
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11633
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 430,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.037,
+              "live_retained_at_end_per_episode": 4.963,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 2,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.85,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 2,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 191,
+              "2": 88,
+              "3": 82,
+              "4": 337,
+              "5": 507,
+              "6": 442,
+              "7": 272,
+              "8": 81
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.8465,
+            "mean_live_items_per_episode": 5.009,
+            "contrast_episode_fraction": 0.138
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04881250113248825,
+              "short": 0.0820000022649765,
+              "medium": 0.16368749737739563,
+              "far": 0.21412500739097595,
+              "persistent": 0.11749999970197678,
+              "never": 0.3738749921321869
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6873874664306641,
+            "bayes_optimal_live_vs_never_auroc": 0.8497554615849265,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.30094928589754
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11693,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2367
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3528
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5798
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7295
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4398
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 10018
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1675
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5781
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5912
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11693
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 383,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 2.991,
+              "live_retained_at_end_per_episode": 5.009,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11693,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2367
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3528
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5798
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7295
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4398
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 10018
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1675
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5781
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5912
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11693
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 383,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 2.991,
+              "live_retained_at_end_per_episode": 5.009,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11693,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2367
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3528
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5798
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7295
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4398
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 10018
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1675
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5781
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5912
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11693
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 383,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 2.991,
+              "live_retained_at_end_per_episode": 5.009,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11693,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2367
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3528
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5798
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7295
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4398
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 10018
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1675
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5781
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5912
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11693
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 383,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 2.991,
+              "live_retained_at_end_per_episode": 5.009,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11693,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2367
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3528
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5798
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7295
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4398
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 10018
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1675
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5781
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5912
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11693
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 383,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 2.991,
+              "live_retained_at_end_per_episode": 5.009,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 3,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.798,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 218,
+              "2": 85,
+              "3": 69,
+              "4": 341,
+              "5": 501,
+              "6": 447,
+              "7": 262,
+              "8": 77
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.787,
+            "mean_live_items_per_episode": 4.9405,
+            "contrast_episode_fraction": 0.151
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04712500050663948,
+              "short": 0.08668749779462814,
+              "medium": 0.15662500262260437,
+              "far": 0.20881250500679016,
+              "persistent": 0.11831250041723251,
+              "never": 0.38243749737739563
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6882437467575073,
+            "bayes_optimal_live_vs_never_auroc": 0.8491063137511313,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.04173146708139
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11574,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2381
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3553
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5640
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7228
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9881
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1693
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5613
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5961
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11574
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 432,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0595,
+              "live_retained_at_end_per_episode": 4.9405,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11574,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2381
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3553
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5640
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7228
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9881
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1693
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5613
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5961
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11574
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 432,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0595,
+              "live_retained_at_end_per_episode": 4.9405,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11574,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2381
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3553
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5640
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7228
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9881
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1693
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5613
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5961
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11574
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 432,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0595,
+              "live_retained_at_end_per_episode": 4.9405,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11574,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2381
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3553
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5640
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7228
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9881
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1693
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5613
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5961
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11574
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 432,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0595,
+              "live_retained_at_end_per_episode": 4.9405,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11574,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2381
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3553
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5640
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7228
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4346
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9881
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1693
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5613
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5961
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11574
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 432,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0595,
+              "live_retained_at_end_per_episode": 4.9405,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 4,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.8045,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 213,
+              "2": 91,
+              "3": 66,
+              "4": 302,
+              "5": 544,
+              "6": 461,
+              "7": 262,
+              "8": 61
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.8205,
+            "mean_live_items_per_episode": 4.958,
+            "contrast_episode_fraction": 0.151
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04937500134110451,
+              "short": 0.07968749850988388,
+              "medium": 0.15706250071525574,
+              "far": 0.2150000035762787,
+              "persistent": 0.11862500011920929,
+              "never": 0.3802500069141388
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6880249977111816,
+            "bayes_optimal_live_vs_never_auroc": 0.8497801157503801,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.35185980585861
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2364
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3514
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5763
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7308
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4333
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9916
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1725
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5679
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5962
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 426,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.042,
+              "live_retained_at_end_per_episode": 4.958,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2364
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3514
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5763
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7308
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4333
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9916
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1725
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5679
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5962
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 426,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.042,
+              "live_retained_at_end_per_episode": 4.958,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2364
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3514
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5763
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7308
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4333
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9916
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1725
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5679
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5962
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 426,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.042,
+              "live_retained_at_end_per_episode": 4.958,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2364
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3514
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5763
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7308
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4333
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9916
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1725
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5679
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5962
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 426,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.042,
+              "live_retained_at_end_per_episode": 4.958,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2364
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3514
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5763
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7308
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4333
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9916
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1725
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5679
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5962
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 426,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.042,
+              "live_retained_at_end_per_episode": 4.958,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 5,
+          "writes": 8,
+          "query_condition": "canonical",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.859,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 203,
+              "2": 89,
+              "3": 63,
+              "4": 314,
+              "5": 520,
+              "6": 458,
+              "7": 280,
+              "8": 73
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.8205,
+            "mean_live_items_per_episode": 4.9995,
+            "contrast_episode_fraction": 0.1455
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.049562498927116394,
+              "short": 0.08131249994039536,
+              "medium": 0.15687499940395355,
+              "far": 0.22156250476837158,
+              "persistent": 0.11562500149011612,
+              "never": 0.375062495470047
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6875061988830566,
+            "bayes_optimal_live_vs_never_auroc": 0.8501409168593572,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.56799244051199
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2354
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3437
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5850
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7174
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4467
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9999
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1642
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5799
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5842
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 420,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0005,
+              "live_retained_at_end_per_episode": 4.9995,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2354
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3437
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5850
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7174
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4467
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9999
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1642
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5799
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5842
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 420,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0005,
+              "live_retained_at_end_per_episode": 4.9995,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2354
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3437
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5850
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7174
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4467
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9999
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1642
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5799
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5842
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 420,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0005,
+              "live_retained_at_end_per_episode": 4.9995,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2354
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3437
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5850
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7174
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4467
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9999
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1642
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5799
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5842
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 420,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0005,
+              "live_retained_at_end_per_episode": 4.9995,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 11641,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2354
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3437
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5850
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 7174
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4467
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9999
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1642
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5799
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5842
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 11641
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 420,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.0005,
+              "live_retained_at_end_per_episode": 4.9995,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        }
+      ],
+      "summary": {
+        "mean_recall": {
+          "random": 1.0,
+          "fifo": 1.0,
+          "lru": 1.0,
+          "oracle_future_relevance": 1.0,
+          "belady": 1.0
+        },
+        "sample_sd_recall": {
+          "random": 0.0,
+          "fifo": 0.0,
+          "lru": 0.0,
+          "oracle_future_relevance": 0.0,
+          "belady": 0.0
+        },
+        "per_seed_recall": {
+          "random": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fifo": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "lru": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "oracle_future_relevance": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "belady": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "oracle_minus_lru": {
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "sample_sd": 0.0,
+          "seed_wins": 0,
+          "seeds": 6
+        },
+        "oracle_minus_best_non_oracle": 0.0,
+        "belady_matches_oracle_future_relevance": true,
+        "gate_oracle_beats_lru_by_5pp": false
+      }
+    },
+    "spec": {
+      "runs": [
+        {
+          "seed": 0,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.448,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 2,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 198,
+              "2": 124,
+              "3": 199,
+              "4": 463,
+              "5": 385,
+              "6": 386,
+              "7": 200,
+              "8": 45
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.356,
+            "mean_live_items_per_episode": 4.5815,
+            "contrast_episode_fraction": 0.146
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04349999874830246,
+              "short": 0.07981249690055847,
+              "medium": 0.1459999978542328,
+              "far": 0.1941249966621399,
+              "persistent": 0.10925000160932541,
+              "never": 0.4273124933242798
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6927312612533569,
+            "bayes_optimal_live_vs_never_auroc": 0.8492480256961397,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.25690814040328
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10712,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2115
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3314
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5283
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6614
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4098
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9163
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1549
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5228
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5484
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10712
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 415,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4185,
+              "live_retained_at_end_per_episode": 4.5815,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10712,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2115
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3314
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5283
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6614
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4098
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9163
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1549
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5228
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5484
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10712
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 415,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4185,
+              "live_retained_at_end_per_episode": 4.5815,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10712,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2115
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3314
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5283
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6614
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4098
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9163
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1549
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5228
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5484
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10712
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 415,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4185,
+              "live_retained_at_end_per_episode": 4.5815,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10712,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2115
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3314
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5283
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6614
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4098
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9163
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1549
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5228
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5484
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10712
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 415,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4185,
+              "live_retained_at_end_per_episode": 4.5815,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10712,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2115
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3314
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5283
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6614
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4098
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9163
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1549
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5228
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5484
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10712
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 415,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4185,
+              "live_retained_at_end_per_episode": 4.5815,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 1,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.4395,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 220,
+              "2": 108,
+              "3": 204,
+              "4": 413,
+              "5": 439,
+              "6": 376,
+              "7": 192,
+              "8": 48
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.372,
+            "mean_live_items_per_episode": 4.5825,
+            "contrast_episode_fraction": 0.15
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.045125000178813934,
+              "short": 0.07325000315904617,
+              "medium": 0.14512500166893005,
+              "far": 0.19856250286102295,
+              "persistent": 0.1107499971985817,
+              "never": 0.4271875023841858
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6927187442779541,
+            "bayes_optimal_live_vs_never_auroc": 0.8498363156210913,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.36271407297096
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10744,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2189
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3211
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5344
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6700
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4044
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9165
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1579
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5447
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10744
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 435,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4175,
+              "live_retained_at_end_per_episode": 4.5825,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10744,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2189
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3211
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5344
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6700
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4044
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9165
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1579
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5447
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10744
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 435,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4175,
+              "live_retained_at_end_per_episode": 4.5825,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10744,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2189
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3211
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5344
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6700
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4044
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9165
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1579
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5447
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10744
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 435,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4175,
+              "live_retained_at_end_per_episode": 4.5825,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10744,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2189
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3211
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5344
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6700
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4044
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9165
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1579
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5447
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10744
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 435,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4175,
+              "live_retained_at_end_per_episode": 4.5825,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10744,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2189
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3211
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5344
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6700
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4044
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9165
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1579
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5447
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10744
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 435,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4175,
+              "live_retained_at_end_per_episode": 4.5825,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 2,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.5075,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 202,
+              "2": 102,
+              "3": 223,
+              "4": 426,
+              "5": 397,
+              "6": 360,
+              "7": 229,
+              "8": 61
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.426,
+            "mean_live_items_per_episode": 4.646,
+            "contrast_episode_fraction": 0.138
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04450000077486038,
+              "short": 0.07649999856948853,
+              "medium": 0.15275000035762787,
+              "far": 0.19618749618530273,
+              "persistent": 0.11081250011920929,
+              "never": 0.4192500114440918
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6919249296188354,
+            "bayes_optimal_live_vs_never_auroc": 0.8496104137690627,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.17517508293402
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10852,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2229
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3273
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5350
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6762
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4090
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9292
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1560
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5328
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5524
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10852
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 388,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.354,
+              "live_retained_at_end_per_episode": 4.646,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10852,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2229
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3273
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5350
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6762
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4090
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9292
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1560
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5328
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5524
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10852
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 388,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.354,
+              "live_retained_at_end_per_episode": 4.646,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10852,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2229
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3273
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5350
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6762
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4090
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9292
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1560
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5328
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5524
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10852
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 388,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.354,
+              "live_retained_at_end_per_episode": 4.646,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10852,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2229
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3273
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5350
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6762
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4090
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9292
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1560
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5328
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5524
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10852
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 388,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.354,
+              "live_retained_at_end_per_episode": 4.646,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10852,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2229
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3273
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5350
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6762
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4090
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9292
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1560
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5328
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5524
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10852
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 388,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.354,
+              "live_retained_at_end_per_episode": 4.646,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 3,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.4475,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 228,
+              "2": 90,
+              "3": 233,
+              "4": 399,
+              "5": 425,
+              "6": 360,
+              "7": 213,
+              "8": 52
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.378,
+            "mean_live_items_per_episode": 4.5765,
+            "contrast_episode_fraction": 0.151
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04387500137090683,
+              "short": 0.0794375017285347,
+              "medium": 0.14474999904632568,
+              "far": 0.19293749332427979,
+              "persistent": 0.11106249690055847,
+              "never": 0.42793750762939453
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6927937269210815,
+            "bayes_optimal_live_vs_never_auroc": 0.8490593178904337,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.0070658237263
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10756,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2203
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3305
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5248
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6711
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4045
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9153
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1603
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5176
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5580
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10756
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 438,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4235,
+              "live_retained_at_end_per_episode": 4.5765,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10756,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2203
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3305
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5248
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6711
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4045
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9153
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1603
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5176
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5580
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10756
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 438,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4235,
+              "live_retained_at_end_per_episode": 4.5765,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10756,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2203
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3305
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5248
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6711
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4045
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9153
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1603
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5176
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5580
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10756
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 438,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4235,
+              "live_retained_at_end_per_episode": 4.5765,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10756,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2203
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3305
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5248
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6711
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4045
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9153
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1603
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5176
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5580
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10756
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 438,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4235,
+              "live_retained_at_end_per_episode": 4.5765,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10756,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2203
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3305
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5248
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6711
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4045
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9153
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1603
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5176
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5580
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10756
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 438,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4235,
+              "live_retained_at_end_per_episode": 4.5765,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 4,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.4485,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 210,
+              "2": 111,
+              "3": 201,
+              "4": 448,
+              "5": 415,
+              "6": 353,
+              "7": 219,
+              "8": 43
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.3505,
+            "mean_live_items_per_episode": 4.5895,
+            "contrast_episode_fraction": 0.151
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.044187501072883606,
+              "short": 0.07325000315904617,
+              "medium": 0.1458750069141388,
+              "far": 0.20125000178813934,
+              "persistent": 0.10912500321865082,
+              "never": 0.42631250619888306
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6926312446594238,
+            "bayes_optimal_live_vs_never_auroc": 0.8502244059775829,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.4771516680684
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10701,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2168
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3213
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5320
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6655
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4046
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9179
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1522
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5404
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10701
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 421,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4105,
+              "live_retained_at_end_per_episode": 4.5895,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10701,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2168
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3213
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5320
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6655
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4046
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9179
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1522
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5404
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10701
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 421,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4105,
+              "live_retained_at_end_per_episode": 4.5895,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10701,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2168
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3213
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5320
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6655
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4046
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9179
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1522
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5404
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10701
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 421,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4105,
+              "live_retained_at_end_per_episode": 4.5895,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10701,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2168
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3213
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5320
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6655
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4046
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9179
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1522
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5404
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10701
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 421,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4105,
+              "live_retained_at_end_per_episode": 4.5895,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10701,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2168
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3213
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5320
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6655
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4046
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9179
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1522
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5297
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5404
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10701
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 421,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.4105,
+              "live_retained_at_end_per_episode": 4.5895,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        },
+        {
+          "seed": 5,
+          "writes": 8,
+          "query_condition": "spec",
+          "episodes": 2000,
+          "pressure": {
+            "max_concurrent_live_mean": 4.503,
+            "max_concurrent_live_median": 5,
+            "max_concurrent_live_p10": 1,
+            "max_concurrent_live_p90": 7,
+            "max_concurrent_live_min": 1,
+            "max_concurrent_live_max": 8,
+            "max_concurrent_live_histogram": {
+              "1": 218,
+              "2": 91,
+              "3": 206,
+              "4": 428,
+              "5": 413,
+              "6": 362,
+              "7": 217,
+              "8": 65
+            },
+            "fraction_episodes_above_8": 0.0,
+            "fraction_episodes_above_10": 0.0,
+            "fraction_episodes_above_12": 0.0,
+            "mean_queries_per_episode": 5.393,
+            "mean_live_items_per_episode": 4.631,
+            "contrast_episode_fraction": 0.1455
+          },
+          "signal": {
+            "class_prior": {
+              "near": 0.04531250149011612,
+              "short": 0.07625000178813934,
+              "medium": 0.14550000429153442,
+              "far": 0.20493750274181366,
+              "persistent": 0.10687500238418579,
+              "never": 0.42112499475479126
+            },
+            "bayes_optimal_tag_class_accuracy": 0.6921124458312988,
+            "bayes_optimal_live_vs_never_auroc": 0.8501338464967357,
+            "delay_min": 29,
+            "delay_max": 104,
+            "delay_mean": 71.57556091229371
+          },
+          "policies": {
+            "random": {
+              "recall": 1.0,
+              "queries": 10786,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2165
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3202
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5419
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6665
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4121
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9262
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1524
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5368
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5418
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10786
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 425,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.369,
+              "live_retained_at_end_per_episode": 4.631,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "fifo": {
+              "recall": 1.0,
+              "queries": 10786,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2165
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3202
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5419
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6665
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4121
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9262
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1524
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5368
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5418
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10786
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 425,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.369,
+              "live_retained_at_end_per_episode": 4.631,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "lru": {
+              "recall": 1.0,
+              "queries": 10786,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2165
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3202
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5419
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6665
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4121
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9262
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1524
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5368
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5418
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10786
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 425,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.369,
+              "live_retained_at_end_per_episode": 4.631,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "oracle_future_relevance": {
+              "recall": 1.0,
+              "queries": 10786,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2165
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3202
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5419
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6665
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4121
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9262
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1524
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5368
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5418
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10786
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 425,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.369,
+              "live_retained_at_end_per_episode": 4.631,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            },
+            "belady": {
+              "recall": 1.0,
+              "queries": 10786,
+              "recall_by_delay": {
+                "29-49": {
+                  "recall": 1.0,
+                  "queries": 2165
+                },
+                "50-74": {
+                  "recall": 1.0,
+                  "queries": 3202
+                },
+                "75-104": {
+                  "recall": 1.0,
+                  "queries": 5419
+                }
+              },
+              "recall_by_intervening_writes": {
+                "0-4": {
+                  "recall": 1.0,
+                  "queries": 6665
+                },
+                "5-8": {
+                  "recall": 1.0,
+                  "queries": 4121
+                }
+              },
+              "recall_by_query_occurrence": {
+                "first-use": {
+                  "recall": 1.0,
+                  "queries": 9262
+                },
+                "repeat-use": {
+                  "recall": 1.0,
+                  "queries": 1524
+                }
+              },
+              "recall_by_time_since_last_access": {
+                "65-128": {
+                  "recall": 1.0,
+                  "queries": 5368
+                },
+                "<=64": {
+                  "recall": 1.0,
+                  "queries": 5418
+                }
+              },
+              "recall_by_live_pressure_bucket": {
+                "<=8 live": {
+                  "recall": 1.0,
+                  "queries": 10786
+                }
+              },
+              "recall_contrast_anchor": 1.0,
+              "contrast_anchor_queries": 425,
+              "evictions": 0,
+              "evictions_per_episode": 0.0,
+              "fraction_of_evictions_that_were_future_needed": null,
+              "fraction_of_evictions_that_were_dead": null,
+              "dead_retained_at_end_per_episode": 3.369,
+              "live_retained_at_end_per_episode": 4.631,
+              "wrong_protection_rate": null,
+              "wrong_protection_decisions": 0,
+              "protection_decisions": 0,
+              "contrast_decisions": 0,
+              "contrast_correct_rate": null,
+              "mean_occupied_slots_at_write": 3.5,
+              "mean_memory_lifetime_tokens": null,
+              "mean_overwrites_before_query": 0.0
+            }
+          }
+        }
+      ],
+      "summary": {
+        "mean_recall": {
+          "random": 1.0,
+          "fifo": 1.0,
+          "lru": 1.0,
+          "oracle_future_relevance": 1.0,
+          "belady": 1.0
+        },
+        "sample_sd_recall": {
+          "random": 0.0,
+          "fifo": 0.0,
+          "lru": 0.0,
+          "oracle_future_relevance": 0.0,
+          "belady": 0.0
+        },
+        "per_seed_recall": {
+          "random": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fifo": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "lru": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "oracle_future_relevance": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "belady": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "oracle_minus_lru": {
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "sample_sd": 0.0,
+          "seed_wins": 0,
+          "seeds": 6
+        },
+        "oracle_minus_best_non_oracle": 0.0,
+        "belady_matches_oracle_future_relevance": true,
+        "gate_oracle_beats_lru_by_5pp": false
+      }
+    }
+  },
+  "elapsed_seconds": 31.11995800001023
+}

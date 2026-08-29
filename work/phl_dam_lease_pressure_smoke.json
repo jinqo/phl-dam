@@ -1,0 +1,100 @@
+{
+  "experiment": "PHL-DAM Lease-001 \u2014 Retention-only memory-pressure pilot",
+  "configuration": {
+    "seed": 0,
+    "slots": 8,
+    "writes_per_episode": 32,
+    "delay_classes": {
+      "near": [
+        5,
+        9
+      ],
+      "medium": [
+        14,
+        22
+      ],
+      "far": [
+        32,
+        48
+      ]
+    },
+    "never_queried_class": true,
+    "causal_cue_only_at_inference": true,
+    "future_query_metadata_visible_to_learned_policy": false,
+    "exact_content_store": true,
+    "query_consumes_binding": true,
+    "training_steps": 200,
+    "training_batch_size": 256,
+    "eval_episodes": 300,
+    "lease_predictor_parameters": 548,
+    "lease_influence": true,
+    "promotion": false
+  },
+  "gates": {
+    "prediction_accuracy_at_least_0_85": true,
+    "oracle_over_best_heuristic_at_least_0_10": true,
+    "phl_over_static_at_least_0_05": true,
+    "phl_over_best_heuristic_at_least_0_05": true
+  },
+  "metrics": {
+    "prediction": {
+      "top1_accuracy": 0.9993749856948853,
+      "cross_entropy": 0.018459558486938477,
+      "expected_calibration_error": 0.016285795718431473,
+      "examples": 9600
+    },
+    "retention": {
+      "random": {
+        "hits": 5292,
+        "queries": 8029,
+        "hit_rate": 0.6591107236268526
+      },
+      "fifo": {
+        "hits": 5574,
+        "queries": 8029,
+        "hit_rate": 0.6942334039108232
+      },
+      "static_learned": {
+        "hits": 6414,
+        "queries": 8029,
+        "hit_rate": 0.7988541536928634
+      },
+      "randomized_lease": {
+        "hits": 6122,
+        "queries": 8029,
+        "hit_rate": 0.7624859882924399
+      },
+      "phl_transported_lease": {
+        "hits": 7033,
+        "queries": 8029,
+        "hit_rate": 0.8759496824012953
+      },
+      "oracle_next_use": {
+        "hits": 7048,
+        "queries": 8029,
+        "hit_rate": 0.8778179100759745
+      }
+    }
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 1.3638534545898438,
+      "accuracy": 0.3046875,
+      "gradient_norm": 0.6784511208534241
+    },
+    {
+      "step": 100,
+      "loss": 0.07091404497623444,
+      "accuracy": 1.0,
+      "gradient_norm": 0.13299047946929932
+    },
+    {
+      "step": 200,
+      "loss": 0.016786715015769005,
+      "accuracy": 1.0,
+      "gradient_norm": 0.04664826765656471
+    }
+  ],
+  "finite": true
+}
