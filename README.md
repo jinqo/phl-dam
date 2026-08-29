@@ -8,7 +8,12 @@ Every artifact here is evidence for or against a hypothesis. The reports are
 written to be falsifiable, several of them argue against their own headline, and
 the mechanisms that failed are documented as carefully as the ones that worked.
 
-**Author:** Liam Pattiata.
+**Author:** Liam Pattiata — research programme, hypotheses, experimental design,
+preregistered gates, and all decisions about what to test and what counts as
+evidence.
+
+Experiment code, test suites and run execution were carried out with AI
+assistance under that direction. See `NOTICE`.
 
 ---
 
