@@ -8,9 +8,7 @@ Every artifact here is evidence for or against a hypothesis. The reports are
 written to be falsifiable, several of them argue against their own headline, and
 the mechanisms that failed are documented as carefully as the ones that worked.
 
-**Author:** Liam Pattiata. Implementation carried out with AI assistance
-(Claude Opus 5); see `NOTICE` and the `Co-Authored-By` trailers in the git
-history.
+**Author:** Liam Pattiata.
 
 ---
 
