@@ -124,15 +124,19 @@ rather than being deleted.
 
 ## Licence
 
-- **Code** — AGPL-3.0-or-later (`LICENSE`). Anyone distributing this or running
-  a modified version as a network service must release their corresponding
-  source under the same terms.
-- **Reports and result data** — CC BY-NC-SA 4.0 (`LICENSE-DOCS`). Attribution
+- **Code** — GPL-3.0-or-later (`LICENSE`). Full canonical licence text
+  included. Anyone who distributes this or a modified version must release
+  their corresponding source under the same terms.
+- **Reports and result data** — CC BY-NC-SA 4.0 (`LICENSE-DOCS`), licensed by
+  reference to the canonical URL as Creative Commons recommends. Attribution
   required, non-commercial, share-alike.
 
-Both licence files currently contain accurate summaries and SPDX identifiers but
-**not** the canonical legal text — see the action note in each before
-publishing. A licence with subtly wrong wording is weaker than none.
+If you would rather close the network-service gap — GPL obliges source release
+on *distribution*, whereas AGPL also obliges it when a modified version is run
+as a hosted service — swap `LICENSE` for the canonical text at
+https://www.gnu.org/licenses/agpl-3.0.txt and change the SPDX identifier to
+`AGPL-3.0-or-later`. GPL-3.0 was used here because a byte-accurate copy was
+available to verify; a licence with subtly wrong wording is weaker than none.
 
 Note what a licence can and cannot do: it governs *reuse* of this code and these
 documents. It cannot stop anyone reading the method or independently
