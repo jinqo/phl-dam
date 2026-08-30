@@ -128,6 +128,66 @@ def paired(differences: list[float], resamples: int = 10_000, seed: int = 12345)
     }
 
 
+def paired_verdict(differences: list[float], threshold: float = 0.05) -> dict:
+    """A paired contrast that reports its own fragility.
+
+    Added after a real mistake: the backbone comparison showed `ssm` beating
+    `phl` by +0.184 mean recall at W=8, which was narrated as meaningful. It was
+    not - the median was -0.001, the bootstrap interval spanned zero, only 2 of 5
+    seeds favoured `ssm`, and dropping one seed moved the mean from 0.256 to
+    0.015. A bare mean hides all four of those facts.
+
+    This returns the mean alongside every check that would have caught it, and a
+    `robust` flag that is only true when they agree. Report the flag, not the
+    mean alone.
+    """
+    base = paired(differences)
+    if base.get("n", 0) < 2:
+        return {**base, "robust": False, "warnings": ["fewer than two paired samples"]}
+
+    values = base["per_seed"]
+    leave_one_out = [
+        statistics.fmean(values[:i] + values[i + 1 :]) for i in range(len(values))
+    ]
+    low, high = base["bootstrap_95"]
+    warnings = []
+    if (base["mean"] > 0) != (base["median"] > 0):
+        warnings.append("mean and median disagree in sign: outlier-driven")
+    if low <= 0.0 <= high:
+        warnings.append("bootstrap 95% interval spans zero")
+    if min(base["positive"], base["negative"]) >= max(1, len(values) // 3):
+        warnings.append("seed wins are split, not consistent")
+    if (max(leave_one_out) > 0) != (min(leave_one_out) > 0):
+        warnings.append("leave-one-seed-out flips the sign: single-seed leverage")
+    if abs(base["mean"]) < threshold:
+        warnings.append(f"mean below the {threshold:.0%} decision threshold")
+
+    return {
+        **base,
+        "leave_one_out_means": leave_one_out,
+        "leave_one_out_spread": max(leave_one_out) - min(leave_one_out),
+        "exceeds_threshold": abs(base["mean"]) >= threshold,
+        "warnings": warnings,
+        "robust": not warnings,
+    }
+
+
+def describe_paired(name: str, differences: list[float], threshold: float = 0.05) -> str:
+    """One-line human summary that leads with the verdict, not the mean."""
+    v = paired_verdict(differences, threshold)
+    if v.get("n", 0) < 2:
+        return f"{name}: too few paired samples"
+    verdict = "ROBUST" if v["robust"] else "NOT ROBUST"
+    line = (
+        f"{name}: {verdict} | mean {v['mean']:+.4f} median {v['median']:+.4f} "
+        f"| +/-/= {v['positive']}/{v['negative']}/{v['ties']} "
+        f"| boot95 [{v['bootstrap_95'][0]:+.3f}, {v['bootstrap_95'][1]:+.3f}]"
+    )
+    for w in v["warnings"]:
+        line += chr(10) + "    warning: " + w
+    return line
+
+
 def within_run_contrast(runs: list[dict], arm: str, reference: str, setting: str) -> dict:
     """Arm minus a fixed policy evaluated under the SAME trained weights."""
     differences = []

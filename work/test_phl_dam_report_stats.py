@@ -150,3 +150,48 @@ class PairedStatisticsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PairedVerdictTests(unittest.TestCase):
+    """Regression tests for a real reporting mistake.
+
+    The backbone comparison showed ssm beating phl by +0.184 mean recall at
+    W=8 and that was narrated as meaningful. It was not: median -0.001,
+    bootstrap spanning zero, 2/5 seed wins, and dropping one seed moved the
+    mean to 0.015. A bare mean hides all of that.
+    """
+
+    W8_SSM_MINUS_PHL = [-0.013, 0.859, 0.178, -0.103, -0.001]
+    W16_SSM_MINUS_PHL = [-0.700, 0.346, 0.054]
+
+    def test_the_outlier_driven_contrast_is_flagged_not_robust(self) -> None:
+        v = stats.paired_verdict(self.W8_SSM_MINUS_PHL)
+        self.assertFalse(v["robust"])
+        self.assertGreater(v["mean"], 0.05)          # a bare mean would pass
+        self.assertLess(v["median"], 0.0)            # the median disagrees
+        self.assertIn("mean and median disagree in sign: outlier-driven", v["warnings"])
+        self.assertIn("bootstrap 95% interval spans zero", v["warnings"])
+
+    def test_single_seed_leverage_is_detected(self) -> None:
+        v = stats.paired_verdict(self.W16_SSM_MINUS_PHL)
+        self.assertFalse(v["robust"])
+        self.assertIn(
+            "leave-one-seed-out flips the sign: single-seed leverage", v["warnings"]
+        )
+        self.assertGreater(v["leave_one_out_spread"], 0.4)
+
+    def test_a_consistent_effect_passes(self) -> None:
+        v = stats.paired_verdict([0.11, 0.14, 0.09, 0.12, 0.13])
+        self.assertTrue(v["robust"], v["warnings"])
+        self.assertEqual((v["positive"], v["negative"]), (5, 0))
+
+    def test_a_small_consistent_effect_fails_the_threshold(self) -> None:
+        """Consistent but below the decision threshold is still not adoptable."""
+        v = stats.paired_verdict([0.004, 0.006, 0.005, 0.003, 0.007], threshold=0.05)
+        self.assertFalse(v["robust"])
+        self.assertFalse(v["exceeds_threshold"])
+
+    def test_describe_leads_with_the_verdict(self) -> None:
+        line = stats.describe_paired("x", self.W8_SSM_MINUS_PHL)
+        self.assertTrue(line.startswith("x: NOT ROBUST"))
+        self.assertIn("warning:", line)
