@@ -26,6 +26,16 @@ only spend parameters. This is meant to be a strong baseline, not a strawman.
 
 Streams, objective, optimiser and budget are imported unchanged from Stage B so
 the numbers sit directly beside the PHL-DAM, Transformer and SSM results.
+
+``--factorized`` runs a control arm. PHL-DAM hardwires the binding roles: its
+write key is projected from the *previous* token alone, its value from the
+*current* token alone, its read query from the current token alone, and keys and
+values live in separate banks. The plain DNC must discover all of that from a
+mixed three-token controller vector, with key and value sharing one row, so a
+PHL-DAM win over it could come from that inductive bias rather than from the
+memory mechanics. The factorized arm gives the DNC exactly the same role
+factorization and bank split, keeping every DNC mechanic (learned key strength,
+usage allocation, allocation gate, erase/add, free gate) unchanged.
 """
 
 from __future__ import annotations
@@ -130,6 +140,74 @@ class DNCMemory(nn.Module):
         return memory, usage, read_vector
 
 
+class FactorizedDNCMemory(DNCMemory):
+    """DNC memory given PHL-DAM's key/value role factorization.
+
+    The row is split into a key bank and a value bank. Write addressing and the
+    stored key both come from the previous token; the stored value from the
+    current token; the read key from the current token. Gates, strengths and
+    erase still come from the controller, as PHL-DAM's write gate does.
+    """
+
+    def __init__(
+        self, slots: int, key_width: int, value_width: int,
+        controller_width: int, d_model: int,
+    ) -> None:
+        nn.Module.__init__(self)
+        self.slots = slots
+        self.key_width = key_width
+        self.value_width = value_width
+        self.width = value_width
+        self.write_key = nn.Linear(d_model, key_width)       # from previous token
+        self.add_vector = nn.Linear(d_model, value_width)    # from current token
+        self.read_key = nn.Linear(d_model, key_width)        # from current token
+        self.write_strength = nn.Linear(controller_width, 1)
+        self.erase_vector = nn.Linear(controller_width, key_width + value_width)
+        self.allocation_gate = nn.Linear(controller_width, 1)
+        self.write_gate = nn.Linear(controller_width, 1)
+        self.read_strength = nn.Linear(controller_width, 1)
+        self.free_gate = nn.Linear(controller_width, 1)
+        nn.init.constant_(self.write_gate.bias, -1.0)
+
+    def forward(
+        self, controller: Tensor, memory: Tensor, usage: Tensor,
+        previous_token: Tensor, current_token: Tensor,
+    ) -> tuple[Tensor, Tensor, Tensor]:
+        keys = memory[..., : self.key_width]
+        # --- write ---------------------------------------------------------
+        key = self.write_key(previous_token)
+        strength = F.softplus(self.write_strength(controller)) + 1.0
+        content = self.content_weighting(keys, key, strength)
+        allocation = self.allocation_weighting(usage)
+        gate_allocation = torch.sigmoid(self.allocation_gate(controller))
+        gate_write = torch.sigmoid(self.write_gate(controller))
+        write_weighting = gate_write * (
+            gate_allocation * allocation + (1.0 - gate_allocation) * content
+        )
+        erase = torch.sigmoid(self.erase_vector(controller))
+        add = torch.cat([key, self.add_vector(current_token)], dim=-1)
+        weighting = write_weighting.unsqueeze(-1)
+        memory = memory * (1.0 - weighting * erase.unsqueeze(1))
+        memory = memory + weighting * add.unsqueeze(1)
+
+        # --- read: address by the key bank, return the value bank ----------
+        read_key = self.read_key(current_token)
+        read_strength = F.softplus(self.read_strength(controller)) + 1.0
+        read_weighting = self.content_weighting(
+            memory[..., : self.key_width], read_key, read_strength
+        )
+        read_vector = torch.einsum(
+            "bn,bnw->bw", read_weighting, memory[..., self.key_width :]
+        )
+
+        # --- usage ---------------------------------------------------------
+        free = torch.sigmoid(self.free_gate(controller))
+        usage = (usage + write_weighting - usage * write_weighting) * (
+            1.0 - free * read_weighting
+        )
+        return memory, usage, read_vector
+
+
 class NTMBaseline(nn.Module):
     """Feedforward controller plus a DNC-style external memory."""
 
@@ -139,20 +217,33 @@ class NTMBaseline(nn.Module):
         slots: int = 8,
         width: int = 48,          # parameter-matched: 32,836 params
         controller_width: int = 72,
+        factorized: bool = False,
+        key_width: int = 24,      # factorized banks mirror PHL-DAM's d_key/d_value
+        value_width: int = 24,
+        vocab_size: int = VOCAB_SIZE,
     ) -> None:
         super().__init__()
         self.d_model = d_model
         self.slots = slots
-        self.width = width
+        self.factorized = factorized
         self.controller_width = controller_width
-        self.token_embedding = nn.Embedding(VOCAB_SIZE, d_model)
+        self.token_embedding = nn.Embedding(vocab_size, d_model)
         # Same three-token causal window the PHL-DAM controller sees.
         self.controller = nn.Sequential(
             nn.Linear(3 * d_model, controller_width), nn.Tanh()
         )
-        self.memory = DNCMemory(slots, width, controller_width)
+        if factorized:
+            self.width = value_width
+            self.row_width = key_width + value_width
+            self.memory = FactorizedDNCMemory(
+                slots, key_width, value_width, controller_width, d_model
+            )
+        else:
+            self.width = width
+            self.row_width = width
+            self.memory = DNCMemory(slots, width, controller_width)
         self.output_norm = nn.RMSNorm(controller_width)
-        self.output = nn.Linear(controller_width + width, VOCAB_SIZE)
+        self.output = nn.Linear(controller_width + self.width, vocab_size)
 
     def windows(self, tokens: Tensor) -> Tensor:
         embedded = self.token_embedding(tokens)
@@ -163,15 +254,21 @@ class NTMBaseline(nn.Module):
         return torch.cat([padded[:, 0:-2], padded[:, 1:-1], padded[:, 2:]], dim=-1)
 
     def forward(self, tokens: Tensor, disable_memory: bool = False) -> Tensor:
+        embedded = self.token_embedding(tokens)
+        previous = torch.cat([torch.zeros_like(embedded[:, :1]), embedded[:, :-1]], dim=1)
         controller = self.controller(self.windows(tokens))
         batch, length, _ = controller.shape
-        memory = torch.zeros(batch, self.slots, self.width, device=tokens.device)
+        memory = torch.zeros(batch, self.slots, self.row_width, device=tokens.device)
         usage = torch.zeros(batch, self.slots, device=tokens.device)
         outputs = []
         for step in range(length):
             hidden = controller[:, step]
             if disable_memory:
                 read_vector = torch.zeros(batch, self.width, device=tokens.device)
+            elif self.factorized:
+                memory, usage, read_vector = self.memory(
+                    hidden, memory, usage, previous[:, step], embedded[:, step]
+                )
             else:
                 memory, usage, read_vector = self.memory(hidden, memory, usage)
             outputs.append(
@@ -186,13 +283,23 @@ def active_parameter_count(model: nn.Module) -> int:
 
 def recurrent_state_floats(model: NTMBaseline) -> int:
     """Memory bank plus usage vector - constant in sequence length."""
-    return model.slots * model.width + model.slots
+    return model.slots * model.row_width + model.slots
 
 
-def train(seed, steps, batch_size, learning_rate, device):
+def build_model(factorized: bool = False) -> NTMBaseline:
+    if factorized:
+        return NTMBaseline(factorized=True, controller_width=FACTORIZED_CONTROLLER_WIDTH)
+    return NTMBaseline()
+
+
+# Chosen so the factorized arm lands within 1% of PHL-DAM's 33,034 parameters.
+FACTORIZED_CONTROLLER_WIDTH = 106
+
+
+def train(seed, steps, batch_size, learning_rate, device, factorized=False):
     seed_everything(seed)
     generator = torch.Generator().manual_seed(seed + 10_000)
-    model = NTMBaseline().to(device)
+    model = build_model(factorized).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
     history = []
     started = time.perf_counter()
@@ -267,12 +374,12 @@ def evaluate(model, seed, episodes, batch_size, device):
     }
 
 
-def run(seed, steps, batch_size, eval_episodes, learning_rate, device):
-    model, history = train(seed, steps, batch_size, learning_rate, device)
+def run(seed, steps, batch_size, eval_episodes, learning_rate, device, factorized=False):
+    model, history = train(seed, steps, batch_size, learning_rate, device, factorized)
     metrics = evaluate(model, seed + 20_000, eval_episodes, batch_size, device)
     return {
         "experiment": "PHL-DAM NTM/DNC baseline - conventional differentiable memory",
-        "model": "ntm_dnc",
+        "model": "ntm_dnc_factorized" if factorized else "ntm_dnc",
         "configuration": {
             "seed": seed,
             "slots": model.slots,
@@ -289,6 +396,7 @@ def run(seed, steps, batch_size, eval_episodes, learning_rate, device):
             "active_parameters": active_parameter_count(model),
             "recurrent_state_floats": recurrent_state_floats(model),
             "addressing": "content + usage-based allocation (DNC)",
+            "factorized_roles": factorized,
             "temporal_linkage": False,
         },
         "metrics": metrics,
@@ -304,6 +412,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--eval-episodes", type=int, default=2_000)
     parser.add_argument("--learning-rate", type=float, default=2e-3)
+    parser.add_argument("--factorized", action="store_true",
+                        help="give the DNC PHL-DAM's key/value role factorization")
     parser.add_argument("--output", type=Path)
     return parser.parse_args()
 
@@ -312,7 +422,7 @@ def main() -> None:
     args = parse_args()
     summary = run(
         args.seed, args.steps, args.batch_size, args.eval_episodes,
-        args.learning_rate, torch.device("cpu"),
+        args.learning_rate, torch.device("cpu"), args.factorized,
     )
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

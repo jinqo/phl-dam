@@ -1,0 +1,128 @@
+{
+  "experiment": "PHL-DAM NTM/DNC baseline - conventional differentiable memory",
+  "model": "ntm_dnc_factorized",
+  "configuration": {
+    "seed": 0,
+    "slots": 8,
+    "memory_width": 24,
+    "controller_width": 106,
+    "d_model": 48,
+    "sequence_length": 176,
+    "training_steps": 500,
+    "batch_size": 16,
+    "eval_episodes": 2000,
+    "learning_rate": 0.002,
+    "optimizer": "AdamW(weight_decay=1e-4)",
+    "objective": "all-token next-token CE + marked recall-token CE",
+    "active_parameters": 33088,
+    "recurrent_state_floats": 392,
+    "addressing": "content + usage-based allocation (DNC)",
+    "factorized_roles": true,
+    "temporal_linkage": false
+  },
+  "metrics": {
+    "episodes": 2000,
+    "queries": 6000,
+    "recall_accuracy": 0.9998333333333334,
+    "memory_disabled_accuracy": 0.10416666666666667,
+    "all_token_ce": 0.21775306868553163,
+    "recall_token_ce": 0.002006939247250557,
+    "distance_accuracy": {
+      "29-63": 1.0,
+      "64-95": 1.0,
+      "96-169": 0.9995
+    },
+    "finite": true
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 8.066426277160645,
+      "all_token_ce": 4.142347812652588,
+      "recall_ce": 3.9240782260894775,
+      "gradient_norm": 13.564179420471191,
+      "elapsed_seconds": 0.5494342590000088
+    },
+    {
+      "step": 50,
+      "loss": 2.5853281021118164,
+      "all_token_ce": 0.3037886917591095,
+      "recall_ce": 2.2815394401550293,
+      "gradient_norm": 1.7844797372817993,
+      "elapsed_seconds": 25.88420595399998
+    },
+    {
+      "step": 100,
+      "loss": 1.7471239566802979,
+      "all_token_ce": 0.2847297787666321,
+      "recall_ce": 1.462394118309021,
+      "gradient_norm": 2.301751136779785,
+      "elapsed_seconds": 53.18233968699997
+    },
+    {
+      "step": 150,
+      "loss": 0.2710416615009308,
+      "all_token_ce": 0.2622932493686676,
+      "recall_ce": 0.008748413063585758,
+      "gradient_norm": 0.08757263422012329,
+      "elapsed_seconds": 79.59056760299995
+    },
+    {
+      "step": 200,
+      "loss": 0.2445269525051117,
+      "all_token_ce": 0.2410205453634262,
+      "recall_ce": 0.0035064027179032564,
+      "gradient_norm": 0.44408178329467773,
+      "elapsed_seconds": 106.59222053500002
+    },
+    {
+      "step": 250,
+      "loss": 0.23475094139575958,
+      "all_token_ce": 0.23230965435504913,
+      "recall_ce": 0.002441282384097576,
+      "gradient_norm": 0.17789214849472046,
+      "elapsed_seconds": 133.594618179
+    },
+    {
+      "step": 300,
+      "loss": 0.22610291838645935,
+      "all_token_ce": 0.22422584891319275,
+      "recall_ce": 0.001877071219496429,
+      "gradient_norm": 0.28395211696624756,
+      "elapsed_seconds": 160.69234330099994
+    },
+    {
+      "step": 350,
+      "loss": 0.226262629032135,
+      "all_token_ce": 0.22467832267284393,
+      "recall_ce": 0.001584302051924169,
+      "gradient_norm": 0.37633034586906433,
+      "elapsed_seconds": 188.4195843
+    },
+    {
+      "step": 400,
+      "loss": 0.2196178138256073,
+      "all_token_ce": 0.21840441226959229,
+      "recall_ce": 0.0012134051648899913,
+      "gradient_norm": 0.16399513185024261,
+      "elapsed_seconds": 215.15546395799993
+    },
+    {
+      "step": 450,
+      "loss": 0.22537356615066528,
+      "all_token_ce": 0.22441062331199646,
+      "recall_ce": 0.0009629499982111156,
+      "gradient_norm": 0.20508912205696106,
+      "elapsed_seconds": 241.915321878
+    },
+    {
+      "step": 500,
+      "loss": 0.22008860111236572,
+      "all_token_ce": 0.2192617952823639,
+      "recall_ce": 0.0008268081001006067,
+      "gradient_norm": 0.6606506109237671,
+      "elapsed_seconds": 268.83471420399997
+    }
+  ],
+  "finite": true
+}

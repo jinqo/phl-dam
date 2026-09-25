@@ -90,5 +90,80 @@ class NTMBaselineTests(unittest.TestCase):
             self.assertNotIn(forbidden, names)
 
 
+class FactorizedNTMTests(unittest.TestCase):
+    """The control arm that gives the DNC PHL-DAM's key/value role wiring."""
+
+    def setUp(self) -> None:
+        torch.manual_seed(0)
+        self.model = ntm.build_model(factorized=True)
+        self.generator = torch.Generator().manual_seed(11)
+
+    def test_parameters_are_matched_to_phl_dam(self) -> None:
+        count = ntm.active_parameter_count(self.model)
+        self.assertLess(abs(count - 33_034) / 33_034, 0.01)
+
+    def test_state_matches_phl_dam_banks(self) -> None:
+        # 8 slots x (24 key + 24 value) + 8 usage = PHL-DAM's 8 x (24+24+1).
+        self.assertEqual(ntm.recurrent_state_floats(self.model), 392)
+        self.assertLessEqual(ntm.recurrent_state_floats(self.model), 456)
+
+    def test_forward_is_causal(self) -> None:
+        batch = make_batch(self.generator, 2)
+        mutated = batch.tokens.clone()
+        mutated[:, 100:] = 4
+        with torch.no_grad():
+            original = self.model(batch.tokens)
+            changed = self.model(mutated)
+        self.assertTrue(torch.equal(original[:, :100], changed[:, :100]))
+
+    def test_stored_key_depends_only_on_previous_token(self) -> None:
+        memory = self.model.memory
+        d = self.model.d_model
+        controller = torch.randn(1, self.model.controller_width)
+        previous = torch.randn(1, d)
+        state = torch.zeros(1, self.model.slots, self.model.row_width)
+        usage = torch.zeros(1, self.model.slots)
+        with torch.no_grad():
+            a, _, _ = memory(controller, state, usage, previous, torch.randn(1, d))
+            b, _, _ = memory(controller, state, usage, previous, torch.randn(1, d))
+        key_width = memory.key_width
+        self.assertTrue(torch.allclose(a[..., :key_width], b[..., :key_width]))
+        self.assertFalse(torch.allclose(a[..., key_width:], b[..., key_width:]))
+
+    def test_read_returns_the_value_bank_addressed_by_the_key_bank(self) -> None:
+        memory = self.model.memory
+        key_width = memory.key_width
+        state = torch.zeros(1, self.model.slots, self.model.row_width)
+        state[0, 3, :key_width] = 5.0 * memory.read_key.bias.detach()
+        state[0, 3, key_width:] = 7.0
+        controller = torch.zeros(1, self.model.controller_width)
+        with torch.no_grad():
+            memory.read_strength.bias.fill_(50.0)
+            memory.write_gate.bias.fill_(-50.0)
+            _, _, read = memory(
+                controller, state, torch.zeros(1, self.model.slots),
+                torch.zeros(1, self.model.d_model), torch.zeros(1, self.model.d_model),
+            )
+        self.assertEqual(read.shape, (1, memory.value_width))
+        self.assertTrue(torch.allclose(read, torch.full_like(read, 7.0), atol=1e-3))
+
+    def test_gradients_reach_every_memory_interface(self) -> None:
+        batch = make_batch(self.generator, 2)
+        loss, _, _ = common_objective(self.model(batch.tokens), batch)
+        loss.backward()
+        for name in ("write_key", "erase_vector", "add_vector", "read_key",
+                     "allocation_gate", "write_gate", "free_gate"):
+            parameter = getattr(self.model.memory, name).weight
+            self.assertIsNotNone(parameter.grad, name)
+            self.assertGreater(parameter.grad.abs().sum().item(), 0.0, name)
+
+    def test_memory_ablation_changes_the_output(self) -> None:
+        batch = make_batch(self.generator, 2)
+        with torch.no_grad():
+            self.assertFalse(torch.equal(
+                self.model(batch.tokens), self.model(batch.tokens, disable_memory=True)
+            ))
+
+
 if __name__ == "__main__":
     unittest.main()
