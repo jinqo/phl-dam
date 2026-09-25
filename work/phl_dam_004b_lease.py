@@ -69,6 +69,15 @@ MERGE_SHARPNESS = 12.0
 # when it is not, the score should contribute nothing rather than amplified
 # noise. Set to 0.0 to recover the original behaviour exactly.
 EVICTION_SCORE_SPREAD_FLOOR = 0.1
+# Read each slot's value divided by its occupancy (PHL-DAM v2, see
+# phl_dam_v2.py). Values and occupancy accumulate with identical convex-blend
+# weights, so the ratio is the write-weighted average of what the slot holds,
+# independent of how far the write gate is open. Stage B's write gate collapses
+# to ~1% open early in training and sigmoid saturation starves it of gradient;
+# normalised reads remove the magnitude dependence. False reproduces the
+# published behaviour exactly.
+NORMALIZED_VALUES = False
+NORMALIZED_VALUES_FLOOR = 1e-3
 
 
 def _slot_unit(mixed_keys: Tensor, occupancy: Tensor) -> Tensor:
@@ -643,7 +652,11 @@ class PHLDAMLease(nn.Module):
             occupancy + OCCUPANCY_LOG_EPSILON
         )
         attention = torch.softmax(read_score, dim=-1)
-        retrieved = torch.einsum("bn,bnv->bv", attention, values)
+        readable = (
+            values / occupancy.clamp_min(NORMALIZED_VALUES_FLOOR)[:, :, None]
+            if NORMALIZED_VALUES else values
+        )
+        retrieved = torch.einsum("bn,bnv->bv", attention, readable)
         entropy = -(attention * attention.clamp_min(1e-12).log()).sum(dim=-1)
         confidence = 1.0 - entropy / math.log(self.num_slots)
         read_strength = torch.sigmoid(

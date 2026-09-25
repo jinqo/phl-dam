@@ -284,6 +284,7 @@ def run(
             "learning_rate": learning_rate,
             "optimizer": "AdamW(weight_decay=1e-4)",
             "merge_sharpness": lease_module.MERGE_SHARPNESS,
+            "normalized_values": lease_module.NORMALIZED_VALUES,
             "merge_temperature": lease_module.MERGE_TEMPERATURE,
             "eval_episodes": eval_episodes,
             "telemetry_every": TELEMETRY_EVERY,
@@ -319,6 +320,8 @@ def parse_args() -> argparse.Namespace:
     # Self-supervised read-back consistency: gives the write path a signal
     # that does not have to survive eviction and a long delay first.
     parser.add_argument("--readback-weight", type=float, default=0.0)
+    parser.add_argument("--normalized-values", action="store_true",
+                        help="PHL-DAM v2: read slot values divided by occupancy")
     parser.add_argument("--merge-sharpness", type=float, default=12.0)
     parser.add_argument("--merge-temperature", type=float, default=0.10)
     parser.add_argument("--output", type=Path)
@@ -330,6 +333,7 @@ def main() -> None:
     global BACKBONE, READBACK_WEIGHT
     BACKBONE = args.backbone
     READBACK_WEIGHT = args.readback_weight
+    lease_module.NORMALIZED_VALUES = args.normalized_values
     lease_module.MERGE_SHARPNESS = args.merge_sharpness
     lease_module.MERGE_TEMPERATURE = args.merge_temperature
     task.set_scale("pressure")
