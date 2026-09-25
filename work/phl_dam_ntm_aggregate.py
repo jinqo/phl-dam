@@ -16,7 +16,7 @@ import statistics
 import zipfile
 from pathlib import Path
 
-from phl_dam_report_stats import paired_verdict
+from phl_dam_report_stats import learned, paired_verdict
 
 SEEDS = range(6)
 BUNDLE = "PHL_DAM_No_Write_Budget_vs_Transformer_Reproduction.zip"
@@ -76,6 +76,55 @@ def describe(name: str, runs: dict[int, dict]) -> dict:
     }
 
 
+PRESSURE_LEVELS = (8, 16, 20, 24, 32)
+PRESSURE_ARMS = {
+    # PHL-DAM with the spread-floor stability fix: the reference 004G ladder.
+    "phl_dam": "phl_dam_004g_stable_w{writes}_seed{seed}.json",
+    "ntm_dnc_factorized": "phl_dam_004i_ntm_dnc_factorized_w{writes}_seed{seed}.json",
+    "ntm_dnc": "phl_dam_004i_ntm_dnc_w{writes}_seed{seed}.json",
+}
+
+
+def pressure_ladder(outputs: Path) -> dict:
+    """Learned counts and paired recall contrasts at every write level."""
+    ladder: dict = {"levels": {}, "contrasts": {}}
+    for writes in PRESSURE_LEVELS:
+        level = {}
+        runs_by_arm = {}
+        for arm, pattern in PRESSURE_ARMS.items():
+            runs = {}
+            for seed in range(5):
+                path = outputs / pattern.format(writes=writes, seed=seed)
+                if path.exists():
+                    runs[seed] = json.loads(path.read_text(encoding="utf-8"))
+            if not runs:
+                continue
+            runs_by_arm[arm] = runs
+            recall = {s: r["metrics"].get("recall", 0.0) for s, r in runs.items()}
+            level[arm] = {
+                "seeds": sorted(runs),
+                "learned": sum(learned(r) for r in runs.values()),
+                "runs": len(runs),
+                "finite": sum(bool(r.get("finite", True)) for r in runs.values()),
+                "seed_recall": [recall[s] for s in sorted(recall)],
+                "mean_recall": statistics.fmean(recall.values()),
+                "final_recall_ce": [runs[s]["final_recall_ce"] for s in sorted(runs)],
+            }
+        ladder["levels"][str(writes)] = level
+        if "phl_dam" in runs_by_arm:
+            for arm in ("ntm_dnc_factorized", "ntm_dnc"):
+                if arm not in runs_by_arm:
+                    continue
+                shared = sorted(set(runs_by_arm[arm]) & set(runs_by_arm["phl_dam"]))
+                if len(shared) >= 2:
+                    ladder["contrasts"][f"w{writes}_{arm}_minus_phl_dam"] = paired_verdict([
+                        runs_by_arm[arm][s]["metrics"].get("recall", 0.0)
+                        - runs_by_arm["phl_dam"][s]["metrics"].get("recall", 0.0)
+                        for s in shared
+                    ])
+    return ladder
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--outputs", type=Path, default=Path("../outputs"))
@@ -121,6 +170,8 @@ def main() -> None:
                 for s in shared
             ])
 
+    summary["write_pressure_ladder"] = pressure_ladder(args.outputs)
+
     text = json.dumps(summary, indent=2) + "\n"
     if args.write:
         args.write.write_text(text, encoding="utf-8")
@@ -132,6 +183,14 @@ def main() -> None:
     for name, verdict in summary["contrasts"].items():
         print(f"{name:40s} mean={verdict['mean']:+.4f} robust={verdict['robust']} "
               f"wins={verdict['positive']}/{verdict['n']} warnings={verdict['warnings']}")
+    print("\nwrite-pressure ladder (learned = final recall CE < 2.0)")
+    for writes, level in summary["write_pressure_ladder"]["levels"].items():
+        print(f"  W={writes:>2s} " + "  ".join(
+            f"{arm}: {row['learned']}/{row['runs']} recall={row['mean_recall']:.3f}"
+            for arm, row in level.items()))
+    for name, verdict in summary["write_pressure_ladder"]["contrasts"].items():
+        print(f"  {name:40s} mean={verdict['mean']:+.4f} robust={verdict['robust']} "
+              f"wins={verdict['positive']}/{verdict['n']}")
 
 
 if __name__ == "__main__":
