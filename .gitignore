@@ -18,3 +18,7 @@ work/*_jobs.txt
 # would capture them mid-write. Logs for completed experiments are shipped
 # inside the corresponding outputs/*_Reproduction.zip bundle.
 work/*.log
+
+# Downloaded third-party corpora (WikiText-2, TinyShakespeare) - fetched on demand,
+# not redistributed. See work/lm_hybrid.py for the source URLs.
+data_cache/
