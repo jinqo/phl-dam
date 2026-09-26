@@ -4,6 +4,10 @@
 ``phl_dam_v2conf_{arm}_seed{seed}.json``. Its seconds criterion is applied as
 written, including the flaw that charges never-converging arms 510 steps.
 
+``--round 3``: PREREGISTRATION_v3_round3.md part A, seeds 12-17, files
+``phl_dam_v3r3_{arm}_seed{seed}.json``; the copy-readout DNC is a full
+opponent.
+
 ``--round 2``: PREREGISTRATION_v2_round2.md, seeds 6-11, files
 ``phl_dam_v2r2_{arm}_seed{seed}.json``, with the seconds criterion fixed (any
 seed that never reaches 90% makes time-to-90% infinite) and the copy-readout
@@ -33,6 +37,11 @@ ROUNDS = {
         "seeds": range(6, 12), "prefix": "phl_dam_v2r2", "infinite_if_never": True,
         "timing": "phl_dam_v2_timing_benchmark_round2.json",
         "state_limit": {"v2_TC": 95, "v2_SC": 392}},
+    3: {"candidates": ("v3", "v3_TC"), "controls": (), "seeds": range(12, 18),
+        "prefix": "phl_dam_v3r3", "infinite_if_never": True,
+        "timing": "phl_dam_v3_timing_benchmark_round3.json",
+        "state_limit": {"v3": 392, "v3_TC": 95},
+        "baselines": BASELINES + ("ntm_dnc_factorized_copy",)},
 }
 NEVER = 510            # steps charged to a run that never reaches 90%
 CEILING = 0.995
@@ -62,8 +71,9 @@ def main() -> None:
     parser.add_argument("--write", type=Path)
     parser.add_argument("--round", type=int, choices=tuple(ROUNDS), default=1)
     args = parser.parse_args()
-    global CANDIDATES, SEEDS, STATE_LIMIT
+    global CANDIDATES, SEEDS, STATE_LIMIT, BASELINES
     config = ROUNDS[args.round]
+    BASELINES = config.get("baselines", BASELINES)
     CANDIDATES, SEEDS, STATE_LIMIT = (config["candidates"], config["seeds"],
                                       config["state_limit"])
     runs = load(args.outputs, config["prefix"],
