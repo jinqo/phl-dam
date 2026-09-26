@@ -1,6 +1,59 @@
-# PHL-DAM v3 (and v2) — what made the architecture win, and what it owes to generic mechanisms
+# PHL-DAM v4 — what made the architecture win, and what it owes to generic mechanisms
 
-## Latest verdict — v3, round 3 (`work/PREREGISTRATION_v3_round3.md`)
+## Latest verdict — v4, round 4 (`work/PREREGISTRATION_v4_round4.md`)
+
+v4 = v3 + copy readout initialised at scale 2.0 + a tied query/key projection.
+One architecture on both tasks: 8 slots × (24+24), 392 state floats,
+30,477 parameters at 176 tokens (fewer than every opponent).
+
+**176-token benchmark, fresh seeds 18–23.**
+
+| Model | Recall | Steps to 90% | Time to 90% | Training recall loss | Params | State |
+|---|---:|---|---:|---:|---:|---:|
+| **v4** | **100.00%** | **10 10 10 10 20 10** | **3.6 s** | **0.015** | **30,477** | 392 |
+| DNC + PHL-DAM wiring + copy readout | 100.00% | mean 27 | 12.1 s | 0.063 | 33,089 | 392 |
+| DNC + PHL-DAM wiring | 99.97% | mean 128 | 65.5 s | 0.574 | 33,088 | 392 |
+| PHL-DAM (original) | 99.61% | mean 250 | 145.7 s | 1.016 | 33,034 | 456 |
+| DNC (plain) | 48.02% | never | ∞ | 1.733 | 32,836 | 392 |
+| Transformer | 47.56% | never | ∞ | 1.790 | 33,074 | 16,896 |
+| SSM selective / diagonal | 27.9 / 26.6% | never | ∞ | 2.19 / 2.25 | ~33K | 96 |
+
+v4 reaches 90% sooner than every opponent on 6/6 seeds and has lower training
+recall loss than every opponent on 6/6 seeds. Against six opponents every
+preregistered criterion passes. Against the copy-readout DNC every criterion
+passes except the training-loss threshold: v4's loss area is 4.2× lower
+(0.015 vs 0.063; difference 0.047, 95% CI [0.037, 0.057], 6/6 seeds), but
+the preregistered rule demanded a difference of at least 0.05, which could
+only be met with a loss area ≤ 0.013. Reported as FAIL; the threshold was
+written for recall differences and does not suit a quantity this small.
+
+**Write-pressure ladder, seeds 0–4 — won against every opponent at every
+level on every criterion** (learned count, higher recall with no robust
+loss, strictly earlier breakthrough; breakthrough logged every 5 steps for
+every arm):
+
+| Writes | v4 learned · recall · breakthrough | copy DNC | wired DNC | PHL-DAM orig. |
+|---:|---|---|---|---|
+| 8 | 5/5 · **100.0%** · **18** | 94.1% · 31 | 91.4% · >150 | 66.3% · 342 |
+| 16 | 5/5 · **88.0%** · **20** | 80.6% · 34 | 79.3% · >150 | 50.0% · 514 |
+| 20 | 5/5 · **82.6%** · **23** | 75.8% · 39 | 73.9% · >150 | 15.7% · never |
+| 24 | 5/5 · **78.1%** · **24** | 72.0% · 40 | 71.3% · >150 | 15.2% · 648 |
+| 32 | 5/5 · **71.0%** · **29** | 67.6% · 44 | 67.4% · >150 | 19.9% · 586 |
+
+The recall lead is robust at 8–24 writes (+6 to +9 pp) and not robust at 32
+(+3.4 pp). DNC breakthroughs come from 150-step reruns (verified to reproduce
+the stored runs' losses); runs that break through after step 150 are charged
+710, which cannot change any comparison.
+
+**Attribution** is unchanged from v3: the copy readout and the DNC's write
+addressing are generic and borrowed; v4's own additions (tied query/key,
+stronger copy initialisation) are small. What remains distinctively
+PHL-DAM is occupancy-normalised convex slot storage, occupancy-weighted
+reads and separate key/value banks.
+
+---
+
+## v3, round 3 (`work/PREREGISTRATION_v3_round3.md`)
 
 v3 is one architecture used unchanged on both tasks: normalised slot values,
 no PHL lattice, copy readout, bounded key normalisation, and **the DNC's write
