@@ -118,7 +118,16 @@ function (asserted by test). Each change can then be ablated on its own:
   per step. Reads, value normalisation and the copy readout are unchanged.
   Every attempt to patch Stage B's allocation under write pressure helped a
   little or hurt; this tests whether the allocation rule itself is the weak
-  component. Stage B allocation targets the
+  component.
+* ``erase_gate`` / ``erase_bias`` - erase by address, add by gate. Before a
+  write, the addressed slot's values, occupancy and key are scaled by
+  (1 - e * address) with e a learned gate from the context, so a slot that is
+  fully addressed is fully replaced however far the write gate is open. With
+  normalised reads a plain convex write into an occupied slot only *blends*
+  the new binding with the old one. Measured motivation (W=32, dev seeds):
+  v4 recalls only 45-48% of bindings with no write between them and their
+  query versus 78-83% of the oldest, while the DNC - which erases - shows the
+  opposite profile. e = 0 reproduces v4 exactly. Stage B allocation targets the
   least-occupied slot; once every slot is full, occupancy is ~1 everywhere and
   the fixed ``slot_bias`` tie-break sends every new write to the *same* slot,
   so under write pressure the newest bindings overwrite each other while the
@@ -169,6 +178,8 @@ class PHLDAMv2(PHLDAM):
         capacity_gated_allocation: bool = False,
         allocation_temperature: float = 0.10,
         dnc_write_addressing: bool = False,
+        erase_gate: bool = False,
+        erase_bias: float = -2.0,
         d_model: int = 64,
         d_key: int = 24,
         d_value: int = 24,
@@ -206,6 +217,9 @@ class PHLDAMv2(PHLDAM):
         self.capacity_gated_allocation = capacity_gated_allocation
         self.allocation_temperature = allocation_temperature
         self.dnc_write_addressing = dnc_write_addressing
+        self.erase_gate = nn.Linear(d_model, 1) if erase_gate else None
+        if erase_gate:
+            nn.init.constant_(self.erase_gate.bias, erase_bias)
         if dnc_write_addressing:
             self.allocation_gate = nn.Linear(d_model, 1)
             self.write_sharpness = nn.Linear(d_model, 1)
@@ -256,7 +270,8 @@ class PHLDAMv2(PHLDAM):
                 or self.normalized_floor != OCCUPANCY_FLOOR
                 or self.prior_epsilon != 1e-6 or self.key_norm_epsilon is not None
                 or self.capacity_gated_allocation
-                or self.allocation_temperature != 0.10 or self.dnc_write_addressing):
+                or self.allocation_temperature != 0.10 or self.dnc_write_addressing
+                or self.erase_gate is not None):
             return super().forward(tokens, disable_retrieval, return_diagnostics)
         if return_diagnostics:
             raise NotImplementedError("v2 fast path does not collect diagnostics")
@@ -274,6 +289,8 @@ class PHLDAMv2(PHLDAM):
         if self.dnc_write_addressing:
             allocation_gates = torch.sigmoid(self.allocation_gate(context))
             sharpness = F.softplus(self.write_sharpness(context)) + 1.0
+        erases = (torch.sigmoid(self.erase_gate(context)).squeeze(-1)
+                  if self.erase_gate is not None else None)
         keeps = (
             torch.sigmoid(self.retention_head(context)).squeeze(-1)
             if self.retention_head is not None else None
@@ -339,21 +356,22 @@ class PHLDAMv2(PHLDAM):
                     1, order, (1.0 - sorted_occ) * exclusive)
                 content = torch.softmax(sharpness[:, t] * similarity, dim=-1)
                 gate_a = allocation_gates[:, t]
-                write = write_strengths[:, t, None] * (
-                    gate_a * usage_alloc + (1.0 - gate_a) * content)
+                address = gate_a * usage_alloc + (1.0 - gate_a) * content
             else:
-                write = write_strengths[:, t, None] * (
-                    merge_strength * merge + (1.0 - merge_strength) * allocation
-                )
-            remain = (1.0 - write)[:, :, None]
+                address = merge_strength * merge + (1.0 - merge_strength) * allocation
+            write = write_strengths[:, t, None] * address
+            keep_old = 1.0 - write
+            if erases is not None:
+                keep_old = keep_old * (1.0 - erases[:, t, None] * address)
+            remain = keep_old[:, :, None]
             keys = self._unit(remain * keys + write[:, :, None] * candidate_key[:, None])
             if keeps is None:
                 values = remain * values + write[:, :, None] * candidate_values[:, t, None]
-                occupancy = occupancy + write * (1.0 - occupancy)
+                occupancy = keep_old * occupancy + write
             else:
                 strength = keeps[:, t, None]
                 values = remain * values + (write * strength)[:, :, None] * candidate_values[:, t, None]
-                occupancy = (1.0 - write) * occupancy + write * strength
+                occupancy = keep_old * occupancy + write * strength
 
             score = torch.einsum("bd,bnd->bn", queries[:, t], keys) / temperature
             attention = torch.softmax(
