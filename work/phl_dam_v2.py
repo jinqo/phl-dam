@@ -56,6 +56,40 @@ function (asserted by test). Each change can then be ablated on its own:
   60-80) waits on the output layer learning to decode retrieved values, which
   rises only gradually (18% -> 39% -> 57% over the first 60 steps). One extra
   parameter, the learned ``copy_scale``.
+* ``occupancy_decay`` - multiply every slot's values *and* occupancy by
+  (1 - decay) each step. Between writes their ratio, which
+  ``normalized_values`` reads, is unchanged; a new write into a slot then
+  counts for relatively more against the decayed history, so a slot reads as
+  a recency-weighted average of what it received. Occupancy falls with age.
+  (Tested under write pressure: worse. In the 004 pressure profile every write
+  precedes every query, so FIFO keeps the last writes, not the needed ones.)
+* ``retention_head`` - a learned keep score in (0, 1) from the write context
+  scales both the written value and the occupancy increment. A fresh slot
+  still reads back exactly its candidate value (the ratio is unchanged), but
+  a low-keep slot has low occupancy, so allocation overwrites it first. This
+  is a learned retention priority set at write time - the "static priority"
+  the 004B lease study found as good as the lease - with no extra state: it
+  replaces the fixed ``slot_bias`` tie-break that otherwise sends every write
+  to the same slot once all slots are full.
+* ``free_gate`` - after each read, scale the read slots' occupancy (and
+  values, so the normalised read is unchanged) by (1 - f * attention), with f
+  a learned gate from the context. A slot whose binding has just been
+  retrieved can be released and reused - the DNC's free gate, ported to
+  occupancy-based allocation. No extra state.
+* ``normalized_floor`` - floor on the occupancy that normalised reads divide
+  by (default 1e-3). The Jacobian of values/occupancy grows as 1/occupancy^2,
+  so on a nearly empty slot a 1e-3 floor allows ~1e6x amplification; the
+  retention head and free gate both create such slots, and dev runs with them
+  broke through and then collapsed with gradient norms up to 2e3. The same
+  failure shape as Stage B's eviction z-score (fixed with a spread floor).
+* ``prior_epsilon`` - epsilon inside the read prior 0.25 * log(occupancy +
+  eps) (Stage B: 1e-6). Its derivative is ~1/occupancy, a second singularity
+  on nearly empty slots. Stage B allocation targets the
+  least-occupied slot; once every slot is full, occupancy is ~1 everywhere and
+  the fixed ``slot_bias`` tie-break sends every new write to the *same* slot,
+  so under write pressure the newest bindings overwrite each other while the
+  oldest never move. With decay the least-occupied slot is the oldest, which
+  turns allocation into FIFO eviction. No extra state or parameters.
 """
 
 from __future__ import annotations
@@ -92,6 +126,11 @@ class PHLDAMv2(PHLDAM):
         copy_readout: bool = False,
         copy_scale: float = 1.0,
         vocab_size: int = VOCAB_SIZE,
+        occupancy_decay: float = 0.0,
+        retention_head: bool = False,
+        free_gate: bool = False,
+        normalized_floor: float = OCCUPANCY_FLOOR,
+        prior_epsilon: float = 1e-6,
         d_model: int = 64,
         d_key: int = 24,
         d_value: int = 24,
@@ -116,6 +155,15 @@ class PHLDAMv2(PHLDAM):
             del self.query_projection
         self.direct_readout = direct_readout
         self.copy_readout = copy_readout
+        self.occupancy_decay = occupancy_decay
+        self.retention_head = (
+            nn.Linear(d_model, 1) if retention_head else None
+        )
+        if retention_head:
+            nn.init.constant_(self.retention_head.bias, 2.0)   # keep ~0.88
+        self.free_gate = nn.Linear(d_model, 1) if free_gate else None
+        self.normalized_floor = normalized_floor
+        self.prior_epsilon = prior_epsilon
         if copy_readout:
             self.copy_scale = nn.Parameter(torch.tensor(float(copy_scale)))
         self.normalized_values = normalized_values
@@ -152,7 +200,11 @@ class PHLDAMv2(PHLDAM):
                 or self.normalized_values or self.log_temperature is not None
                 or self.read_temperature != READ_TEMPERATURE
                 or self.occupied_threshold != 0.05 or self.key_bias
-                or self.copy_readout or self.vocab_size != VOCAB_SIZE):
+                or self.copy_readout or self.vocab_size != VOCAB_SIZE
+                or self.occupancy_decay > 0.0 or self.retention_head is not None
+                or self.free_gate is not None
+                or self.normalized_floor != OCCUPANCY_FLOOR
+                or self.prior_epsilon != 1e-6):
             return super().forward(tokens, disable_retrieval, return_diagnostics)
         if return_diagnostics:
             raise NotImplementedError("v2 fast path does not collect diagnostics")
@@ -167,7 +219,15 @@ class PHLDAMv2(PHLDAM):
         candidate_keys = F.normalize(self.key_projection(previous), dim=-1)
         candidate_values = self.value_projection(current)
         write_strengths = torch.sigmoid(self.write_gate(context)).squeeze(-1)
+        keeps = (
+            torch.sigmoid(self.retention_head(context)).squeeze(-1)
+            if self.retention_head is not None else None
+        )
         queries = self._query(current)
+        frees = (
+            torch.sigmoid(self.free_gate(context)).squeeze(-1)
+            if self.free_gate is not None else None
+        )
         if self.use_phl:
             injected = self.phl_input(context).view(
                 batch, length, self.horizons, self.horizon_width
@@ -189,6 +249,9 @@ class PHLDAMv2(PHLDAM):
                 phl = self.phl_norm(transported + injected[:, t])
                 phl_steps.append(phl.flatten(1))
 
+            if self.occupancy_decay > 0.0:
+                values = values * (1.0 - self.occupancy_decay)
+                occupancy = occupancy * (1.0 - self.occupancy_decay)
             candidate_key = candidate_keys[:, t]
             occupied = occupancy > self.occupied_threshold
             similarity = torch.einsum("bd,bnd->bn", candidate_key, keys)
@@ -213,18 +276,28 @@ class PHLDAMv2(PHLDAM):
             write = write_strengths[:, t, None] * (
                 merge_strength * merge + (1.0 - merge_strength) * allocation
             )
-            keep = (1.0 - write)[:, :, None]
-            keys = F.normalize(keep * keys + write[:, :, None] * candidate_key[:, None], dim=-1)
-            values = keep * values + write[:, :, None] * candidate_values[:, t, None]
-            occupancy = occupancy + write * (1.0 - occupancy)
+            remain = (1.0 - write)[:, :, None]
+            keys = F.normalize(remain * keys + write[:, :, None] * candidate_key[:, None], dim=-1)
+            if keeps is None:
+                values = remain * values + write[:, :, None] * candidate_values[:, t, None]
+                occupancy = occupancy + write * (1.0 - occupancy)
+            else:
+                strength = keeps[:, t, None]
+                values = remain * values + (write * strength)[:, :, None] * candidate_values[:, t, None]
+                occupancy = (1.0 - write) * occupancy + write * strength
 
             score = torch.einsum("bd,bnd->bn", queries[:, t], keys) / temperature
-            attention = torch.softmax(score + 0.25 * torch.log(occupancy + 1e-6), dim=-1)
+            attention = torch.softmax(
+                score + 0.25 * torch.log(occupancy + self.prior_epsilon), dim=-1)
             readable = (
-                values / occupancy.clamp_min(OCCUPANCY_FLOOR)[:, :, None]
+                values / occupancy.clamp_min(self.normalized_floor)[:, :, None]
                 if self.normalized_values else values
             )
             retrieved_steps.append(torch.einsum("bn,bnv->bv", attention, readable))
+            if frees is not None:
+                release = 1.0 - frees[:, t, None] * attention
+                occupancy = occupancy * release
+                values = values * release[:, :, None]
             if t == 0:
                 entropies = []
             entropies.append(-(attention * attention.clamp_min(1e-12).log()).sum(-1))

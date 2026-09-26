@@ -1,0 +1,427 @@
+{
+  "experiment": "PHL-DAM learning curves - common protocol",
+  "arm": "phl_dam_v2",
+  "options": {
+    "fast": true,
+    "normalized_values": true,
+    "use_phl": false,
+    "copy_readout": true,
+    "d_model": 76
+  },
+  "seed": 7,
+  "steps": 500,
+  "target_recall": 0.9,
+  "parameters": 32147,
+  "state_floats": 392,
+  "steps_to_target": 50,
+  "seconds_to_target": 40.55977001300562,
+  "training_seconds": 398.3414523189822,
+  "seconds_per_step": 0.7966829046379644,
+  "mean_training_recall_ce": 0.14199337792459119,
+  "final_recall": 0.9961666666666666,
+  "eval_episodes": 2000,
+  "peak_rss_mb": 741.34765625,
+  "finite": true,
+  "curve": [
+    {
+      "step": 10,
+      "recall_ce": 2.1363933086395264,
+      "all_token_ce": 0.6238964796066284,
+      "probe_recall": 0.3268229166666667,
+      "gradient_norm": 3.2054367065429688,
+      "training_seconds": 8.750235487997998
+    },
+    {
+      "step": 20,
+      "recall_ce": 1.2401612997055054,
+      "all_token_ce": 0.5277979373931885,
+      "probe_recall": 0.49609375,
+      "gradient_norm": 1.9185625314712524,
+      "training_seconds": 16.630747529001383
+    },
+    {
+      "step": 30,
+      "recall_ce": 0.689667284488678,
+      "all_token_ce": 0.4622078239917755,
+      "probe_recall": 0.7721354166666666,
+      "gradient_norm": 2.592153787612915,
+      "training_seconds": 24.612920956999005
+    },
+    {
+      "step": 40,
+      "recall_ce": 0.37173059582710266,
+      "all_token_ce": 0.411031574010849,
+      "probe_recall": 0.8893229166666666,
+      "gradient_norm": 2.518124580383301,
+      "training_seconds": 32.97994136700436
+    },
+    {
+      "step": 50,
+      "recall_ce": 0.23479561507701874,
+      "all_token_ce": 0.34661391377449036,
+      "probe_recall": 0.93359375,
+      "gradient_norm": 1.8959187269210815,
+      "training_seconds": 40.55977001300562
+    },
+    {
+      "step": 60,
+      "recall_ce": 0.12732695043087006,
+      "all_token_ce": 0.314012736082077,
+      "probe_recall": 0.9401041666666666,
+      "gradient_norm": 1.1734905242919922,
+      "training_seconds": 47.83235966900611
+    },
+    {
+      "step": 70,
+      "recall_ce": 0.4154402017593384,
+      "all_token_ce": 0.31030863523483276,
+      "probe_recall": 0.9401041666666666,
+      "gradient_norm": 4.343062877655029,
+      "training_seconds": 55.718406849009625
+    },
+    {
+      "step": 80,
+      "recall_ce": 0.1995713710784912,
+      "all_token_ce": 0.29661238193511963,
+      "probe_recall": 0.9440104166666666,
+      "gradient_norm": 2.475395679473877,
+      "training_seconds": 63.31841661200451
+    },
+    {
+      "step": 90,
+      "recall_ce": 0.21883338689804077,
+      "all_token_ce": 0.2911084294319153,
+      "probe_recall": 0.96875,
+      "gradient_norm": 2.7574288845062256,
+      "training_seconds": 71.66635523000878
+    },
+    {
+      "step": 100,
+      "recall_ce": 0.23409610986709595,
+      "all_token_ce": 0.2860721945762634,
+      "probe_recall": 0.9661458333333334,
+      "gradient_norm": 2.6980648040771484,
+      "training_seconds": 78.72702575700532
+    },
+    {
+      "step": 110,
+      "recall_ce": 0.12748712301254272,
+      "all_token_ce": 0.2846902310848236,
+      "probe_recall": 0.9583333333333334,
+      "gradient_norm": 2.0789895057678223,
+      "training_seconds": 86.34581049100234
+    },
+    {
+      "step": 120,
+      "recall_ce": 0.10742774605751038,
+      "all_token_ce": 0.277375727891922,
+      "probe_recall": 0.9700520833333334,
+      "gradient_norm": 1.6610822677612305,
+      "training_seconds": 93.3043945419995
+    },
+    {
+      "step": 130,
+      "recall_ce": 0.04151530936360359,
+      "all_token_ce": 0.2761925756931305,
+      "probe_recall": 0.9830729166666666,
+      "gradient_norm": 1.021249532699585,
+      "training_seconds": 102.28309283800627
+    },
+    {
+      "step": 140,
+      "recall_ce": 0.024062128737568855,
+      "all_token_ce": 0.2738739848136902,
+      "probe_recall": 0.9752604166666666,
+      "gradient_norm": 0.8982959985733032,
+      "training_seconds": 109.22351004600569
+    },
+    {
+      "step": 150,
+      "recall_ce": 0.046231526881456375,
+      "all_token_ce": 0.27265098690986633,
+      "probe_recall": 0.984375,
+      "gradient_norm": 1.3202255964279175,
+      "training_seconds": 117.29427477699937
+    },
+    {
+      "step": 160,
+      "recall_ce": 0.009773913770914078,
+      "all_token_ce": 0.27291929721832275,
+      "probe_recall": 0.9765625,
+      "gradient_norm": 0.31743335723876953,
+      "training_seconds": 125.42193883199798
+    },
+    {
+      "step": 170,
+      "recall_ce": 0.13899023830890656,
+      "all_token_ce": 0.2751444876194,
+      "probe_recall": 0.9791666666666666,
+      "gradient_norm": 3.1356122493743896,
+      "training_seconds": 133.8560655340043
+    },
+    {
+      "step": 180,
+      "recall_ce": 0.03136685863137245,
+      "all_token_ce": 0.27208468317985535,
+      "probe_recall": 0.9765625,
+      "gradient_norm": 1.1388436555862427,
+      "training_seconds": 142.72584412700235
+    },
+    {
+      "step": 190,
+      "recall_ce": 0.015200418420135975,
+      "all_token_ce": 0.27244672179222107,
+      "probe_recall": 0.98828125,
+      "gradient_norm": 0.9163188934326172,
+      "training_seconds": 150.99154150100367
+    },
+    {
+      "step": 200,
+      "recall_ce": 0.05420021712779999,
+      "all_token_ce": 0.27010148763656616,
+      "probe_recall": 0.9830729166666666,
+      "gradient_norm": 1.87608802318573,
+      "training_seconds": 159.33847026399235
+    },
+    {
+      "step": 210,
+      "recall_ce": 0.10800892114639282,
+      "all_token_ce": 0.2712272107601166,
+      "probe_recall": 0.9908854166666666,
+      "gradient_norm": 3.3339531421661377,
+      "training_seconds": 168.45261552599186
+    },
+    {
+      "step": 220,
+      "recall_ce": 0.09221648424863815,
+      "all_token_ce": 0.27006080746650696,
+      "probe_recall": 0.9895833333333334,
+      "gradient_norm": 2.9181458950042725,
+      "training_seconds": 176.34189871499257
+    },
+    {
+      "step": 230,
+      "recall_ce": 0.0007885347004048526,
+      "all_token_ce": 0.26784586906433105,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.07014782726764679,
+      "training_seconds": 183.30153716299174
+    },
+    {
+      "step": 240,
+      "recall_ce": 0.04901621863245964,
+      "all_token_ce": 0.26744747161865234,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 2.086069345474243,
+      "training_seconds": 191.95021941399318
+    },
+    {
+      "step": 250,
+      "recall_ce": 0.003722391091287136,
+      "all_token_ce": 0.2695292532444,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.29989755153656006,
+      "training_seconds": 200.44784047599387
+    },
+    {
+      "step": 260,
+      "recall_ce": 0.02194349281489849,
+      "all_token_ce": 0.26776230335235596,
+      "probe_recall": 0.9947916666666666,
+      "gradient_norm": 1.8857741355895996,
+      "training_seconds": 208.41431506199297
+    },
+    {
+      "step": 270,
+      "recall_ce": 0.009717010892927647,
+      "all_token_ce": 0.26540571451187134,
+      "probe_recall": 0.9947916666666666,
+      "gradient_norm": 0.666633665561676,
+      "training_seconds": 216.11547576699013
+    },
+    {
+      "step": 280,
+      "recall_ce": 0.015079539269208908,
+      "all_token_ce": 0.2690008580684662,
+      "probe_recall": 0.9908854166666666,
+      "gradient_norm": 1.0256074666976929,
+      "training_seconds": 223.44104790297934
+    },
+    {
+      "step": 290,
+      "recall_ce": 0.006042408291250467,
+      "all_token_ce": 0.2677411437034607,
+      "probe_recall": 0.9947916666666666,
+      "gradient_norm": 0.3099270164966583,
+      "training_seconds": 231.33913129298162
+    },
+    {
+      "step": 300,
+      "recall_ce": 0.043015625327825546,
+      "all_token_ce": 0.26818522810935974,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 2.108612537384033,
+      "training_seconds": 239.39464068698726
+    },
+    {
+      "step": 310,
+      "recall_ce": 0.0005362434894777834,
+      "all_token_ce": 0.26447752118110657,
+      "probe_recall": 0.9908854166666666,
+      "gradient_norm": 0.06207088753581047,
+      "training_seconds": 248.49572860397893
+    },
+    {
+      "step": 320,
+      "recall_ce": 0.0010148069122806191,
+      "all_token_ce": 0.26891404390335083,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.09054078906774521,
+      "training_seconds": 256.9272507049791
+    },
+    {
+      "step": 330,
+      "recall_ce": 0.03698285296559334,
+      "all_token_ce": 0.2671549320220947,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 2.031404733657837,
+      "training_seconds": 263.57187720596994
+    },
+    {
+      "step": 340,
+      "recall_ce": 0.009500330314040184,
+      "all_token_ce": 0.26861095428466797,
+      "probe_recall": 0.9934895833333334,
+      "gradient_norm": 0.5149571895599365,
+      "training_seconds": 271.2296896269727
+    },
+    {
+      "step": 350,
+      "recall_ce": 0.038796380162239075,
+      "all_token_ce": 0.26445621252059937,
+      "probe_recall": 0.9934895833333334,
+      "gradient_norm": 1.9537711143493652,
+      "training_seconds": 279.38139130497075
+    },
+    {
+      "step": 360,
+      "recall_ce": 0.0047680893912911415,
+      "all_token_ce": 0.2694782018661499,
+      "probe_recall": 0.9908854166666666,
+      "gradient_norm": 0.39182114601135254,
+      "training_seconds": 287.6592290609733
+    },
+    {
+      "step": 370,
+      "recall_ce": 0.006812535226345062,
+      "all_token_ce": 0.2689526677131653,
+      "probe_recall": 0.9934895833333334,
+      "gradient_norm": 0.518496572971344,
+      "training_seconds": 296.57955784097794
+    },
+    {
+      "step": 380,
+      "recall_ce": 0.0016712126089259982,
+      "all_token_ce": 0.26481273770332336,
+      "probe_recall": 0.9934895833333334,
+      "gradient_norm": 0.10950713604688644,
+      "training_seconds": 304.7947063559768
+    },
+    {
+      "step": 390,
+      "recall_ce": 0.023250969126820564,
+      "all_token_ce": 0.2661028206348419,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 1.3561666011810303,
+      "training_seconds": 312.35319715197693
+    },
+    {
+      "step": 400,
+      "recall_ce": 0.00019188510486856103,
+      "all_token_ce": 0.2659231126308441,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.06420330703258514,
+      "training_seconds": 320.8643765569759
+    },
+    {
+      "step": 410,
+      "recall_ce": 0.003435686230659485,
+      "all_token_ce": 0.26439791917800903,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.2228032499551773,
+      "training_seconds": 329.6586619649752
+    },
+    {
+      "step": 420,
+      "recall_ce": 0.10547546297311783,
+      "all_token_ce": 0.26642677187919617,
+      "probe_recall": 0.9947916666666666,
+      "gradient_norm": 3.0896732807159424,
+      "training_seconds": 338.49301538898
+    },
+    {
+      "step": 430,
+      "recall_ce": 5.458792657009326e-05,
+      "all_token_ce": 0.2635422945022583,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 0.057271189987659454,
+      "training_seconds": 346.63920031697126
+    },
+    {
+      "step": 440,
+      "recall_ce": 0.0034237466752529144,
+      "all_token_ce": 0.26458311080932617,
+      "probe_recall": 0.99609375,
+      "gradient_norm": 0.2989591062068939,
+      "training_seconds": 354.53927440797634
+    },
+    {
+      "step": 450,
+      "recall_ce": 0.013938193209469318,
+      "all_token_ce": 0.26518502831459045,
+      "probe_recall": 0.9973958333333334,
+      "gradient_norm": 1.3820682764053345,
+      "training_seconds": 361.4692019919785
+    },
+    {
+      "step": 460,
+      "recall_ce": 0.01029044110327959,
+      "all_token_ce": 0.26607927680015564,
+      "probe_recall": 0.9973958333333334,
+      "gradient_norm": 1.086279034614563,
+      "training_seconds": 368.003474257981
+    },
+    {
+      "step": 470,
+      "recall_ce": 0.014055275358259678,
+      "all_token_ce": 0.2663060128688812,
+      "probe_recall": 0.9921875,
+      "gradient_norm": 1.059444785118103,
+      "training_seconds": 376.2100748129851
+    },
+    {
+      "step": 480,
+      "recall_ce": 0.0034209939185529947,
+      "all_token_ce": 0.2649596333503723,
+      "probe_recall": 0.9934895833333334,
+      "gradient_norm": 0.2702697813510895,
+      "training_seconds": 383.1828766119761
+    },
+    {
+      "step": 490,
+      "recall_ce": 0.007900647819042206,
+      "all_token_ce": 0.26656198501586914,
+      "probe_recall": 0.99609375,
+      "gradient_norm": 0.5403040051460266,
+      "training_seconds": 390.0899849159796
+    },
+    {
+      "step": 500,
+      "recall_ce": 0.00032632521470077336,
+      "all_token_ce": 0.2640097439289093,
+      "probe_recall": 0.9947916666666666,
+      "gradient_norm": 0.071471206843853,
+      "training_seconds": 398.3414523189822
+    }
+  ]
+}

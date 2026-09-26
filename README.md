@@ -56,7 +56,34 @@ fastest way to have the work dismissed.
 
 The comparison that would genuinely discriminate is against **NTM/DNC**, which
 also has addressable memory and which PHL-DAM's working core closely resembles.
-That baseline is implemented in `work/phl_dam_ntm_baseline.py`; results pending.
+That baseline is implemented in `work/phl_dam_ntm_baseline.py`. **Result:**
+PHL-DAM beats a plain DNC by +50 pp (6/6 seeds), but a DNC given PHL-DAM's
+hardwired key/value role wiring ties it (99.99%). The advantage in the table
+above came from that wiring, not from PHL-DAM's slot mechanics. See
+`outputs/PHL_DAM_v2_Report.md`.
+
+## PHL-DAM v2
+
+Diagnosing *why* PHL-DAM learned slowly (its write gate collapses early and
+starves itself of gradient; then its output layer must learn to decode
+retrieved values) led to v2: read slot values normalised by occupancy, drop the
+PHL horizon lattice, a copy readout, and a compact 4-slot memory. On fresh,
+preregistered seeds (6–11) it passes every criterion against every baseline:
+
+| Model | Recall | Steps to 90% | Time to 90% | Training recall loss | State |
+|---|---:|---:|---:|---:|---:|
+| **PHL-DAM v2** | **99.99%** | **55** | **14.0 s** | **0.166** | **68** |
+| DNC with PHL-DAM's wiring | 100.00% | 115 | 59.6 s | 0.511 | 392 |
+| PHL-DAM (original) | 84.73% | 272 (1 seed never) | never | 1.136 | 456 |
+| Transformer | 47.08% | never | never | 1.839 | 16,896 |
+| Selective SSM | 27.70% | never | never | 2.161 | 96 |
+
+What this does **not** show: the copy readout that supplies most of the speed
+is generic — a DNC given it reaches 90% in 30 steps (v2 still wins on
+wall-clock and 5.8× less state). And under write pressure the DNC still wins
+on final recall: it has no cliff at all (learns 5/5 at 20–24 writes, where
+original PHL-DAM learns 0/5), while v2 breaks through 4× sooner but ends lower
+and shows gradient spikes. Full account: `outputs/PHL_DAM_v2_Report.md`.
 
 ## What was tested and rejected
 

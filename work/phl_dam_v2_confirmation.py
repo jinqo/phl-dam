@@ -1,9 +1,16 @@
-"""Apply PREREGISTRATION_v2_confirmation.md to the seed 0-5 learning curves.
+"""Apply a v2 preregistration to its learning curves.
 
-Reads ``phl_dam_v2conf_{arm}_seed{seed}.json`` (written by
-``phl_dam_learning_curve.py``) and the round-robin timing benchmark, and
-reports every criterion for every candidate against every baseline, pass or
-fail. Criteria are implemented exactly as written in the preregistration.
+``--round 1`` (default): PREREGISTRATION_v2_confirmation.md, seeds 0-5, files
+``phl_dam_v2conf_{arm}_seed{seed}.json``. Its seconds criterion is applied as
+written, including the flaw that charges never-converging arms 510 steps.
+
+``--round 2``: PREREGISTRATION_v2_round2.md, seeds 6-11, files
+``phl_dam_v2r2_{arm}_seed{seed}.json``, with the seconds criterion fixed (any
+seed that never reaches 90% makes time-to-90% infinite) and the copy-readout
+DNC reported as a control.
+
+Every criterion for every candidate against every baseline is reported, pass
+or fail, exactly as preregistered.
 """
 
 from __future__ import annotations
@@ -15,21 +22,31 @@ from pathlib import Path
 
 from phl_dam_report_stats import paired_verdict
 
-CANDIDATES = ("v2_S", "v2_T")
 BASELINES = ("phl_dam", "ntm_dnc_factorized", "ntm_dnc", "transformer",
              "ssm_selective", "ssm_diagonal")
-SEEDS = range(6)
+ROUNDS = {
+    1: {"candidates": ("v2_S", "v2_T"), "controls": (), "seeds": range(6),
+        "prefix": "phl_dam_v2conf", "infinite_if_never": False,
+        "timing": "phl_dam_v2_timing_benchmark.json",
+        "state_limit": {"v2_S": 392, "v2_T": 95}},
+    2: {"candidates": ("v2_TC", "v2_SC"), "controls": ("ntm_dnc_factorized_copy",),
+        "seeds": range(6, 12), "prefix": "phl_dam_v2r2", "infinite_if_never": True,
+        "timing": "phl_dam_v2_timing_benchmark_round2.json",
+        "state_limit": {"v2_TC": 95, "v2_SC": 392}},
+}
 NEVER = 510            # steps charged to a run that never reaches 90%
 CEILING = 0.995
 CEILING_MARGIN = -0.005
-STATE_LIMIT = {"v2_S": 392, "v2_T": 95}   # <= DNC; strictly below the SSMs' 96
+CANDIDATES: tuple = ()
+SEEDS: range = range(0)
+STATE_LIMIT: dict = {}
 
 
-def load(outputs: Path) -> dict[str, dict[int, dict]]:
+def load(outputs: Path, prefix: str, arms: tuple) -> dict[str, dict[int, dict]]:
     runs: dict[str, dict[int, dict]] = {}
-    for arm in CANDIDATES + BASELINES:
+    for arm in arms:
         for seed in SEEDS:
-            path = outputs / f"phl_dam_v2conf_{arm}_seed{seed}.json"
+            path = outputs / f"{prefix}_{arm}_seed{seed}.json"
             if path.exists():
                 runs.setdefault(arm, {})[seed] = json.loads(path.read_text())
     return runs
@@ -43,9 +60,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--outputs", type=Path, default=Path("../outputs"))
     parser.add_argument("--write", type=Path)
+    parser.add_argument("--round", type=int, choices=tuple(ROUNDS), default=1)
     args = parser.parse_args()
-    runs = load(args.outputs)
-    timing = json.loads((args.outputs / "phl_dam_v2_timing_benchmark.json").read_text())
+    global CANDIDATES, SEEDS, STATE_LIMIT
+    config = ROUNDS[args.round]
+    CANDIDATES, SEEDS, STATE_LIMIT = (config["candidates"], config["seeds"],
+                                      config["state_limit"])
+    runs = load(args.outputs, config["prefix"],
+                CANDIDATES + BASELINES + config["controls"])
+    timing = json.loads((args.outputs / config["timing"]).read_text())
 
     arms = {}
     for arm, by_seed in runs.items():
@@ -62,7 +85,10 @@ def main() -> None:
             "mean_steps_to_90": statistics.fmean(s90),
             "reached_90": sum(by_seed[s]["steps_to_target"] is not None for s in seeds),
             "median_seconds_per_step": per_step,
-            "est_seconds_to_90": statistics.fmean(s90) * per_step,
+            "est_seconds_to_90": (
+                float("inf") if config["infinite_if_never"] and NEVER in s90
+                else statistics.fmean(s90) * per_step
+            ),
             "mean_training_recall_ce": statistics.fmean(
                 by_seed[s]["mean_training_recall_ce"] for s in seeds),
             "peak_rss_mb": max(by_seed[s]["peak_rss_mb"] for s in seeds),

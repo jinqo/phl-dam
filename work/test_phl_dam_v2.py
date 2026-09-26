@@ -121,6 +121,24 @@ class CopyReadoutTests(unittest.TestCase):
         tokens = torch.randint(0, 87, (2, 50))
         self.assertEqual(model(tokens)[0].shape, (2, 50, 87))
 
+    def test_occupancy_decay_keeps_reads_bounded_over_long_sequences(self) -> None:
+        """Dividing by a decayed occupancy must not blow the read up.
+
+        Values decay with occupancy, so each slot still reads as a weighted
+        average of candidate values; logits over a 456-token sequence with a
+        strong decay stay finite and of the same order as without decay.
+        """
+        torch.manual_seed(0)
+        plain = PHLDAMv2(**{**self.OPTIONS, "vocab_size": 87})
+        decayed = PHLDAMv2(**{**self.OPTIONS, "vocab_size": 87, "occupancy_decay": 0.05})
+        decayed.load_state_dict(plain.state_dict())
+        tokens = torch.randint(0, 87, (2, 456), generator=torch.Generator().manual_seed(5))
+        with torch.no_grad():
+            a, b = plain(tokens)[0], decayed(tokens)[0]
+        self.assertTrue(torch.isfinite(b).all())
+        self.assertLess(b.abs().max().item(), 3.0 * a.abs().max().item() + 1.0)
+        self.assertFalse(torch.equal(a, b))
+
     def test_dnc_control_arm_gets_the_same_readout(self) -> None:
         model = curve.build("ntm_dnc_factorized_copy", {})
         self.assertTrue(model.copy_readout)
