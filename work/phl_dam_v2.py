@@ -84,7 +84,41 @@ function (asserted by test). Each change can then be ablated on its own:
   failure shape as Stage B's eviction z-score (fixed with a spread floor).
 * ``prior_epsilon`` - epsilon inside the read prior 0.25 * log(occupancy +
   eps) (Stage B: 1e-6). Its derivative is ~1/occupancy, a second singularity
-  on nearly empty slots. Stage B allocation targets the
+  on nearly empty slots.
+* ``key_norm_epsilon`` - unit-normalise keys and queries as
+  x / sqrt(|x|^2 + eps^2) instead of ``F.normalize`` (which divides by
+  max(|x|, 1e-12)). Located by tracing per-op gradient amplification at every
+  gradient spike under write pressure: all of them sat in ``F.normalize`` on
+  the slot keys, with amplification exactly 1e12 = 1/1e-12, on slots holding an
+  exactly zero key (the t=0 candidate key is normalize(key_projection(zero
+  padding)) = 0). The same failure the pressure model's ``_slot_unit`` guards
+  against. With eps = 0.05, unit-scale keys change by ~0.1% and a zero key's
+  Jacobian is bounded by 1/eps = 20.
+* ``capacity_gated_allocation`` - multiply the allocation softmax by each
+  slot's free capacity (1 - occupancy). Once every slot is full, Stage B's
+  allocation falls back on the fixed ``slot_bias`` tie-break, whose softmax at
+  temperature 0.1 spreads each new write over *all* slots (~27% into slot 0
+  down to ~7% into slot 7), so under write pressure every write partially
+  overwrites every stored binding. Gated, a write lands only where there is
+  room - an empty slot, or one whose occupancy is low because the retention
+  head gave it a low keep score - as the DNC's usage-based allocation does.
+  (Tested under pressure: worse. It drops new items once full.)
+* ``allocation_temperature`` - temperature of the allocation softmax (Stage
+  B: 0.10). A diagnostic of trained models under write pressure showed v2
+  never writing 21% of the bindings it later needs (DNC: 5%), with its gate
+  learning to write about eight items per episode - exactly the slot count -
+  because once full, the 0.02-wide slot_bias tie-break at temperature 0.10
+  smears every new write across all slots. A colder allocation turns overflow
+  into a sharp single-slot overwrite instead. (Tested at 0.01: training
+  diverges; the softmax gradient is scaled 100x.)
+* ``dnc_write_addressing`` - replace Stage B's merge-or-allocate rule with
+  the DNC's write addressing: a learned allocation gate mixing usage-sorted
+  allocation (1 - occ_j) * prod_{i<j} occ_i over ascending occupancy with a
+  content-based write weighting softmax(beta * cos(key, slots)), beta learned
+  per step. Reads, value normalisation and the copy readout are unchanged.
+  Every attempt to patch Stage B's allocation under write pressure helped a
+  little or hurt; this tests whether the allocation rule itself is the weak
+  component. Stage B allocation targets the
   least-occupied slot; once every slot is full, occupancy is ~1 everywhere and
   the fixed ``slot_bias`` tie-break sends every new write to the *same* slot,
   so under write pressure the newest bindings overwrite each other while the
@@ -131,6 +165,10 @@ class PHLDAMv2(PHLDAM):
         free_gate: bool = False,
         normalized_floor: float = OCCUPANCY_FLOOR,
         prior_epsilon: float = 1e-6,
+        key_norm_epsilon: float | None = None,
+        capacity_gated_allocation: bool = False,
+        allocation_temperature: float = 0.10,
+        dnc_write_addressing: bool = False,
         d_model: int = 64,
         d_key: int = 24,
         d_value: int = 24,
@@ -164,6 +202,13 @@ class PHLDAMv2(PHLDAM):
         self.free_gate = nn.Linear(d_model, 1) if free_gate else None
         self.normalized_floor = normalized_floor
         self.prior_epsilon = prior_epsilon
+        self.key_norm_epsilon = key_norm_epsilon
+        self.capacity_gated_allocation = capacity_gated_allocation
+        self.allocation_temperature = allocation_temperature
+        self.dnc_write_addressing = dnc_write_addressing
+        if dnc_write_addressing:
+            self.allocation_gate = nn.Linear(d_model, 1)
+            self.write_sharpness = nn.Linear(d_model, 1)
         if copy_readout:
             self.copy_scale = nn.Parameter(torch.tensor(float(copy_scale)))
         self.normalized_values = normalized_values
@@ -180,9 +225,14 @@ class PHLDAMv2(PHLDAM):
         self.read_temperature = read_temperature
 
     # ------------------------------------------------------------------
+    def _unit(self, x: Tensor) -> Tensor:
+        if self.key_norm_epsilon is None:
+            return F.normalize(x, dim=-1)
+        return x / (x.pow(2).sum(-1, keepdim=True) + self.key_norm_epsilon ** 2).sqrt()
+
     def _query(self, current_token: Tensor) -> Tensor:
         projection = self.key_projection if self.tie_query_key else self.query_projection
-        return F.normalize(projection(current_token), dim=-1)
+        return self._unit(projection(current_token))
 
     def _temperature(self) -> Tensor | float:
         if self.log_temperature is None:
@@ -204,7 +254,9 @@ class PHLDAMv2(PHLDAM):
                 or self.occupancy_decay > 0.0 or self.retention_head is not None
                 or self.free_gate is not None
                 or self.normalized_floor != OCCUPANCY_FLOOR
-                or self.prior_epsilon != 1e-6):
+                or self.prior_epsilon != 1e-6 or self.key_norm_epsilon is not None
+                or self.capacity_gated_allocation
+                or self.allocation_temperature != 0.10 or self.dnc_write_addressing):
             return super().forward(tokens, disable_retrieval, return_diagnostics)
         if return_diagnostics:
             raise NotImplementedError("v2 fast path does not collect diagnostics")
@@ -216,9 +268,12 @@ class PHLDAMv2(PHLDAM):
         device = tokens.device
 
         # Everything that depends only on the token stream, computed once.
-        candidate_keys = F.normalize(self.key_projection(previous), dim=-1)
+        candidate_keys = self._unit(self.key_projection(previous))
         candidate_values = self.value_projection(current)
         write_strengths = torch.sigmoid(self.write_gate(context)).squeeze(-1)
+        if self.dnc_write_addressing:
+            allocation_gates = torch.sigmoid(self.allocation_gate(context))
+            sharpness = F.softplus(self.write_sharpness(context)) + 1.0
         keeps = (
             torch.sigmoid(self.retention_head(context)).squeeze(-1)
             if self.retention_head is not None else None
@@ -271,13 +326,27 @@ class PHLDAMv2(PHLDAM):
                 MERGE_SHARPNESS * (max_similarity - MERGE_THRESHOLD)
             )[:, None]
             allocation = torch.softmax(
-                (5.0 * (1.0 - occupancy) + slot_bias) / 0.10, dim=-1
+                (5.0 * (1.0 - occupancy) + slot_bias) / self.allocation_temperature, dim=-1
             )
-            write = write_strengths[:, t, None] * (
-                merge_strength * merge + (1.0 - merge_strength) * allocation
-            )
+            if self.capacity_gated_allocation:
+                allocation = allocation * (1.0 - occupancy)
+            if self.dnc_write_addressing:
+                sorted_occ, order = occupancy.sort(dim=-1)
+                exclusive = torch.cat(
+                    [torch.ones_like(sorted_occ[:, :1]), sorted_occ[:, :-1]], dim=-1
+                ).cumprod(dim=-1)
+                usage_alloc = torch.zeros_like(occupancy).scatter(
+                    1, order, (1.0 - sorted_occ) * exclusive)
+                content = torch.softmax(sharpness[:, t] * similarity, dim=-1)
+                gate_a = allocation_gates[:, t]
+                write = write_strengths[:, t, None] * (
+                    gate_a * usage_alloc + (1.0 - gate_a) * content)
+            else:
+                write = write_strengths[:, t, None] * (
+                    merge_strength * merge + (1.0 - merge_strength) * allocation
+                )
             remain = (1.0 - write)[:, :, None]
-            keys = F.normalize(remain * keys + write[:, :, None] * candidate_key[:, None], dim=-1)
+            keys = self._unit(remain * keys + write[:, :, None] * candidate_key[:, None])
             if keeps is None:
                 values = remain * values + write[:, :, None] * candidate_values[:, t, None]
                 occupancy = occupancy + write * (1.0 - occupancy)

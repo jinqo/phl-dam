@@ -38,7 +38,8 @@ PHL_DAM_PRESSURE_PARAMETERS = 38_641
 BREAKTHROUGH_RECALL_CE = 2.0
 LOG_EVERY = 25
 # Controller widths that land each arm within 1% of PHL-DAM on vocabulary 87.
-CONTROLLER_WIDTH = {"ntm_dnc": 70, "ntm_dnc_factorized": 100}
+CONTROLLER_WIDTH = {"ntm_dnc": 70, "ntm_dnc_factorized": 100,
+                    "ntm_dnc_factorized_copy": 100}
 
 
 ARMS = tuple(CONTROLLER_WIDTH) + ("phl_dam_v2",)
@@ -49,9 +50,10 @@ def build(arm: str, options: dict | None = None):
         from phl_dam_v2 import PHLDAMv2
         return PHLDAMv2(**{**(options or {}), "vocab_size": task.VOCAB_SIZE})
     return NTMBaseline(
-        factorized=arm == "ntm_dnc_factorized",
+        factorized=arm.startswith("ntm_dnc_factorized"),
         controller_width=CONTROLLER_WIDTH[arm],
         vocab_size=task.VOCAB_SIZE,
+        copy_readout=arm.endswith("_copy"),
     )
 
 
