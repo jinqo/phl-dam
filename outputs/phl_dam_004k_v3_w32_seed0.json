@@ -1,0 +1,289 @@
+{
+  "experiment": "PHL-DAM-004 write-pressure ladder - NTM/DNC baselines",
+  "model": "phl_dam_v2",
+  "configuration": {
+    "scale": "pressure",
+    "seed": 0,
+    "writes": 32,
+    "sequence_length": 456,
+    "delay_range": [
+      32,
+      256
+    ],
+    "query_budget": [
+      6,
+      9
+    ],
+    "options": {
+      "fast": true,
+      "normalized_values": true,
+      "use_phl": false,
+      "copy_readout": true,
+      "key_norm_epsilon": 0.05,
+      "dnc_write_addressing": true,
+      "d_model": 76
+    },
+    "slots": 8,
+    "controller_width": null,
+    "factorized_roles": true,
+    "training_steps": 700,
+    "batch_size": 16,
+    "learning_rate": 0.002,
+    "optimizer": "AdamW(weight_decay=1e-4)",
+    "eval_episodes": 192,
+    "breakthrough_recall_ce": 2.0
+  },
+  "accounting": {
+    "total_parameters": 38421,
+    "phl_dam_reference_parameters": 38641,
+    "recurrent_state_floats": 392
+  },
+  "breakthrough_step": 50,
+  "final_recall_ce": 0.7454907298088074,
+  "max_gradient_norm": 12.061691284179688,
+  "metrics": {
+    "writes": 32,
+    "condition": "canonical",
+    "episodes": 192,
+    "queries": 1381,
+    "recall": 0.7139753801593048,
+    "retrieval_disabled_recall": 0.0890658942795076,
+    "all_token_ce": 0.8719445367654165,
+    "recall_token_ce": 0.8197332074244817
+  },
+  "training_history": [
+    {
+      "step": 1,
+      "loss": 8.138543128967285,
+      "all_token_ce": 3.1666219234466553,
+      "recall_ce": 4.971921443939209,
+      "gradient_norm": 12.061691284179688,
+      "elapsed_seconds": 1.1999111170007382
+    },
+    {
+      "step": 25,
+      "loss": 3.309781074523926,
+      "all_token_ce": 1.0442168712615967,
+      "recall_ce": 2.265564203262329,
+      "gradient_norm": 2.266223430633545,
+      "elapsed_seconds": 37.10845078800048
+    },
+    {
+      "step": 50,
+      "loss": 2.8277928829193115,
+      "all_token_ce": 0.9916578531265259,
+      "recall_ce": 1.8361350297927856,
+      "gradient_norm": 3.0428812503814697,
+      "elapsed_seconds": 72.90246181700059
+    },
+    {
+      "step": 75,
+      "loss": 2.243926525115967,
+      "all_token_ce": 0.9551700949668884,
+      "recall_ce": 1.2887563705444336,
+      "gradient_norm": 2.03389048576355,
+      "elapsed_seconds": 108.98221008200198
+    },
+    {
+      "step": 100,
+      "loss": 1.9236643314361572,
+      "all_token_ce": 0.907971203327179,
+      "recall_ce": 1.0156930685043335,
+      "gradient_norm": 1.6565009355545044,
+      "elapsed_seconds": 145.49661305899645
+    },
+    {
+      "step": 125,
+      "loss": 1.831728219985962,
+      "all_token_ce": 0.8954433798789978,
+      "recall_ce": 0.9362848401069641,
+      "gradient_norm": 2.0457236766815186,
+      "elapsed_seconds": 182.36324465600046
+    },
+    {
+      "step": 150,
+      "loss": 1.9126067161560059,
+      "all_token_ce": 0.9042910933494568,
+      "recall_ce": 1.0083156824111938,
+      "gradient_norm": 1.9664812088012695,
+      "elapsed_seconds": 220.3304361249975
+    },
+    {
+      "step": 175,
+      "loss": 1.9018338918685913,
+      "all_token_ce": 0.8979450464248657,
+      "recall_ce": 1.0038888454437256,
+      "gradient_norm": 2.335642099380493,
+      "elapsed_seconds": 257.4312464399991
+    },
+    {
+      "step": 200,
+      "loss": 1.781015157699585,
+      "all_token_ce": 0.8832199573516846,
+      "recall_ce": 0.8977952599525452,
+      "gradient_norm": 2.7141764163970947,
+      "elapsed_seconds": 293.4529036169988
+    },
+    {
+      "step": 225,
+      "loss": 1.7196868658065796,
+      "all_token_ce": 0.8890843391418457,
+      "recall_ce": 0.8306025266647339,
+      "gradient_norm": 1.9922034740447998,
+      "elapsed_seconds": 331.21683372499683
+    },
+    {
+      "step": 250,
+      "loss": 1.8357346057891846,
+      "all_token_ce": 0.8859519362449646,
+      "recall_ce": 0.94978266954422,
+      "gradient_norm": 1.936809778213501,
+      "elapsed_seconds": 368.53774637600145
+    },
+    {
+      "step": 275,
+      "loss": 1.8307089805603027,
+      "all_token_ce": 0.8915120959281921,
+      "recall_ce": 0.9391969442367554,
+      "gradient_norm": 1.6064478158950806,
+      "elapsed_seconds": 407.3372560689968
+    },
+    {
+      "step": 300,
+      "loss": 1.654866337776184,
+      "all_token_ce": 0.8854771256446838,
+      "recall_ce": 0.7693892121315002,
+      "gradient_norm": 2.150714635848999,
+      "elapsed_seconds": 443.1671540519965
+    },
+    {
+      "step": 325,
+      "loss": 1.7216243743896484,
+      "all_token_ce": 0.8829616904258728,
+      "recall_ce": 0.8386626839637756,
+      "gradient_norm": 2.04856538772583,
+      "elapsed_seconds": 479.1305816460008
+    },
+    {
+      "step": 350,
+      "loss": 1.9426121711730957,
+      "all_token_ce": 0.8733693957328796,
+      "recall_ce": 1.0692427158355713,
+      "gradient_norm": 2.5479276180267334,
+      "elapsed_seconds": 516.3734777619975
+    },
+    {
+      "step": 375,
+      "loss": 1.8767857551574707,
+      "all_token_ce": 0.8774489760398865,
+      "recall_ce": 0.999336838722229,
+      "gradient_norm": 2.800433397293091,
+      "elapsed_seconds": 553.1516859350013
+    },
+    {
+      "step": 400,
+      "loss": 1.4568332433700562,
+      "all_token_ce": 0.8632878065109253,
+      "recall_ce": 0.5935454368591309,
+      "gradient_norm": 1.3856862783432007,
+      "elapsed_seconds": 590.146799119997
+    },
+    {
+      "step": 425,
+      "loss": 1.5915703773498535,
+      "all_token_ce": 0.8784850835800171,
+      "recall_ce": 0.7130853533744812,
+      "gradient_norm": 1.5983901023864746,
+      "elapsed_seconds": 626.1410016329974
+    },
+    {
+      "step": 450,
+      "loss": 1.6179773807525635,
+      "all_token_ce": 0.8653033971786499,
+      "recall_ce": 0.7526739835739136,
+      "gradient_norm": 1.410446047782898,
+      "elapsed_seconds": 662.1232759740014
+    },
+    {
+      "step": 475,
+      "loss": 1.5925061702728271,
+      "all_token_ce": 0.8730855584144592,
+      "recall_ce": 0.7194206714630127,
+      "gradient_norm": 1.4813517332077026,
+      "elapsed_seconds": 695.7496390800006
+    },
+    {
+      "step": 500,
+      "loss": 1.6325383186340332,
+      "all_token_ce": 0.8751339316368103,
+      "recall_ce": 0.7574043869972229,
+      "gradient_norm": 1.130374789237976,
+      "elapsed_seconds": 728.4983099829988
+    },
+    {
+      "step": 525,
+      "loss": 1.7050213813781738,
+      "all_token_ce": 0.8932109475135803,
+      "recall_ce": 0.8118104934692383,
+      "gradient_norm": 1.4997509717941284,
+      "elapsed_seconds": 761.0423269449966
+    },
+    {
+      "step": 550,
+      "loss": 1.6419970989227295,
+      "all_token_ce": 0.8635827898979187,
+      "recall_ce": 0.7784143090248108,
+      "gradient_norm": 1.4893498420715332,
+      "elapsed_seconds": 793.6944525150029
+    },
+    {
+      "step": 575,
+      "loss": 1.5743811130523682,
+      "all_token_ce": 0.8731710314750671,
+      "recall_ce": 0.701210081577301,
+      "gradient_norm": 2.372130870819092,
+      "elapsed_seconds": 828.0592650159961
+    },
+    {
+      "step": 600,
+      "loss": 1.3533284664154053,
+      "all_token_ce": 0.8739854693412781,
+      "recall_ce": 0.4793429970741272,
+      "gradient_norm": 0.9994034767150879,
+      "elapsed_seconds": 861.9132597790012
+    },
+    {
+      "step": 625,
+      "loss": 1.6814615726470947,
+      "all_token_ce": 0.873240053653717,
+      "recall_ce": 0.8082215785980225,
+      "gradient_norm": 1.1902302503585815,
+      "elapsed_seconds": 896.8102663829995
+    },
+    {
+      "step": 650,
+      "loss": 1.496687412261963,
+      "all_token_ce": 0.8606739044189453,
+      "recall_ce": 0.6360135674476624,
+      "gradient_norm": 1.3137214183807373,
+      "elapsed_seconds": 930.8544198620002
+    },
+    {
+      "step": 675,
+      "loss": 1.66563081741333,
+      "all_token_ce": 0.8693617582321167,
+      "recall_ce": 0.7962689995765686,
+      "gradient_norm": 1.4435651302337646,
+      "elapsed_seconds": 966.6606813769977
+    },
+    {
+      "step": 700,
+      "loss": 1.6161009073257446,
+      "all_token_ce": 0.8706101775169373,
+      "recall_ce": 0.7454907298088074,
+      "gradient_norm": 1.2243566513061523,
+      "elapsed_seconds": 1000.4640398999982
+    }
+  ],
+  "finite": true
+}
