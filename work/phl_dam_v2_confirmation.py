@@ -42,6 +42,11 @@ ROUNDS = {
         "timing": "phl_dam_v3_timing_benchmark_round3.json",
         "state_limit": {"v3": 392, "v3_TC": 95},
         "baselines": BASELINES + ("ntm_dnc_factorized_copy",)},
+    4: {"candidates": ("v4",), "controls": (), "seeds": range(18, 24),
+        "prefix": "phl_dam_v4r4", "infinite_if_never": True,
+        "timing": "phl_dam_v4_timing_benchmark_round4.json",
+        "state_limit": {"v4": 392},
+        "baselines": BASELINES + ("ntm_dnc_factorized_copy",)},
 }
 NEVER = 510            # steps charged to a run that never reaches 90%
 CEILING = 0.995

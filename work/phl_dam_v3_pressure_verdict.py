@@ -59,20 +59,51 @@ def summary(runs: dict[int, dict]) -> dict:
     }
 
 
+ROUND4_CANDIDATE = ("v4", "phl_dam_004l_v4_w{w}_seed{s}.json")
+ROUND4_BREAKTHROUGH = "phl_dam_004l_bt_{arm}_w{w}_seed{s}.json"
+
+
+def round4_opponent_runs(outputs: Path, name: str, pattern: str, writes: int) -> dict[int, dict]:
+    """Final recall from the frozen full run; breakthrough from the 5-step rerun.
+
+    Checked before use: the rerun's losses at the full run's logged steps
+    (25, 50, ..., 150) must match, or the substitution is refused.
+    """
+    runs = load(outputs, pattern, writes)
+    if name == "phl_dam":
+        return runs
+    merged = {}
+    for seed, full in runs.items():
+        path = outputs / ROUND4_BREAKTHROUGH.format(arm=name, w=writes, s=seed)
+        if not path.exists():
+            continue
+        short = json.loads(path.read_text(encoding="utf-8"))
+        fine = {h["step"]: h["recall_ce"] for h in short["training_history"]}
+        for h in full["training_history"]:
+            if 25 <= h["step"] <= 150 and h["step"] in fine:
+                if abs(fine[h["step"]] - h["recall_ce"]) > 1e-4:
+                    raise SystemExit(f"rerun diverges from stored run: {path} step {h['step']}")
+        merged[seed] = {**full, "breakthrough_step": short["breakthrough_step"]}
+    return merged
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--outputs", type=Path, default=Path("../outputs"))
     parser.add_argument("--write", type=Path)
+    parser.add_argument("--round", type=int, choices=(3, 4), default=3)
     args = parser.parse_args()
+    candidate = ROUND4_CANDIDATE if args.round == 4 else CANDIDATE
 
     result: dict = {"levels": {}, "verdicts": {}}
     won = {name: True for name in OPPONENTS}
     complete = True
     for writes in LEVELS:
-        mine = load(args.outputs, CANDIDATE[1], writes)
+        mine = load(args.outputs, candidate[1], writes)
         level = {"v3": summary(mine) if mine else None}
         for name, pattern in OPPONENTS.items():
-            theirs = load(args.outputs, pattern, writes)
+            theirs = (round4_opponent_runs(args.outputs, name, pattern, writes)
+                      if args.round == 4 else load(args.outputs, pattern, writes))
             shared = sorted(set(mine) & set(theirs))
             if len(shared) < len(SEEDS):
                 complete = False
@@ -101,7 +132,7 @@ def main() -> None:
     for writes, level in result["levels"].items():
         v = level["v3"]
         if v:
-            print(f"W={writes:>2s} v3: learned {v['learned']}/{len(v['seeds'])} "
+            print(f"W={writes:>2s} {candidate[0]}: learned {v['learned']}/{len(v['seeds'])} "
                   f"recall {v['mean_recall']:.3f} breakthrough {v['mean_breakthrough']:.0f}")
         for name in OPPONENTS:
             row = level.get(name)
