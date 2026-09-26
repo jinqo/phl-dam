@@ -45,6 +45,15 @@ The recall lead is robust at 8–24 writes (+6 to +9 pp) and not robust at 32
 the stored runs' losses); runs that break through after step 150 are charged
 710, which cannot change any comparison.
 
+**Tried after round 4 — address-based erase (v5), not adopted.** A v4
+diagnostic at W=32 showed the most recently written bindings recalled worst
+(45–48% with no intervening write vs 78–83% for the oldest; the DNC shows the
+opposite profile). An erase gate that lets a fully addressed slot be replaced
+rather than blended looked good on two dev seeds, then failed its
+preregistered confirmation (`work/PREREGISTRATION_v5_erase.md`) on seeds
+0–4: W=24 +1.3 pp (3/5 seeds, not robust), W=32 +0.0 pp, breakthrough one
+step later at both. The recent-binding weakness remains open.
+
 **Attribution** is unchanged from v3: the copy readout and the DNC's write
 addressing are generic and borrowed; v4's own additions (tied query/key,
 stronger copy initialisation) are small. What remains distinctively
