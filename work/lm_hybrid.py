@@ -94,7 +94,7 @@ class Block(nn.Module):
 class LM(nn.Module):
     def __init__(self, arm: str, length: int, window: int, d: int = 128, layers: int = 4,
                  heads: int = 4, ffn: int = 512, memory_layer: int = 1,
-                 slots: int = 16, d_mem: int = 64) -> None:
+                 slots: int = 16, d_mem: int = 64, compile_step: bool = False) -> None:
         super().__init__()
         self.arm, self.length, self.window = arm, length, window
         self.embed = nn.Embedding(VOCAB, d)
@@ -105,7 +105,8 @@ class LM(nn.Module):
             memory = None
             width = ffn
             if arm in ("window_sml", "window_sml_local") and i == memory_layer:
-                memory = self.memory = SlotMemory(d, slots, d_mem, d_mem)
+                memory = self.memory = SlotMemory(d, slots, d_mem, d_mem,
+                                                  compile_step=compile_step)
                 # shrink this block's FFN to pay for the memory's parameters
                 extra = sum(p.numel() for p in memory.parameters())
                 width = ffn - round(extra / (2 * d + 1))
@@ -213,7 +214,7 @@ def rare_repeat_mask(crop: list[int], reach: int, min_length: int = 4) -> list[b
 
 
 def build_eval(valid: Tensor, length: int, window: int, seed: int = 1234, crops: int = 96,
-               passkeys: int = 192):
+               passkeys: int = 192, rare_crop_limit: int = 400):
     rng = random.Random(seed)
     natural = torch.stack([valid[s:s + length] for s in
                            (rng.randrange(0, len(valid) - length) for _ in range(crops))])
@@ -223,14 +224,16 @@ def build_eval(valid: Tensor, length: int, window: int, seed: int = 1234, crops:
     repeat = torch.tensor([long_range_mask(c.tolist(), reach) for c in natural])
     # Rare-word repeats need far more text than a crop to occur often enough:
     # scan the whole validation set for crops that contain at least one.
-    rare_crops, starts = [], list(range(0, len(valid) - length, length // 2))
+    # Held-out text for this metric: WikiText-2 valid + test (neither is trained on).
+    held_out = torch.cat([valid, load_bytes("test")])
+    rare_crops, starts = [], list(range(0, len(held_out) - length, length // 2))
     rng.shuffle(starts)
     for s in starts:
-        c = valid[s:s + length]
+        c = held_out[s:s + length]
         flags = rare_repeat_mask(c.tolist(), reach)
         if any(flags):
             rare_crops.append((c, torch.tensor(flags)))
-        if len(rare_crops) >= crops:
+        if len(rare_crops) >= rare_crop_limit:
             break
     rare_x = torch.stack([c for c, _ in rare_crops])
     rare_m = torch.stack([f for _, f in rare_crops])
@@ -282,13 +285,15 @@ def evaluate(model: LM, natural: Tensor, repeat: Tensor, rare_x: Tensor, rare_m:
 
 def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         lr: float, passkey_fraction: float, eval_every: int, save: Path | None = None,
-        memory_layer: int = 1, slots: int = 16, d_mem: int = 64) -> dict:
+        memory_layer: int = 1, slots: int = 16, d_mem: int = 64,
+        compile_step: bool = False) -> dict:
     torch.manual_seed(seed)
     rng = random.Random(seed + 10_000)
     train, valid = load_bytes("train"), load_bytes("valid")
     natural, repeat, rare_x, rare_m, keys, answers = build_eval(valid, length + 1, window)
     eval_sets = (natural, repeat, rare_x, rare_m, keys, answers)
-    model = LM(arm, length, window, memory_layer=memory_layer, slots=slots, d_mem=d_mem)
+    model = LM(arm, length, window, memory_layer=memory_layer, slots=slots, d_mem=d_mem,
+               compile_step=compile_step)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.1, betas=(0.9, 0.95))
     warmup = max(1, steps // 20)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warmup)
@@ -357,10 +362,12 @@ def main() -> None:
     p.add_argument("--memory-layer", type=int, default=1)
     p.add_argument("--slots", type=int, default=16)
     p.add_argument("--d-mem", type=int, default=64)
+    p.add_argument("--compile-step", action="store_true")
     a = p.parse_args()
     torch.set_num_threads(a.threads)
     result = run(a.arm, a.seed, a.steps, a.batch, a.length, a.window, a.lr,
-                 a.passkey_fraction, a.eval_every, a.save, a.memory_layer, a.slots, a.d_mem)
+                 a.passkey_fraction, a.eval_every, a.save, a.memory_layer, a.slots, a.d_mem,
+                 a.compile_step)
     if a.output:
         a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: result[k] for k in ("arm", "parameters", "memory_state_floats",

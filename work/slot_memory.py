@@ -36,6 +36,39 @@ def unit(x: Tensor, eps: float = 0.05) -> Tensor:
     return x / (x.pow(2).sum(-1, keepdim=True) + eps * eps).sqrt()
 
 
+def memory_step(keys: Tensor, values: Tensor, occ: Tensor, k: Tensor, v: Tensor,
+                write_gate: Tensor, alloc_gate: Tensor, sharpness: Tensor, q: Tensor,
+                read_temperature: float, floor: float):
+    """One write-then-read step of the slot recurrence (all fp32)."""
+    sorted_occ, order = occ.sort(dim=-1)
+    exclusive = torch.cat([torch.ones_like(sorted_occ[:, :1]),
+                           sorted_occ[:, :-1]], dim=-1).cumprod(dim=-1)
+    alloc = torch.zeros_like(occ).scatter(1, order, (1.0 - sorted_occ) * exclusive)
+    content = torch.softmax(sharpness[:, None] * torch.einsum("bd,bnd->bn", k, keys), -1)
+    g = alloc_gate[:, None]
+    write = write_gate[:, None] * (g * alloc + (1.0 - g) * content)
+    remain = 1.0 - write
+    keys = unit(remain[..., None] * keys + write[..., None] * k[:, None])
+    values = remain[..., None] * values + write[..., None] * v[:, None]
+    occ = remain * occ + write
+    score = torch.einsum("bd,bnd->bn", q, keys) / read_temperature
+    attn = torch.softmax(score + 0.25 * torch.log(occ + 1e-6), dim=-1)
+    retrieved = torch.einsum("bn,bnv->bv", attn, values / occ.clamp_min(floor)[..., None])
+    entropy = -(attn * attn.clamp_min(1e-12).log()).sum(-1)
+    return keys, values, occ, retrieved, entropy
+
+
+_COMPILED_STEP = None
+
+
+def compiled_memory_step():
+    """torch.compile'd step (about 2x faster on CPU; same function)."""
+    global _COMPILED_STEP
+    if _COMPILED_STEP is None:
+        _COMPILED_STEP = torch.compile(memory_step, dynamic=False)
+    return _COMPILED_STEP
+
+
 class SlotMemory(nn.Module):
     def __init__(
         self,
@@ -48,11 +81,13 @@ class SlotMemory(nn.Module):
         read_gate_bias: float = 1.0,
         copy_scale: float = 2.0,
         occupancy_floor: float = 1e-3,
+        compile_step: bool = False,
     ) -> None:
         super().__init__()
         self.num_slots, self.d_key, self.d_value = num_slots, d_key, d_value
         self.read_temperature = read_temperature
         self.occupancy_floor = occupancy_floor
+        self.compile_step = compile_step
         self.key = nn.Linear(d_model, d_key, bias=False)        # tied key/query
         self.value = nn.Linear(d_model, d_value, bias=False)
         self.gates = nn.Linear(d_model, 3)                       # write, alloc, sharpness
@@ -85,28 +120,18 @@ class SlotMemory(nn.Module):
         values = h.new_zeros(batch, n, self.d_value, dtype=torch.float32)
         occ = h.new_zeros(batch, n, dtype=torch.float32)
         retrieved, entropy = [], []
+        step = compiled_memory_step() if self.compile_step else memory_step
         for t in range(length):
             if reset is not None:
                 keep = (~reset[:, t]).float()
                 keys, values = keys * keep[:, None, None], values * keep[:, None, None]
                 occ = occ * keep[:, None]
-            k = cand_keys[:, t]
-            sorted_occ, order = occ.sort(dim=-1)
-            exclusive = torch.cat([torch.ones_like(sorted_occ[:, :1]),
-                                   sorted_occ[:, :-1]], dim=-1).cumprod(dim=-1)
-            alloc = torch.zeros_like(occ).scatter(1, order, (1.0 - sorted_occ) * exclusive)
-            content = torch.softmax(sharpness[:, t, None] * torch.einsum("bd,bnd->bn", k, keys), -1)
-            g = alloc_gate[:, t, None]
-            write = write_gate[:, t, None] * (g * alloc + (1.0 - g) * content)
-            remain = 1.0 - write
-            keys = unit(remain[..., None] * keys + write[..., None] * k[:, None])
-            values = remain[..., None] * values + write[..., None] * cand_values[:, t, None]
-            occ = remain * occ + write
-            score = torch.einsum("bd,bnd->bn", queries[:, t], keys) / self.read_temperature
-            attn = torch.softmax(score + 0.25 * torch.log(occ + 1e-6), dim=-1)
-            readable = values / occ.clamp_min(self.occupancy_floor)[..., None]
-            retrieved.append(torch.einsum("bn,bnv->bv", attn, readable))
-            entropy.append(-(attn * attn.clamp_min(1e-12).log()).sum(-1))
+            keys, values, occ, r_t, e_t = step(
+                keys, values, occ, cand_keys[:, t], cand_values[:, t], write_gate[:, t],
+                alloc_gate[:, t], sharpness[:, t], queries[:, t],
+                self.read_temperature, self.occupancy_floor)
+            retrieved.append(r_t)
+            entropy.append(e_t)
         r = torch.stack(retrieved, 1).to(h.dtype)
         conf = (1.0 - torch.stack(entropy, 1) / math.log(n)).to(h.dtype)
         rho = torch.sigmoid(self.read_gate(torch.cat([h, r, conf[..., None]], -1)))
