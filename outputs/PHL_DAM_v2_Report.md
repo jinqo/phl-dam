@@ -92,7 +92,7 @@ The factorized DNC has no write-pressure cliff at all:
 | 16 | 3/5 | 5/5 | 79.3% |
 | 20 | 0/5 | 5/5 | 73.9% |
 | 24 | 0/5 | 5/5 | 71.3% |
-| 32 | 1/5 | 4/4 (1 pending) | 67.2% |
+| 32 | 1/5 | 5/5 | 67.4% |
 
 The "cliff between 16 and 20 writes" reported for PHL-DAM is therefore a
 property of PHL-DAM's write/allocation mechanics, not of the task.

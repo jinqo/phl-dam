@@ -81,8 +81,8 @@ preregistered seeds (6–11) it passes every criterion against every baseline:
 What this does **not** show: the copy readout that supplies most of the speed
 is generic — a DNC given it reaches 90% in 30 steps (v2 still wins on
 wall-clock and 5.8× less state). And under write pressure the DNC still wins
-on final recall: it has no cliff at all (learns 5/5 at 20–24 writes, where
-original PHL-DAM learns 0/5), while v2 breaks through 4× sooner but ends lower
+on final recall: it has no cliff at all (learns 5/5 at every level from 8 to 32 writes,
+where original PHL-DAM learns 0/5 at 20 and 24), while v2 breaks through 4× sooner but ends lower
 and shows gradient spikes. Full account: `outputs/PHL_DAM_v2_Report.md`.
 
 ## What was tested and rejected
