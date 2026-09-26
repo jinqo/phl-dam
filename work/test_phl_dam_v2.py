@@ -79,6 +79,54 @@ class PHLDAMv2Tests(unittest.TestCase):
             ))
 
 
+class CopyReadoutTests(unittest.TestCase):
+    OPTIONS = {"fast": True, "normalized_values": True, "use_phl": False,
+               "d_model": 76, "copy_readout": True}
+
+    def test_a_clean_retrieval_decodes_to_its_token_at_initialisation(self) -> None:
+        """The point of the copy readout: no decoder has to be learned first."""
+        torch.manual_seed(0)
+        model = PHLDAMv2(**self.OPTIONS)
+        vocabulary = model.value_projection(model.token_embedding.weight)
+        with torch.no_grad():
+            scores = model.copy_scale * vocabulary @ vocabulary.T
+        self.assertGreater(scores.argmax(-1).eq(torch.arange(VOCAB_SIZE)).float().mean(), 0.95)
+
+    def test_copy_term_vanishes_when_retrieval_is_disabled(self) -> None:
+        torch.manual_seed(0)
+        model = PHLDAMv2(**self.OPTIONS)
+        plain = PHLDAMv2(**{**self.OPTIONS, "copy_readout": False})
+        plain.load_state_dict({k: v for k, v in model.state_dict().items()
+                               if k != "copy_scale"})
+        tokens = make_batch(torch.Generator().manual_seed(2), 2).tokens
+        with torch.no_grad():
+            self.assertTrue(torch.allclose(
+                model(tokens, disable_retrieval=True)[0],
+                plain(tokens, disable_retrieval=True)[0]))
+
+    def test_adds_one_parameter_and_is_causal(self) -> None:
+        with_copy = PHLDAMv2(**self.OPTIONS)
+        without = PHLDAMv2(**{**self.OPTIONS, "copy_readout": False})
+        self.assertEqual(active_parameter_count(with_copy),
+                         active_parameter_count(without) + 1)
+        tokens = make_batch(torch.Generator().manual_seed(3), 2).tokens
+        mutated = tokens.clone()
+        mutated[:, 90:] = 4
+        with torch.no_grad():
+            self.assertTrue(torch.equal(with_copy(tokens)[0][:, :90],
+                                        with_copy(mutated)[0][:, :90]))
+
+    def test_vocabulary_can_be_resized_for_the_pressure_task(self) -> None:
+        model = PHLDAMv2(**{**self.OPTIONS, "vocab_size": 87})
+        tokens = torch.randint(0, 87, (2, 50))
+        self.assertEqual(model(tokens)[0].shape, (2, 50, 87))
+
+    def test_dnc_control_arm_gets_the_same_readout(self) -> None:
+        model = curve.build("ntm_dnc_factorized_copy", {})
+        self.assertTrue(model.copy_readout)
+        self.assertLess(abs(active_parameter_count(model) - 33_034) / 33_034, 0.01)
+
+
 class LearningCurveTests(unittest.TestCase):
     def test_every_arm_builds_and_reports(self) -> None:
         for arm in ("phl_dam", "phl_dam_v2", "ntm_dnc", "ntm_dnc_factorized",

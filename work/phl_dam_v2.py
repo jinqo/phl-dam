@@ -48,6 +48,14 @@ function (asserted by test). Each change can then be ablated on its own:
   are near-uniform and retrieve an average of stored values; writing more at a
   binding then moves that average toward the answer, a smooth early gradient
   toward write selectivity that bias-free, sharply read keys do not provide.
+* ``copy_readout`` - add ``scale * r . V(E)^T`` to the logits: score the
+  retrieved value r against the value projection of every vocabulary token
+  (a pointer/copy readout). A clean retrieval of token v is exactly V(E[v]),
+  so it decodes correctly from initialisation. Measured motivation: in v2 the
+  breakout (gate selectivity, addressing and recall all snapping on at step
+  60-80) waits on the output layer learning to decode retrieved values, which
+  rises only gradually (18% -> 39% -> 57% over the first 60 steps). One extra
+  parameter, the learned ``copy_scale``.
 """
 
 from __future__ import annotations
@@ -81,6 +89,9 @@ class PHLDAMv2(PHLDAM):
         read_temperature: float = READ_TEMPERATURE,
         occupied_threshold: float = 0.05,
         key_bias: bool = False,
+        copy_readout: bool = False,
+        copy_scale: float = 1.0,
+        vocab_size: int = VOCAB_SIZE,
         d_model: int = 64,
         d_key: int = 24,
         d_value: int = 24,
@@ -90,6 +101,11 @@ class PHLDAMv2(PHLDAM):
                          num_slots=num_slots, horizon_width=d_model // 4,
                          use_phl=use_phl)
         self.fast = fast
+        self.vocab_size = vocab_size
+        if vocab_size != VOCAB_SIZE:
+            # Other tasks (the 004 pressure ladder) use a larger vocabulary.
+            self.token_embedding = nn.Embedding(vocab_size, d_model)
+            self.output = nn.Linear(d_model, vocab_size)
         self.tie_query_key = tie_query_key
         nn.init.constant_(self.write_gate.bias, write_gate_bias)
         self.key_bias = key_bias
@@ -99,13 +115,16 @@ class PHLDAMv2(PHLDAM):
         if tie_query_key:
             del self.query_projection
         self.direct_readout = direct_readout
+        self.copy_readout = copy_readout
+        if copy_readout:
+            self.copy_scale = nn.Parameter(torch.tensor(float(copy_scale)))
         self.normalized_values = normalized_values
         self.occupied_threshold = occupied_threshold
         if direct_readout:
             # The residual no longer carries memory, so its projection goes;
             # the output layer gains d_value inputs instead.
             del self.memory_projection
-            self.output = nn.Linear(d_model + d_value, VOCAB_SIZE)
+            self.output = nn.Linear(d_model + d_value, vocab_size)
         self.log_temperature = (
             nn.Parameter(torch.tensor(math.log(read_temperature)))
             if learned_temperature else None
@@ -132,7 +151,8 @@ class PHLDAMv2(PHLDAM):
         if not (self.fast or self.tie_query_key or self.direct_readout
                 or self.normalized_values or self.log_temperature is not None
                 or self.read_temperature != READ_TEMPERATURE
-                or self.occupied_threshold != 0.05 or self.key_bias):
+                or self.occupied_threshold != 0.05 or self.key_bias
+                or self.copy_readout or self.vocab_size != VOCAB_SIZE):
             return super().forward(tokens, disable_retrieval, return_diagnostics)
         if return_diagnostics:
             raise NotImplementedError("v2 fast path does not collect diagnostics")
@@ -221,8 +241,13 @@ class PHLDAMv2(PHLDAM):
         if disable_retrieval:
             memory = torch.zeros_like(memory)
         if self.direct_readout:
-            return self.output(torch.cat([self.output_norm(hidden), memory], dim=-1))
-        return self.output(self.output_norm(hidden + self.memory_projection(memory)))
+            logits = self.output(torch.cat([self.output_norm(hidden), memory], dim=-1))
+        else:
+            logits = self.output(self.output_norm(hidden + self.memory_projection(memory)))
+        if self.copy_readout:
+            vocabulary = self.value_projection(self.token_embedding.weight)
+            logits = logits + self.copy_scale * memory @ vocabulary.T
+        return logits
 
 
 def active_parameter_count(model: nn.Module) -> int:

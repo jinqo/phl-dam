@@ -41,12 +41,24 @@ LOG_EVERY = 25
 CONTROLLER_WIDTH = {"ntm_dnc": 70, "ntm_dnc_factorized": 100}
 
 
-def build(arm: str) -> NTMBaseline:
+ARMS = tuple(CONTROLLER_WIDTH) + ("phl_dam_v2",)
+
+
+def build(arm: str, options: dict | None = None):
+    if arm == "phl_dam_v2":
+        from phl_dam_v2 import PHLDAMv2
+        return PHLDAMv2(**{**(options or {}), "vocab_size": task.VOCAB_SIZE})
     return NTMBaseline(
         factorized=arm == "ntm_dnc_factorized",
         controller_width=CONTROLLER_WIDTH[arm],
         vocab_size=task.VOCAB_SIZE,
     )
+
+
+def forward(model, tokens, disable_memory: bool = False):
+    if isinstance(model, NTMBaseline):
+        return model(tokens, disable_memory=disable_memory)
+    return model(tokens, disable_retrieval=disable_memory)[0]
 
 
 def _gather(values: torch.Tensor, positions: torch.Tensor) -> torch.Tensor:
@@ -67,8 +79,8 @@ def evaluate(model: NTMBaseline, seed: int, writes: int, episodes: int, batch_si
         ]
         seen += count
         batch = pack_batch(generated, torch.device("cpu"))
-        logits = model(batch.tokens)
-        ablated = model(batch.tokens, disable_memory=True)
+        logits = forward(model, batch.tokens)
+        ablated = forward(model, batch.tokens, disable_memory=True)
         _, a, r = common_objective(logits, batch)
         all_ce += a.item()
         recall_ce += r.item()
@@ -92,9 +104,9 @@ def evaluate(model: NTMBaseline, seed: int, writes: int, episodes: int, batch_si
 
 
 def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
-        eval_episodes: int, learning_rate: float) -> dict:
+        eval_episodes: int, learning_rate: float, options: dict | None = None) -> dict:
     seed_everything(seed)
-    model = build(arm)
+    model = build(arm, options)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
     history = []
     max_norm = 0.0
@@ -107,7 +119,7 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
             for i in range(batch_size)
         ]
         batch = pack_batch(episodes, torch.device("cpu"))
-        loss, all_ce, recall_ce = common_objective(model(batch.tokens), batch)
+        loss, all_ce, recall_ce = common_objective(forward(model, batch.tokens), batch)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0))
@@ -141,9 +153,10 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
             "sequence_length": task.SEQUENCE_LENGTH,
             "delay_range": [task.MIN_DELAY, task.MAX_DELAY],
             "query_budget": list(task.QUERY_BUDGET["canonical"][writes]),
-            "slots": model.slots,
-            "controller_width": model.controller_width,
-            "factorized_roles": model.factorized,
+            "options": options or {},
+            "slots": getattr(model, "slots", getattr(model, "num_slots", None)),
+            "controller_width": getattr(model, "controller_width", None),
+            "factorized_roles": getattr(model, "factorized", True),
             "training_steps": steps,
             "batch_size": batch_size,
             "learning_rate": learning_rate,
@@ -154,7 +167,10 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
         "accounting": {
             "total_parameters": active_parameter_count(model),
             "phl_dam_reference_parameters": PHL_DAM_PRESSURE_PARAMETERS,
-            "recurrent_state_floats": recurrent_state_floats(model),
+            "recurrent_state_floats": (
+                model.state_floats() if hasattr(model, "state_floats")
+                else recurrent_state_floats(model)
+            ),
         },
         "breakthrough_step": next(
             (r["step"] for r in history if r["recall_ce"] < BREAKTHROUGH_RECALL_CE), None
@@ -169,7 +185,8 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--arm", choices=tuple(CONTROLLER_WIDTH), default="ntm_dnc_factorized")
+    parser.add_argument("--arm", choices=ARMS, default="ntm_dnc_factorized")
+    parser.add_argument("--options", default="{}", help="JSON kwargs for phl_dam_v2")
     parser.add_argument("--writes", type=int, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--steps", type=int, default=700)
@@ -186,7 +203,7 @@ def main() -> None:
     if args.writes not in task.PRESSURE_LEVELS:
         raise SystemExit(f"--writes must be one of {task.PRESSURE_LEVELS}")
     summary = run(args.arm, args.writes, args.seed, args.steps, args.batch_size,
-                  args.eval_episodes, args.learning_rate)
+                  args.eval_episodes, args.learning_rate, json.loads(args.options))
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")

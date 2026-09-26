@@ -221,6 +221,7 @@ class NTMBaseline(nn.Module):
         key_width: int = 24,      # factorized banks mirror PHL-DAM's d_key/d_value
         value_width: int = 24,
         vocab_size: int = VOCAB_SIZE,
+        copy_readout: bool = False,
     ) -> None:
         super().__init__()
         self.d_model = d_model
@@ -244,6 +245,13 @@ class NTMBaseline(nn.Module):
             self.memory = DNCMemory(slots, width, controller_width)
         self.output_norm = nn.RMSNorm(controller_width)
         self.output = nn.Linear(controller_width + self.width, vocab_size)
+        # Control arm for PHL-DAM v2's copy readout: score the read vector
+        # against the stored-value projection of every vocabulary token.
+        self.copy_readout = copy_readout
+        if copy_readout:
+            if not factorized:
+                raise ValueError("copy readout needs the factorized value bank")
+            self.copy_scale = nn.Parameter(torch.tensor(1.0))
 
     def windows(self, tokens: Tensor) -> Tensor:
         embedded = self.token_embedding(tokens)
@@ -261,6 +269,7 @@ class NTMBaseline(nn.Module):
         memory = torch.zeros(batch, self.slots, self.row_width, device=tokens.device)
         usage = torch.zeros(batch, self.slots, device=tokens.device)
         outputs = []
+        reads = []
         for step in range(length):
             hidden = controller[:, step]
             if disable_memory:
@@ -274,7 +283,12 @@ class NTMBaseline(nn.Module):
             outputs.append(
                 self.output(torch.cat([self.output_norm(hidden), read_vector], dim=-1))
             )
-        return torch.stack(outputs, dim=1)
+            reads.append(read_vector)
+        logits = torch.stack(outputs, dim=1)
+        if self.copy_readout:
+            vocabulary = self.memory.add_vector(self.token_embedding.weight)
+            logits = logits + self.copy_scale * torch.stack(reads, dim=1) @ vocabulary.T
+        return logits
 
 
 def active_parameter_count(model: nn.Module) -> int:
@@ -286,9 +300,10 @@ def recurrent_state_floats(model: NTMBaseline) -> int:
     return model.slots * model.row_width + model.slots
 
 
-def build_model(factorized: bool = False) -> NTMBaseline:
+def build_model(factorized: bool = False, copy_readout: bool = False) -> NTMBaseline:
     if factorized:
-        return NTMBaseline(factorized=True, controller_width=FACTORIZED_CONTROLLER_WIDTH)
+        return NTMBaseline(factorized=True, controller_width=FACTORIZED_CONTROLLER_WIDTH,
+                           copy_readout=copy_readout)
     return NTMBaseline()
 
 

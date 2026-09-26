@@ -55,9 +55,9 @@ def build(arm: str, options: dict):
     if arm == "phl_dam_v2":
         from phl_dam_v2 import PHLDAMv2
         return PHLDAMv2(**options)
-    if arm in ("ntm_dnc", "ntm_dnc_factorized"):
+    if arm in ("ntm_dnc", "ntm_dnc_factorized", "ntm_dnc_factorized_copy"):
         from phl_dam_ntm_baseline import build_model
-        return build_model(arm == "ntm_dnc_factorized")
+        return build_model(arm != "ntm_dnc", copy_readout=arm.endswith("_copy"))
     if arm == "transformer":
         from phl_dam_transformer_rematch import CausalTransformer
         return CausalTransformer()
