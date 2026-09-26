@@ -234,7 +234,7 @@ many as the budget allows (state the number and the uncertainty it leaves).
 
 **Ablations** (Stage A, and Stage B if affordable): SML off; no copy
 readout; untied `W_k`; raw (unnormalised) values; Stage-B-style allocation
-instead of DNC addressing; erase off; slot count N.
+instead of DNC addressing; erase gate on; slot count N.
 
 ## 7. Deliverables
 
