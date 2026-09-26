@@ -145,6 +145,41 @@ class CopyReadoutTests(unittest.TestCase):
         self.assertLess(abs(active_parameter_count(model) - 33_034) / 33_034, 0.01)
 
 
+class V4Tests(unittest.TestCase):
+    OPTIONS = {"fast": True, "normalized_values": True, "use_phl": False,
+               "copy_readout": True, "key_norm_epsilon": 0.05,
+               "dnc_write_addressing": True, "d_model": 76,
+               "copy_scale": 2.0, "tie_query_key": True}
+
+    def test_v4_is_causal_even_at_the_answer_position(self) -> None:
+        """No path lets a query's answer, or anything later, reach its logit."""
+        torch.manual_seed(0)
+        model = PHLDAMv2(**self.OPTIONS)
+        batch = make_batch(torch.Generator().manual_seed(9), 4)
+        with torch.no_grad():
+            original = model(batch.tokens)[0]
+            for column in range(batch.query_key_positions.shape[1]):
+                mutated = batch.tokens.clone()
+                for row in range(4):
+                    query = int(batch.query_key_positions[row, column])
+                    mutated[row, query + 1:] = torch.randint(
+                        0, VOCAB_SIZE, (mutated.shape[1] - query - 1,),
+                        generator=torch.Generator().manual_seed(row))
+                changed = model(mutated)[0]
+                for row in range(4):
+                    query = int(batch.query_key_positions[row, column])
+                    self.assertTrue(torch.equal(original[row, :query + 1],
+                                                changed[row, :query + 1]))
+
+    def test_v4_memory_ablation_removes_recall_path(self) -> None:
+        torch.manual_seed(0)
+        model = PHLDAMv2(**self.OPTIONS)
+        tokens = make_batch(torch.Generator().manual_seed(9), 2).tokens
+        with torch.no_grad():
+            self.assertFalse(torch.equal(model(tokens)[0],
+                                         model(tokens, disable_retrieval=True)[0]))
+
+
 class LearningCurveTests(unittest.TestCase):
     def test_every_arm_builds_and_reports(self) -> None:
         for arm in ("phl_dam", "phl_dam_v2", "ntm_dnc", "ntm_dnc_factorized",

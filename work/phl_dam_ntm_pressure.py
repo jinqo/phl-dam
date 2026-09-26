@@ -106,7 +106,8 @@ def evaluate(model: NTMBaseline, seed: int, writes: int, episodes: int, batch_si
 
 
 def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
-        eval_episodes: int, learning_rate: float, options: dict | None = None) -> dict:
+        eval_episodes: int, learning_rate: float, options: dict | None = None,
+        log_every: int = LOG_EVERY) -> dict:
     seed_everything(seed)
     model = build(arm, options)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
@@ -130,7 +131,7 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
         else:
             finite = False
         optimizer.step()
-        if step == 1 or step % LOG_EVERY == 0 or step == steps:
+        if step == 1 or step % log_every == 0 or step == steps:
             record = {
                 "step": step,
                 "loss": loss.item(),
@@ -165,6 +166,7 @@ def run(arm: str, writes: int, seed: int, steps: int, batch_size: int,
             "optimizer": "AdamW(weight_decay=1e-4)",
             "eval_episodes": eval_episodes,
             "breakthrough_recall_ce": BREAKTHROUGH_RECALL_CE,
+            "log_every": log_every,
         },
         "accounting": {
             "total_parameters": active_parameter_count(model),
@@ -195,6 +197,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--eval-episodes", type=int, default=192)
     parser.add_argument("--learning-rate", type=float, default=2e-3)
+    parser.add_argument("--log-every", type=int, default=LOG_EVERY,
+                        help="training-loss logging interval; breakthrough is read from it")
     parser.add_argument("--output", type=Path)
     return parser.parse_args()
 
@@ -205,7 +209,8 @@ def main() -> None:
     if args.writes not in task.PRESSURE_LEVELS:
         raise SystemExit(f"--writes must be one of {task.PRESSURE_LEVELS}")
     summary = run(args.arm, args.writes, args.seed, args.steps, args.batch_size,
-                  args.eval_episodes, args.learning_rate, json.loads(args.options))
+                  args.eval_episodes, args.learning_rate, json.loads(args.options),
+                  args.log_every)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
