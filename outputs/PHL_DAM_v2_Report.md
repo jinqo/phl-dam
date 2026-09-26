@@ -1,4 +1,65 @@
-# PHL-DAM v2 — what made the architecture win, and what it owes to generic mechanisms
+# PHL-DAM v3 (and v2) — what made the architecture win, and what it owes to generic mechanisms
+
+## Latest verdict — v3, round 3 (`work/PREREGISTRATION_v3_round3.md`)
+
+v3 is one architecture used unchanged on both tasks: normalised slot values,
+no PHL lattice, copy readout, bounded key normalisation, and **the DNC's write
+addressing** (usage-sorted allocation, allocation gate, content-based write
+weighting), 8 slots × (24+24), 392 state floats, ~32–38K parameters.
+
+**176-token benchmark, fresh seeds 12–17 — passes 34 of 35 criteria.**
+
+| Model | Recall | Steps to 90% | Time to 90% | Training recall loss | State |
+|---|---:|---|---:|---:|---:|
+| **v3** | **100.00%** | **20 on every seed** | **6.4 s** | **0.046** | 392 |
+| v3_TC (compact) | 100.00% | mean 42 | 11.3 s | 0.136 | **68** |
+| DNC + PHL-DAM wiring + copy readout | 99.99% | mean 27 | 12.7 s | 0.063 | 392 |
+| DNC + PHL-DAM wiring | 99.95% | mean 137 | 67.7 s | 0.585 | 392 |
+| PHL-DAM (original) | 99.56% | mean 220 | 127.8 s | 0.873 | 456 |
+| DNC (plain) | 54.56% | never | ∞ | 1.706 | 392 |
+| Transformer | 47.38% | never | ∞ | 1.815 | 16,896 |
+| SSM selective / diagonal | 27.8 / 26.4% | never | ∞ | 2.18 / 2.22 | 96 |
+
+v3 passes accuracy, steps (faster on 6/6 seeds against every opponent),
+seconds and memory against all seven opponents, and training recall loss
+against six. The one FAIL: training recall loss against the copy-readout DNC
+is lower on 5/6 seeds (bootstrap 95% interval [0.004, 0.030], excluding zero)
+but the mean difference, 0.017, is below the preregistered 0.05 threshold.
+
+**Write-pressure ladder, seeds 0–4, 8–32 writes into 8 slots.**
+
+| Writes | v3 learned / recall / breakthrough | DNC+wiring | DNC+wiring+copy | PHL-DAM orig. |
+|---:|---|---|---|---|
+| 8 | 5/5 · **100.0%** · 30 | 5/5 · 91.4% · 195 | 5/5 · 94.1% · 45 | 4/5 · 66.3% |
+| 16 | 5/5 · **89.2%** · 50 | 5/5 · 79.3% · 215 | 5/5 · 80.6% · 45 | 3/5 · 50.0% |
+| 20 | 5/5 · **83.1%** · 50 | 5/5 · 73.9% · 230 | 5/5 · 75.8% · 50 | 0/5 · 15.7% |
+| 24 | 5/5 · **79.0%** · 50 | 5/5 · 71.3% · 235 | 5/5 · 72.0% · 50 | 0/5 · 15.2% |
+| 32 | 5/5 · **72.4%** · 50 | 5/5 · 67.4% · 250 | 5/5 · 67.6% · 50 | 1/5 · 19.9% |
+
+v3 has the highest recall at every level; the lead over both DNCs is robust at
+8–24 writes (+5.9 to +9.9 pp) and not robust at 32 (+4.8 to +4.9 pp). The
+ladder is **won** against original PHL-DAM and the wired DNC. Against the copy
+DNC it is **not won**: that model breaks through as early (step 45–50, vs v3's
+50) from 16 writes upward, so the "strictly earlier breakthrough" criterion
+fails at four levels.
+
+**Attribution.** The two largest gains are generic: the copy readout (a DNC
+given it is nearly as fast) and the DNC's write addressing (which replaced
+PHL-DAM's merge-or-allocate rule, the component that failed under pressure).
+PHL-DAM's own contributions that survive are convex slot blending with
+occupancy-normalised values, occupancy-weighted reads, and the separate
+key/value banks; the combination beats both DNC variants on recall and
+learning speed. The PHL horizon lattice is not part of v3.
+
+Two stability fixes found on the way, both by instrumenting gradients: value
+normalisation needs a bounded occupancy floor, and `F.normalize` on an exactly
+zero slot key (the t=0 key is normalize(zero padding)) produced every gradient
+spike under pressure, with amplification exactly 1e12; `key_norm_epsilon`
+removes them.
+
+---
+
+# Earlier rounds (v2)
 
 ## Verdict
 

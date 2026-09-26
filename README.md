@@ -62,28 +62,32 @@ hardwired key/value role wiring ties it (99.99%). The advantage in the table
 above came from that wiring, not from PHL-DAM's slot mechanics. See
 `outputs/PHL_DAM_v2_Report.md`.
 
-## PHL-DAM v2
+## PHL-DAM v3
 
-Diagnosing *why* PHL-DAM learned slowly (its write gate collapses early and
-starves itself of gradient; then its output layer must learn to decode
-retrieved values) led to v2: read slot values normalised by occupancy, drop the
-PHL horizon lattice, a copy readout, and a compact 4-slot memory. On fresh,
-preregistered seeds (6–11) it passes every criterion against every baseline:
+Diagnosing *why* PHL-DAM learned slowly and failed under write pressure, one
+mechanism at a time, led to v3: slot values read normalised by occupancy, no
+PHL horizon lattice, a copy readout, bounded key normalisation, and the DNC's
+write addressing in place of PHL-DAM's merge-or-allocate rule. On fresh,
+preregistered seeds:
 
 | Model | Recall | Steps to 90% | Time to 90% | Training recall loss | State |
 |---|---:|---:|---:|---:|---:|
-| **PHL-DAM v2** | **99.99%** | **55** | **14.0 s** | **0.166** | **68** |
-| DNC with PHL-DAM's wiring | 100.00% | 115 | 59.6 s | 0.511 | 392 |
-| PHL-DAM (original) | 84.73% | 272 (1 seed never) | never | 1.136 | 456 |
-| Transformer | 47.08% | never | never | 1.839 | 16,896 |
-| Selective SSM | 27.70% | never | never | 2.161 | 96 |
+| **PHL-DAM v3** | **100.00%** | **20** | **6.4 s** | **0.046** | 392 |
+| DNC + PHL-DAM wiring + copy readout | 99.99% | 27 | 12.7 s | 0.063 | 392 |
+| DNC + PHL-DAM wiring | 99.95% | 137 | 67.7 s | 0.585 | 392 |
+| PHL-DAM (original) | 99.56% | 220 | 127.8 s | 0.873 | 456 |
+| Transformer | 47.38% | never | never | 1.815 | 16,896 |
+| Selective SSM | 27.84% | never | never | 2.175 | 96 |
 
-What this does **not** show: the copy readout that supplies most of the speed
-is generic — a DNC given it reaches 90% in 30 steps (v2 still wins on
-wall-clock and 5.8× less state). And under write pressure the DNC still wins
-on final recall: it has no cliff at all (learns 5/5 at every level from 8 to 32 writes,
-where original PHL-DAM learns 0/5 at 20 and 24), while v2 breaks through 4× sooner but ends lower
-and shows gradient spikes. Full account: `outputs/PHL_DAM_v2_Report.md`.
+Under write pressure (8–32 writes into 8 slots) v3 learns 5/5 at every level
+and has the highest recall at every level (100.0 / 89.2 / 83.1 / 79.0 /
+72.4%); the original PHL-DAM learns 0/5 at 20 and 24 writes.
+
+What this does **not** show: the two biggest gains — the copy readout and the
+write addressing — are generic, the second borrowed outright from the DNC. A
+DNC given the copy readout is nearly as fast, breaks through under pressure as
+early as v3, and its training-loss gap to v3 (0.017) is below the
+preregistered threshold. Full account: `outputs/PHL_DAM_v2_Report.md`.
 
 ## What was tested and rejected
 
