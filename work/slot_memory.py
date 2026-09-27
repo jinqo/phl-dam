@@ -94,6 +94,7 @@ class SlotMemory(nn.Module):
         self.read_gate = nn.Linear(d_model + d_value + 1, 1)
         self.out = nn.Linear(d_value, d_model, bias=False)
         self.copy_scale = nn.Parameter(torch.tensor(float(copy_scale)))
+        self.surprise_weight = nn.Parameter(torch.tensor(0.5))
         with torch.no_grad():
             self.gates.bias.copy_(torch.tensor([write_gate_bias, 0.0, 0.0]))
             self.read_gate.bias.fill_(read_gate_bias)
@@ -102,7 +103,7 @@ class SlotMemory(nn.Module):
         return self.num_slots * (self.d_key + self.d_value + 1)
 
     def forward(self, h: Tensor, reset: Tensor | None = None,
-                disable: bool = False) -> tuple[Tensor, Tensor]:
+                disable: bool = False, surprise: Tensor | None = None) -> tuple[Tensor, Tensor]:
         batch, length, _ = h.shape
         previous = torch.cat([torch.zeros_like(h[:, :1]), h[:, :-1]], dim=1)
         if reset is not None:                   # no key from across a boundary
@@ -111,7 +112,15 @@ class SlotMemory(nn.Module):
         queries = unit(self.key(h)).float()
         cand_values = self.value(h).float()
         gates = self.gates(h).float()
-        write_gate = torch.sigmoid(gates[..., 0])
+        write_logit = gates[..., 0]
+        if surprise is not None:
+            # Surprise-gated writing: unpredictable tokens (a stated passkey,
+            # a new name) are what is worth storing; predictable text is not.
+            # surprise = -log p(x_t | h_{t-1}) from the model's surprise head,
+            # centred by a fixed constant (a per-sequence statistic would leak
+            # future positions); its weight is learned.
+            write_logit = write_logit + self.surprise_weight * (surprise.float() - 2.0)
+        write_gate = torch.sigmoid(write_logit)
         alloc_gate = torch.sigmoid(gates[..., 1])
         sharpness = F.softplus(gates[..., 2]) + 1.0
 
@@ -132,6 +141,8 @@ class SlotMemory(nn.Module):
                 self.read_temperature, self.occupancy_floor)
             retrieved.append(r_t)
             entropy.append(e_t)
+        # Mean write gate, for an optional write-sparsity penalty in the loss.
+        self.last_write_rate = write_gate.mean()
         r = torch.stack(retrieved, 1).to(h.dtype)
         conf = (1.0 - torch.stack(entropy, 1) / math.log(n)).to(h.dtype)
         rho = torch.sigmoid(self.read_gate(torch.cat([h, r, conf[..., None]], -1)))

@@ -78,7 +78,7 @@ class Block(nn.Module):
             self.norm_m = nn.RMSNorm(d)
 
     def forward(self, x: Tensor, mask: Tensor, disable_memory: bool,
-                reset: Tensor | None = None):
+                reset: Tensor | None = None, surprise_fn=None):
         b, t, d = x.shape
         q, k, v = self.qkv(self.norm1(x)).view(b, t, 3, self.heads, d // self.heads).unbind(2)
         att = F.scaled_dot_product_attention(
@@ -86,7 +86,9 @@ class Block(nn.Module):
         x = x + self.proj(att.transpose(1, 2).reshape(b, t, d))
         m = None
         if self.memory is not None:
-            delta, m = self.memory(self.norm_m(x), reset=reset, disable=disable_memory)
+            hm = self.norm_m(x)
+            surprise = surprise_fn(hm) if surprise_fn is not None else None
+            delta, m = self.memory(hm, reset=reset, disable=disable_memory, surprise=surprise)
             x = x + delta
         return x + self.ffn(self.norm2(x)), m
 
@@ -94,9 +96,12 @@ class Block(nn.Module):
 class LM(nn.Module):
     def __init__(self, arm: str, length: int, window: int, d: int = 128, layers: int = 4,
                  heads: int = 4, ffn: int = 512, memory_layer: int = 1,
-                 slots: int = 16, d_mem: int = 64, compile_step: bool = False) -> None:
+                 slots: int = 16, d_mem: int = 64, compile_step: bool = False,
+                 surprise_gate: bool = False) -> None:
         super().__init__()
         self.arm, self.length, self.window = arm, length, window
+        self.surprise_gate = surprise_gate and arm.startswith("window_sml")
+        self.aux_loss = None
         self.embed = nn.Embedding(VOCAB, d)
         self.pos = nn.Embedding(length, d)
         self.memory = None
@@ -113,6 +118,10 @@ class LM(nn.Module):
             blocks.append(Block(d, heads, width, None if arm == "full" else window, memory))
         self.blocks = nn.ModuleList(blocks)
         self.norm = nn.RMSNorm(d)
+        if self.surprise_gate:
+            # Predicts x_t from the memory layer's input at t-1 (tied to the
+            # embedding); its loss on the actual byte is the write-gate surprise.
+            self.surprise_head = nn.Linear(d, d, bias=False)
         # GPT-2-style initialisation. With the head tied to a unit-variance
         # embedding the initial logits have std ~sqrt(d) and training crawls.
         for module in self.modules():
@@ -141,8 +150,17 @@ class LM(nn.Module):
             # capacity, not long-range memory.
             reset = (torch.arange(t) % self.window == 0)[None].expand(tokens.shape[0], t)
         memory_read = None
+        surprise_fn = None
+        if self.surprise_gate:
+            def surprise_fn(hm: Tensor) -> Tensor:
+                pred = self.surprise_head(hm[:, :-1]) @ self.embed.weight.T
+                nll = F.cross_entropy(pred.reshape(-1, VOCAB), tokens[:, 1:].reshape(-1),
+                                      reduction="none").view(tokens.shape[0], -1)
+                self.aux_loss = nll.mean()
+                first = torch.zeros_like(nll[:, :1])     # nothing precedes t = 0
+                return torch.cat([first, nll.detach()], dim=1)
         for block in self.blocks:
-            x, m = block(x, self.mask[:t, :t], disable_memory, reset)
+            x, m = block(x, self.mask[:t, :t], disable_memory, reset, surprise_fn)
             if m is not None:
                 memory_read = m
         logits = self.norm(x) @ self.embed.weight.T                # tied head
@@ -286,14 +304,15 @@ def evaluate(model: LM, natural: Tensor, repeat: Tensor, rare_x: Tensor, rare_m:
 def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         lr: float, passkey_fraction: float, eval_every: int, save: Path | None = None,
         memory_layer: int = 1, slots: int = 16, d_mem: int = 64,
-        compile_step: bool = False) -> dict:
+        compile_step: bool = False, write_penalty: float = 0.0,
+        surprise_gate: bool = False) -> dict:
     torch.manual_seed(seed)
     rng = random.Random(seed + 10_000)
     train, valid = load_bytes("train"), load_bytes("valid")
     natural, repeat, rare_x, rare_m, keys, answers = build_eval(valid, length + 1, window)
     eval_sets = (natural, repeat, rare_x, rare_m, keys, answers)
     model = LM(arm, length, window, memory_layer=memory_layer, slots=slots, d_mem=d_mem,
-               compile_step=compile_step)
+               compile_step=compile_step, surprise_gate=surprise_gate)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.1, betas=(0.9, 0.95))
     warmup = max(1, steps // 20)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warmup)
@@ -311,6 +330,12 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         x = torch.stack(rows)
         logits = model(x[:, :-1])
         loss = F.cross_entropy(logits.reshape(-1, VOCAB), x[:, 1:].reshape(-1))
+        if model.aux_loss is not None:
+            loss = loss + 0.1 * model.aux_loss          # trains the surprise head
+        if write_penalty > 0.0 and model.memory is not None:
+            # Writing costs something: the memory must spend writes on content
+            # worth keeping rather than overwrite itself at every position.
+            loss = loss + write_penalty * model.memory.last_write_rate
         opt.zero_grad(set_to_none=True)
         loss.backward()
         norm = float(torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0))
@@ -334,7 +359,8 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         "configuration": {"steps": steps, "batch": batch, "length": length, "window": window,
                           "lr": lr, "passkey_fraction": passkey_fraction,
                           "d_model": 128, "layers": 4, "heads": 4,
-                          "memory_layer": memory_layer, "slots": slots, "d_mem": d_mem},
+                          "memory_layer": memory_layer, "slots": slots, "d_mem": d_mem,
+                          "write_penalty": write_penalty, "surprise_gate": surprise_gate},
         "parameters": parameter_count(model),
         "memory_state_floats": model.memory.state_floats() if model.memory else 0,
         "kv_cache_floats": 2 * 4 * 128 * (length if arm == "full" else window),
@@ -363,11 +389,13 @@ def main() -> None:
     p.add_argument("--slots", type=int, default=16)
     p.add_argument("--d-mem", type=int, default=64)
     p.add_argument("--compile-step", action="store_true")
+    p.add_argument("--write-penalty", type=float, default=0.0)
+    p.add_argument("--surprise-gate", action="store_true")
     a = p.parse_args()
     torch.set_num_threads(a.threads)
     result = run(a.arm, a.seed, a.steps, a.batch, a.length, a.window, a.lr,
                  a.passkey_fraction, a.eval_every, a.save, a.memory_layer, a.slots, a.d_mem,
-                 a.compile_step)
+                 a.compile_step, a.write_penalty, a.surprise_gate)
     if a.output:
         a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: result[k] for k in ("arm", "parameters", "memory_state_floats",

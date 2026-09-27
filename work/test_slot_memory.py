@@ -64,6 +64,13 @@ class HybridLMTests(unittest.TestCase):
             # attention reach 4*7=28, memory wiped every 8: nothing from 0..3 past 32
             self.assertTrue(torch.equal(model(x)[:, 40:], model(y)[:, 40:]))
 
+    def test_surprise_gated_lm_is_causal(self):
+        torch.manual_seed(0)
+        model = lm.LM("window_sml", 64, 8, memory_layer=3, surprise_gate=True)
+        x = torch.randint(0, 256, (2, 64)); y = x.clone(); y[:, 40:] = 5
+        with torch.no_grad():
+            self.assertTrue(torch.equal(model(x)[:, :40], model(y)[:, :40]))
+
     def test_lm_is_causal_for_every_arm(self):
         for arm in ("window", "window_sml", "window_sml_local", "full"):
             torch.manual_seed(0)
