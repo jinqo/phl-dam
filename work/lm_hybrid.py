@@ -65,6 +65,51 @@ def passkey_crop(text: Tensor, length: int, rng: random.Random) -> tuple[Tensor,
     return crop, answer_positions
 
 
+class SelectiveSSM(nn.Module):
+    """Mamba-style selective diagonal SSM sublayer (the cheap recurrent baseline).
+
+    Selective scan as in Mamba (Gu & Dao, 2023), without the short conv:
+    h_t = exp(-D_t * A) * h_{t-1} + D_t * x_t,
+    y_t = W_out((h_t + skip * x_t) * silu(W_z u_t)),
+    x_t = W_in u_t, D_t = softplus(W_d u_t + b_d). A = exp(log_A) is initialised
+    to 1..16 and b_d so that softplus(b_d) is log-uniform in [1e-3, 1e-1], as in
+    Mamba; the D_t factor on the input keeps the state bounded (~ x / A), which
+    a plain decay-and-add integrator does not.
+    """
+
+    def __init__(self, d_model: int, channels: int) -> None:
+        super().__init__()
+        self.channels = channels
+        self.input_projection = nn.Linear(d_model, channels, bias=False)
+        self.delta_projection = nn.Linear(d_model, channels)
+        self.log_A = nn.Parameter(torch.log(torch.linspace(1.0, 16.0, channels)))
+        self.skip = nn.Parameter(torch.ones(channels))
+        self.gate_projection = nn.Linear(d_model, channels, bias=False)   # Mamba's z branch
+        self.output_projection = nn.Linear(channels, d_model, bias=False)
+        self._dt_init = torch.exp(torch.linspace(math.log(1e-3), math.log(1e-1), channels))
+
+    def reset_dt_bias(self) -> None:
+        """Inverse-softplus of the Mamba dt initialisation (after global init)."""
+        with torch.no_grad():
+            self.delta_projection.bias.copy_(self._dt_init + torch.log(-torch.expm1(-self._dt_init)))
+
+    def forward(self, u: Tensor, **_) -> tuple[Tensor, None]:
+        x = self.input_projection(u)
+        dt = F.softplus(self.delta_projection(u))
+        decay = torch.exp(-dt * torch.exp(self.log_A))
+        drive = dt * x
+        state = torch.zeros(u.shape[0], self.channels)
+        outputs = []
+        for t in range(u.shape[1]):
+            state = decay[:, t] * state + drive[:, t]
+            outputs.append(state)
+        y = (torch.stack(outputs, 1) + self.skip * x) * F.silu(self.gate_projection(u))
+        return self.output_projection(y), None
+
+    def state_floats(self) -> int:
+        return self.channels
+
+
 class Block(nn.Module):
     def __init__(self, d: int, heads: int, ffn: int, window: int | None,
                  memory: SlotMemory | None = None) -> None:
@@ -78,7 +123,7 @@ class Block(nn.Module):
             self.norm_m = nn.RMSNorm(d)
 
     def forward(self, x: Tensor, mask: Tensor, disable_memory: bool,
-                reset: Tensor | None = None, surprise_fn=None):
+                reset: Tensor | None = None, surprise_fn=None, token_embedding=None):
         b, t, d = x.shape
         q, k, v = self.qkv(self.norm1(x)).view(b, t, 3, self.heads, d // self.heads).unbind(2)
         att = F.scaled_dot_product_attention(
@@ -88,7 +133,13 @@ class Block(nn.Module):
         if self.memory is not None:
             hm = self.norm_m(x)
             surprise = surprise_fn(hm) if surprise_fn is not None else None
-            delta, m = self.memory(hm, reset=reset, disable=disable_memory, surprise=surprise)
+            if isinstance(self.memory, SlotMemory):
+                delta, m = self.memory(hm, reset=reset, disable=disable_memory, surprise=surprise,
+                                       token_embedding=token_embedding)
+            else:
+                delta, m = self.memory(hm)
+                if disable_memory:
+                    delta = torch.zeros_like(delta)
             x = x + delta
         return x + self.ffn(self.norm2(x)), m
 
@@ -97,10 +148,12 @@ class LM(nn.Module):
     def __init__(self, arm: str, length: int, window: int, d: int = 128, layers: int = 4,
                  heads: int = 4, ffn: int = 512, memory_layer: int = 1,
                  slots: int = 16, d_mem: int = 64, compile_step: bool = False,
-                 surprise_gate: bool = False) -> None:
+                 surprise_gate: bool = False, value_from_embedding: bool = False,
+                 ssm_channels: int = 64) -> None:
         super().__init__()
         self.arm, self.length, self.window = arm, length, window
         self.surprise_gate = surprise_gate and arm.startswith("window_sml")
+        self.value_from_embedding = value_from_embedding
         self.aux_loss = None
         self.embed = nn.Embedding(VOCAB, d)
         self.pos = nn.Embedding(length, d)
@@ -109,6 +162,10 @@ class LM(nn.Module):
         for i in range(layers):
             memory = None
             width = ffn
+            if arm == "window_ssm" and i == memory_layer:
+                memory = SelectiveSSM(d, ssm_channels)
+                extra = sum(p.numel() for p in memory.parameters())
+                width = ffn - round(extra / (2 * d + 1))
             if arm in ("window_sml", "window_sml_local") and i == memory_layer:
                 memory = self.memory = SlotMemory(d, slots, d_mem, d_mem,
                                                   compile_step=compile_step)
@@ -131,6 +188,9 @@ class LM(nn.Module):
                     nn.init.zeros_(module.bias)
             elif isinstance(module, nn.Embedding):
                 nn.init.normal_(module.weight, std=0.02)
+        for module in self.modules():
+            if isinstance(module, SelectiveSSM):
+                module.reset_dt_bias()
         if self.memory is not None:            # keep the memory's gate initialisations
             with torch.no_grad():
                 self.memory.gates.bias.copy_(torch.tensor([-3.0, 0.0, 0.0]))
@@ -139,6 +199,12 @@ class LM(nn.Module):
         i = torch.arange(length)
         allowed = (i[None, :] <= i[:, None]) & (i[None, :] > i[:, None] - span)
         self.register_buffer("mask", allowed, persistent=False)
+
+    def memory_state_floats(self) -> int:
+        for block in self.blocks:
+            if block.memory is not None:
+                return block.memory.state_floats()
+        return 0
 
     def forward(self, tokens: Tensor, disable_memory: bool = False) -> Tensor:
         t = tokens.shape[1]
@@ -160,10 +226,12 @@ class LM(nn.Module):
                 first = torch.zeros_like(nll[:, :1])     # nothing precedes t = 0
                 return torch.cat([first, nll.detach()], dim=1)
         for block in self.blocks:
-            x, m = block(x, self.mask[:t, :t], disable_memory, reset, surprise_fn)
+            x, m = block(x, self.mask[:t, :t], disable_memory, reset, surprise_fn,
+                         self.embed(tokens) if self.value_from_embedding else None)
             if m is not None:
                 memory_read = m
         logits = self.norm(x) @ self.embed.weight.T                # tied head
+        self.last_memory_read = memory_read
         if memory_read is not None:
             logits = logits + self.memory.copy_logits(memory_read, self.embed.weight)
         return logits
@@ -305,14 +373,18 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         lr: float, passkey_fraction: float, eval_every: int, save: Path | None = None,
         memory_layer: int = 1, slots: int = 16, d_mem: int = 64,
         compile_step: bool = False, write_penalty: float = 0.0,
-        surprise_gate: bool = False) -> dict:
+        surprise_gate: bool = False, value_from_embedding: bool = False,
+        copy_aux: float = 0.0) -> dict:
     torch.manual_seed(seed)
     rng = random.Random(seed + 10_000)
     train, valid = load_bytes("train"), load_bytes("valid")
     natural, repeat, rare_x, rare_m, keys, answers = build_eval(valid, length + 1, window)
     eval_sets = (natural, repeat, rare_x, rare_m, keys, answers)
     model = LM(arm, length, window, memory_layer=memory_layer, slots=slots, d_mem=d_mem,
-               compile_step=compile_step, surprise_gate=surprise_gate)
+               compile_step=compile_step, surprise_gate=surprise_gate,
+               value_from_embedding=value_from_embedding)
+    if copy_aux > 0.0:
+        model.aux_copy_scale = nn.Parameter(torch.tensor(2.0))   # counted, tiny
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.1, betas=(0.9, 0.95))
     warmup = max(1, steps // 20)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / warmup)
@@ -332,6 +404,23 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         loss = F.cross_entropy(logits.reshape(-1, VOCAB), x[:, 1:].reshape(-1))
         if model.aux_loss is not None:
             loss = loss + 0.1 * model.aux_loss          # trains the surprise head
+        if copy_aux > 0.0 and model.last_memory_read is not None:
+            # Long-range copy supervision from the text itself: wherever a
+            # 9-byte pattern recurs from beyond the attention stack's reach
+            # (and not within it), the memory's copy readout should predict the
+            # byte the earlier occurrence continued with - which, by the mask's
+            # construction, is the true next byte. Dense, label-free training
+            # signal for storing and retrieving arbitrary content.
+            reach = 4 * (window - 1)
+            flags = torch.tensor([long_range_mask(row.tolist(), reach) for row in x])
+            target_mask = flags[:, 1:]                      # logits[t-1] predicts x[t]
+            if target_mask.any():
+                # Own scale: shape what the memory stores and retrieves without
+                # pulling the copy term inside the main prediction.
+                copy = model.aux_copy_scale * (model.last_memory_read
+                                               @ model.memory.value(model.embed.weight).T)
+                aux = F.cross_entropy(copy[target_mask], x[:, 1:][target_mask])
+                loss = loss + copy_aux * aux
         if write_penalty > 0.0 and model.memory is not None:
             # Writing costs something: the memory must spend writes on content
             # worth keeping rather than overwrite itself at every position.
@@ -352,7 +441,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
     if save is not None:
         torch.save(model.state_dict(), save)
     ablated = (evaluate(model, *eval_sets, disable_memory=True)
-               if arm.startswith("window_sml") else None)
+               if arm.startswith("window_s") else None)
     return {
         "experiment": "Slot memory in a Transformer LM - WikiText-2 bytes",
         "arm": arm, "seed": seed,
@@ -360,9 +449,10 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
                           "lr": lr, "passkey_fraction": passkey_fraction,
                           "d_model": 128, "layers": 4, "heads": 4,
                           "memory_layer": memory_layer, "slots": slots, "d_mem": d_mem,
-                          "write_penalty": write_penalty, "surprise_gate": surprise_gate},
+                          "write_penalty": write_penalty, "surprise_gate": surprise_gate,
+                          "value_from_embedding": value_from_embedding, "copy_aux": copy_aux},
         "parameters": parameter_count(model),
-        "memory_state_floats": model.memory.state_floats() if model.memory else 0,
+        "memory_state_floats": model.memory_state_floats(),
         "kv_cache_floats": 2 * 4 * 128 * (length if arm == "full" else window),
         "seconds_per_step": train_seconds / steps,
         "final": final, "memory_disabled": ablated, "history": history,
@@ -372,7 +462,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--arm", choices=("window", "window_sml", "window_sml_local", "full"),
+    p.add_argument("--arm", choices=("window", "window_sml", "window_sml_local", "window_ssm", "full"),
                    required=True)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--steps", type=int, default=3000)
@@ -391,11 +481,14 @@ def main() -> None:
     p.add_argument("--compile-step", action="store_true")
     p.add_argument("--write-penalty", type=float, default=0.0)
     p.add_argument("--surprise-gate", action="store_true")
+    p.add_argument("--value-from-embedding", action="store_true")
+    p.add_argument("--copy-aux", type=float, default=0.0)
     a = p.parse_args()
     torch.set_num_threads(a.threads)
     result = run(a.arm, a.seed, a.steps, a.batch, a.length, a.window, a.lr,
                  a.passkey_fraction, a.eval_every, a.save, a.memory_layer, a.slots, a.d_mem,
-                 a.compile_step, a.write_penalty, a.surprise_gate)
+                 a.compile_step, a.write_penalty, a.surprise_gate, a.value_from_embedding,
+                 a.copy_aux)
     if a.output:
         a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: result[k] for k in ("arm", "parameters", "memory_state_floats",

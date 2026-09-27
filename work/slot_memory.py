@@ -103,14 +103,18 @@ class SlotMemory(nn.Module):
         return self.num_slots * (self.d_key + self.d_value + 1)
 
     def forward(self, h: Tensor, reset: Tensor | None = None,
-                disable: bool = False, surprise: Tensor | None = None) -> tuple[Tensor, Tensor]:
+                disable: bool = False, surprise: Tensor | None = None,
+                token_embedding: Tensor | None = None) -> tuple[Tensor, Tensor]:
         batch, length, _ = h.shape
         previous = torch.cat([torch.zeros_like(h[:, :1]), h[:, :-1]], dim=1)
         if reset is not None:                   # no key from across a boundary
             previous = previous.masked_fill(reset[..., None], 0.0)
         cand_keys = unit(self.key(previous)).float()
         queries = unit(self.key(h)).float()
-        cand_values = self.value(h).float()
+        # Values from the current token's embedding when given (a pointer-style
+        # memory of context -> token): the copy readout, which scores against
+        # value(E), then decodes a clean retrieval correctly from initialisation.
+        cand_values = self.value(token_embedding if token_embedding is not None else h).float()
         gates = self.gates(h).float()
         write_logit = gates[..., 0]
         if surprise is not None:
