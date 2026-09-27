@@ -97,5 +97,52 @@ class HybridLMTests(unittest.TestCase):
         self.assertFalse(any(flags[:13]))
 
 
+class ReferenceModuleTests(unittest.TestCase):
+    """work/slot_memory_reference.py is the code embedded in the 150M prompt."""
+
+    def setUp(self):
+        import slot_memory_reference as ref
+        torch.manual_seed(0)
+        self.ref = ref.SlotMemory(32, num_slots=8, d_key=16, d_value=16)
+        with torch.no_grad():                  # open the gates so the test has signal
+            self.ref.gates.bias.copy_(torch.tensor([0.5, 0.0, 0.0]))
+        self.h = torch.randn(2, 40, 32)
+
+    def test_matches_the_module_used_in_every_lm_run(self):
+        tested = SlotMemory(32, num_slots=8, d_key=16, d_value=16)
+        missing, unexpected = tested.load_state_dict(self.ref.state_dict(), strict=False)
+        self.assertEqual((missing, unexpected), (["surprise_weight"], []))
+        reset = torch.zeros(2, 40, dtype=torch.bool); reset[:, 17] = True
+        with torch.no_grad():
+            for a, b in zip(self.ref(self.h, reset), tested(self.h, reset)):
+                self.assertTrue(torch.equal(a, b))
+
+    def test_streaming_step_matches_parallel_forward(self):
+        with torch.no_grad():
+            delta, m = self.ref(self.h)
+            state = self.ref.init_state(2)
+            for t in range(40):
+                d_t, m_t, state = self.ref.step(self.h[:, t], state)
+                torch.testing.assert_close(d_t, delta[:, t], rtol=1e-5, atol=1e-6)
+                torch.testing.assert_close(m_t, m[:, t], rtol=1e-5, atol=1e-6)
+
+    def test_causal_and_reset(self):
+        with torch.no_grad():
+            h2 = self.h.clone(); h2[:, 25:] = 0.3
+            self.assertTrue(torch.equal(self.ref(self.h)[1][:, :25], self.ref(h2)[1][:, :25]))
+            reset = torch.zeros(2, 40, dtype=torch.bool); reset[:, 20] = True
+            alone = self.ref(self.h[:, 20:])[1]
+            packed = self.ref(self.h, reset)[1][:, 20:]
+            torch.testing.assert_close(packed, alone, rtol=1e-5, atol=1e-6)
+
+    def test_generic_init_then_reset_gate_biases(self):
+        for p in self.ref.modules():
+            if isinstance(p, torch.nn.Linear) and p.bias is not None:
+                torch.nn.init.zeros_(p.bias)
+        self.ref.reset_gate_biases()
+        self.assertEqual(float(self.ref.gates.bias[0].detach()), -3.0)
+        self.assertEqual(float(self.ref.read_gate.bias[0].detach()), 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()
