@@ -18,10 +18,28 @@ The design comes from a small, preregistered study (repo `jinqo/phl-dam`,
 `outputs/PHL_DAM_v2_Report.md`). Treat it as a hypothesis for my model, not a
 known result:
 
-* It was validated only on **synthetic key→value associative recall**
+* It was first validated on **synthetic key→value associative recall**
   (176-token episodes with 3 bindings; and a 456-token "write pressure" task
   with 8–32 bindings competing for 8 slots), at **~30–40K parameters**, 8
-  slots, CPU training. Never on natural language, never at scale.
+  slots, CPU training.
+* On **real text** it was then tested as one sublayer in a ~839K-parameter
+  byte-level Transformer (WikiText-2, attention window 16, 128-byte
+  sequences, 4,000 steps; `outputs/LM_Report.md`). It lowered bits/byte on
+  6/6 fresh seeds versus window-only attention (−0.023 mean, ≈1.3–1.7%). It
+  beat a parameter-matched Mamba-style SSM sublayer on 3/3 seeds, and beat
+  full attention over the whole sequence on average (5/6 seeds). The cost
+  was +3.9% FLOPs and a 16×129-float state. It passed a preregistered
+  "worth using" bar.
+* **Caveats from that test, which apply to you:**
+  * The effect is small and untested beyond 839K parameters and 128 bytes.
+  * About half the gain survives a control that wipes the memory every 16
+    bytes, so it is not all long-range recall.
+  * The learned write gate is *anti*-selective: it writes less at a stated
+    passkey than at ordinary text. Passkey recall was learned in 1 of 6
+    runs. A write-sparsity penalty, a surprise-gated write, values from
+    token embeddings, 64 slots and a copy auxiliary loss did not fix it.
+  * Placement mattered: the block at 3/4 depth beat blocks 1 and 2 of 4 in
+    dev.
 * There it beat a parameter-matched Transformer, two SSMs, and two DNC
   variants on accuracy, steps to 90% recall (10–30 steps vs 27–250+) and
   training recall loss, with 392 floats of recurrent state.
@@ -33,8 +51,9 @@ known result:
 * A 150M Transformer already does in-context associative recall with
   attention. The plausible benefits here are **constant-size memory for
   recall beyond the attention window, cheaper long-context inference, and
-  faster acquisition of recall** — not lower short-context perplexity.
-  Design the evaluation to detect those, and to detect harm.
+  faster acquisition of recall**, plus possibly the small perplexity gain
+  seen at tiny scale (which may vanish at 150M). Design the evaluation to
+  detect those, and to detect harm.
 
 ## 1. Inspect my model first — **STOP after this step**
 
@@ -152,8 +171,12 @@ investigate there.
 Start small and measurable, then scale:
 
 * **One SML layer first**, inserted as an extra residual sublayer after the
-  attention sublayer of a middle block (e.g. block L/2), pre-normed like the
-  model's other sublayers. Later try 2–4 layers or several independent
+  attention sublayer of an upper block (≈ 3/4 depth, e.g. block 3L/4 — in
+  the 4-layer LM test block 3 beat blocks 1 and 2), pre-normed like the
+  model's other sublayers. Its benefit showed alongside *windowed* attention;
+  with full attention over a 2k context, test whether it still adds anything,
+  and test window + memory against full attention (that pairing is where the
+  inference-memory saving is). Later try 2–4 layers or several independent
   memory heads per layer (separate `W_k, W_v`, gates and state).
 * **Sizes to start**: `N = 16–64` slots per head, `dk = dv = 64`,
   `d = d_model`. State per head is `N·(dk+dv+1)` floats — e.g. 64 slots ×

@@ -1,0 +1,116 @@
+{
+  "complete": true,
+  "seeds": [
+    3,
+    4,
+    5
+  ],
+  "table": {
+    "window": {
+      "bits_per_byte": [
+        1.7651,
+        1.772,
+        1.7694
+      ],
+      "rare_word_bits_per_byte": [
+        3.4567,
+        3.4901,
+        3.6891
+      ],
+      "passkey_digit_accuracy": [
+        0.085,
+        0.091,
+        0.094
+      ],
+      "cpu_seconds_per_step": [
+        0.449,
+        0.443,
+        0.45
+      ]
+    },
+    "window_sml": {
+      "bits_per_byte": [
+        1.738,
+        1.7332,
+        1.7445
+      ],
+      "rare_word_bits_per_byte": [
+        3.3763,
+        3.5012,
+        3.5436
+      ],
+      "passkey_digit_accuracy": [
+        0.092,
+        0.108,
+        0.224
+      ],
+      "cpu_seconds_per_step": [
+        0.748,
+        0.755,
+        0.747
+      ]
+    },
+    "window_ssm": {
+      "bits_per_byte": [
+        1.7748,
+        1.7681,
+        1.7681
+      ],
+      "rare_word_bits_per_byte": [
+        3.4585,
+        3.5322,
+        3.5303
+      ],
+      "passkey_digit_accuracy": [
+        0.085,
+        0.103,
+        0.077
+      ],
+      "cpu_seconds_per_step": [
+        0.508,
+        0.502,
+        0.505
+      ]
+    },
+    "full": {
+      "bits_per_byte": [
+        1.7438,
+        1.7497,
+        1.7653
+      ],
+      "rare_word_bits_per_byte": [
+        3.4606,
+        3.4736,
+        3.6006
+      ],
+      "passkey_digit_accuracy": [
+        0.087,
+        0.109,
+        1.0
+      ],
+      "cpu_seconds_per_step": [
+        0.446,
+        0.444,
+        0.44
+      ]
+    }
+  },
+  "flops_per_step_batch4": {
+    "window": 2516582400,
+    "window_sml": 2614291456,
+    "window_ssm": 2516582400,
+    "full": 2516582400
+  },
+  "criteria": {
+    "1_helps_text": true,
+    "2_beats_selective_ssm": true,
+    "3_as_good_as_full_attention": true,
+    "4_affordable": {
+      "flop_ratio": 1.0388,
+      "state_floats": 18448,
+      "full_kv_cache_floats": 131072,
+      "pass": true
+    }
+  },
+  "worth_using": true
+}

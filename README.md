@@ -91,6 +91,32 @@ given the copy readout is the closest competitor everywhere. The preregistered
 lower, 6/6 seeds); at 32 writes the recall lead (+3.4 pp) is not robust.
 Full account: `outputs/PHL_DAM_v2_Report.md`.
 
+## In a Transformer language model (real text)
+
+The v4 memory as one extra sublayer (`work/slot_memory.py`) in a ~839K-parameter
+byte-level Transformer on WikiText-2, attention window 16. Preregistered,
+fresh seeds 3–5, parameter-matched arms
+(`work/PREREGISTRATION_LM_round2.md`):
+
+| Arm | Bits/byte (mean of 3) | FLOPs | Inference state |
+|---|---:|---:|---:|
+| **window + SlotMemory** | **1.7386** (best on 3/3) | 1.039× | 18,448 |
+| full attention (128) | 1.7529 | 1.000× | 131,072 |
+| window only | 1.7688 | 1.000× | 16,384 |
+| window + Mamba-style SSM | 1.7703 | 1.000× | 16,448 |
+
+All four "worth using" criteria pass. They are: better than window-only
+on 3/3 seeds, better than the SSM sublayer on 3/3, at least as good as full
+attention on average, and ≤1.10× FLOPs with a smaller inference state. Round 1
+(seeds 0–2) gave the same ordering but failed its own preregistration, on an
+invalid metric and on CPU wall-clock.
+
+Caveats: the effect is small (≈1.7%) and only tested at tiny scale. About
+half of it survives a control that wipes the memory every 16 bytes, so not
+all of it is long-range. A stated passkey is still not recalled reliably, and
+CPU wall-clock is 1.68× (a Python loop; it needs a fused scan).
+Full account: `outputs/LM_Report.md`.
+
 ## What was tested and rejected
 
 | Mechanism | Verdict |
