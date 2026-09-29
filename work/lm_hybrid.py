@@ -149,7 +149,8 @@ class LM(nn.Module):
                  heads: int = 4, ffn: int = 512, memory_layer: int = 1,
                  slots: int = 16, d_mem: int = 64, compile_step: bool = False,
                  surprise_gate: bool = False, value_from_embedding: bool = False,
-                 ssm_channels: int = 64) -> None:
+                 ssm_channels: int = 64, write_mode: str = "blend",
+                 write_bias: float = -3.0) -> None:
         super().__init__()
         self.arm, self.length, self.window = arm, length, window
         self.surprise_gate = surprise_gate and arm.startswith("window_sml")
@@ -168,7 +169,8 @@ class LM(nn.Module):
                 width = ffn - round(extra / (2 * d + 1))
             if arm in ("window_sml", "window_sml_local", "full_sml") and i == memory_layer:
                 memory = self.memory = SlotMemory(d, slots, d_mem, d_mem,
-                                                  compile_step=compile_step)
+                                                  compile_step=compile_step,
+                                                  write_mode=write_mode)
                 # shrink this block's FFN to pay for the memory's parameters
                 extra = sum(p.numel() for p in memory.parameters())
                 width = ffn - round(extra / (2 * d + 1))
@@ -193,7 +195,7 @@ class LM(nn.Module):
                 module.reset_dt_bias()
         if self.memory is not None:            # keep the memory's gate initialisations
             with torch.no_grad():
-                self.memory.gates.bias.copy_(torch.tensor([-3.0, 0.0, 0.0]))
+                self.memory.gates.bias.copy_(torch.tensor([write_bias, 0.0, 0.0]))
                 self.memory.read_gate.bias.fill_(1.0)
         span = length if arm.startswith("full") else window
         i = torch.arange(length)
@@ -374,7 +376,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         memory_layer: int = 1, slots: int = 16, d_mem: int = 64,
         compile_step: bool = False, write_penalty: float = 0.0,
         surprise_gate: bool = False, value_from_embedding: bool = False,
-        copy_aux: float = 0.0) -> dict:
+        copy_aux: float = 0.0, write_mode: str = "blend", write_bias: float = -3.0) -> dict:
     torch.manual_seed(seed)
     rng = random.Random(seed + 10_000)
     train, valid = load_bytes("train"), load_bytes("valid")
@@ -382,7 +384,8 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
     eval_sets = (natural, repeat, rare_x, rare_m, keys, answers)
     model = LM(arm, length, window, memory_layer=memory_layer, slots=slots, d_mem=d_mem,
                compile_step=compile_step, surprise_gate=surprise_gate,
-               value_from_embedding=value_from_embedding)
+               value_from_embedding=value_from_embedding, write_mode=write_mode,
+               write_bias=write_bias)
     if copy_aux > 0.0:
         model.aux_copy_scale = nn.Parameter(torch.tensor(2.0))   # counted, tiny
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.1, betas=(0.9, 0.95))
@@ -436,7 +439,11 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
                             "train_seconds": train_seconds, **metrics})
             print(f"{arm} seed={seed} step={step} loss={loss.item():.3f} "
                   f"bpb={metrics['bits_per_byte']:.3f} rare={metrics['rare_word_repeat_bits_per_byte']:.3f} "
-                  f"key={metrics['passkey_key_accuracy']:.2f} t={train_seconds:.0f}s", flush=True)
+                  f"key={metrics['passkey_key_accuracy']:.2f} "
+                  f"digit={metrics['passkey_digit_accuracy']:.2f}"
+                  + (f" writes={float(model.memory.last_hard_write_rate):.3f}"
+                     if model.memory is not None else "")
+                  + f" t={train_seconds:.0f}s", flush=True)
     final = history[-1]
     if save is not None:
         torch.save(model.state_dict(), save)
@@ -450,7 +457,8 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
                           "d_model": 128, "layers": 4, "heads": 4,
                           "memory_layer": memory_layer, "slots": slots, "d_mem": d_mem,
                           "write_penalty": write_penalty, "surprise_gate": surprise_gate,
-                          "value_from_embedding": value_from_embedding, "copy_aux": copy_aux},
+                          "value_from_embedding": value_from_embedding, "copy_aux": copy_aux,
+                          "write_mode": write_mode, "write_bias": write_bias},
         "parameters": parameter_count(model),
         "memory_state_floats": model.memory_state_floats(),
         "kv_cache_floats": 2 * 4 * 128 * (length if arm.startswith("full") else window),
@@ -483,12 +491,14 @@ def main() -> None:
     p.add_argument("--surprise-gate", action="store_true")
     p.add_argument("--value-from-embedding", action="store_true")
     p.add_argument("--copy-aux", type=float, default=0.0)
+    p.add_argument("--write-mode", choices=("blend", "replace"), default="blend")
+    p.add_argument("--write-bias", type=float, default=-3.0)
     a = p.parse_args()
     torch.set_num_threads(a.threads)
     result = run(a.arm, a.seed, a.steps, a.batch, a.length, a.window, a.lr,
                  a.passkey_fraction, a.eval_every, a.save, a.memory_layer, a.slots, a.d_mem,
                  a.compile_step, a.write_penalty, a.surprise_gate, a.value_from_embedding,
-                 a.copy_aux)
+                 a.copy_aux, a.write_mode, a.write_bias)
     if a.output:
         a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: result[k] for k in ("arm", "parameters", "memory_state_floats",

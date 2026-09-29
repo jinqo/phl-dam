@@ -58,7 +58,46 @@ def memory_step(keys: Tensor, values: Tensor, occ: Tensor, k: Tensor, v: Tensor,
     return keys, values, occ, retrieved, entropy
 
 
+def replace_step(keys: Tensor, values: Tensor, occ: Tensor, score: Tensor, k: Tensor,
+                 v: Tensor, salience: Tensor, q: Tensor, read_temperature: float,
+                 floor: float, decay: float):
+    """Hard replacement write, then the same read as memory_step.
+
+    A position is written iff its salience > 0.5 (straight-through gradient to
+    the salience). A write replaces one whole slot - an empty one if any, else
+    the one with the lowest retained score (salience at write time, decayed by
+    `decay` per step) - so a stored key/value stays clean instead of being
+    blended with everything written after it.
+    """
+    hard = (salience > 0.5).float()
+    z = salience + (hard - salience).detach()                     # [B]
+    priority = torch.where(occ > 0.5, score, torch.full_like(score, -1.0))
+    target = F.one_hot(priority.argmin(-1), occ.shape[-1]).float()   # [B, N]
+    write = z[:, None] * target
+    remain = 1.0 - write
+    keys = remain[..., None] * keys + write[..., None] * k[:, None]
+    values = remain[..., None] * values + write[..., None] * v[:, None]
+    occ = remain * occ + write
+    written = (hard[:, None] * target) > 0
+    score = torch.where(written, salience.detach()[:, None].expand_as(score), score * decay)
+    s = torch.einsum("bd,bnd->bn", q, keys) / read_temperature
+    attn = torch.softmax(s + 0.25 * torch.log(occ + 1e-6), dim=-1)
+    retrieved = torch.einsum("bn,bnv->bv", attn, values / occ.clamp_min(floor)[..., None])
+    entropy = -(attn * attn.clamp_min(1e-12).log()).sum(-1)
+    return keys, values, occ, score, retrieved, entropy
+
+
 _COMPILED_STEP = None
+
+
+_COMPILED_REPLACE = None
+
+
+def compiled_replace_step():
+    global _COMPILED_REPLACE
+    if _COMPILED_REPLACE is None:
+        _COMPILED_REPLACE = torch.compile(replace_step, dynamic=False)
+    return _COMPILED_REPLACE
 
 
 def compiled_memory_step():
@@ -82,12 +121,15 @@ class SlotMemory(nn.Module):
         copy_scale: float = 2.0,
         occupancy_floor: float = 1e-3,
         compile_step: bool = False,
+        write_mode: str = "blend",
+        replace_decay: float = 0.99,
     ) -> None:
         super().__init__()
         self.num_slots, self.d_key, self.d_value = num_slots, d_key, d_value
         self.read_temperature = read_temperature
         self.occupancy_floor = occupancy_floor
         self.compile_step = compile_step
+        self.write_mode, self.replace_decay = write_mode, replace_decay
         self.key = nn.Linear(d_model, d_key, bias=False)        # tied key/query
         self.value = nn.Linear(d_model, d_value, bias=False)
         self.gates = nn.Linear(d_model, 3)                       # write, alloc, sharpness
@@ -132,21 +174,33 @@ class SlotMemory(nn.Module):
         keys = h.new_zeros(batch, n, self.d_key, dtype=torch.float32)
         values = h.new_zeros(batch, n, self.d_value, dtype=torch.float32)
         occ = h.new_zeros(batch, n, dtype=torch.float32)
+        score = h.new_zeros(batch, n, dtype=torch.float32)
         retrieved, entropy = [], []
-        step = compiled_memory_step() if self.compile_step else memory_step
+        replace = self.write_mode == "replace"
+        if replace:
+            step = compiled_replace_step() if self.compile_step else replace_step
+        else:
+            step = compiled_memory_step() if self.compile_step else memory_step
         for t in range(length):
             if reset is not None:
                 keep = (~reset[:, t]).float()
                 keys, values = keys * keep[:, None, None], values * keep[:, None, None]
                 occ = occ * keep[:, None]
-            keys, values, occ, r_t, e_t = step(
-                keys, values, occ, cand_keys[:, t], cand_values[:, t], write_gate[:, t],
-                alloc_gate[:, t], sharpness[:, t], queries[:, t],
-                self.read_temperature, self.occupancy_floor)
+            if replace:
+                keys, values, occ, score, r_t, e_t = step(
+                    keys, values, occ, score, cand_keys[:, t], cand_values[:, t],
+                    write_gate[:, t], queries[:, t], self.read_temperature,
+                    self.occupancy_floor, self.replace_decay)
+            else:
+                keys, values, occ, r_t, e_t = step(
+                    keys, values, occ, cand_keys[:, t], cand_values[:, t], write_gate[:, t],
+                    alloc_gate[:, t], sharpness[:, t], queries[:, t],
+                    self.read_temperature, self.occupancy_floor)
             retrieved.append(r_t)
             entropy.append(e_t)
         # Mean write gate, for an optional write-sparsity penalty in the loss.
         self.last_write_rate = write_gate.mean()
+        self.last_hard_write_rate = (write_gate > 0.5).float().mean()
         r = torch.stack(retrieved, 1).to(h.dtype)
         conf = (1.0 - torch.stack(entropy, 1) / math.log(n)).to(h.dtype)
         rho = torch.sigmoid(self.read_gate(torch.cat([h, r, conf[..., None]], -1)))

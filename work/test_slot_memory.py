@@ -145,5 +145,44 @@ class ReferenceModuleTests(unittest.TestCase):
         self.assertEqual(float(self.ref.read_gate.bias[0].detach()), 1.0)
 
 
+class ReplaceWriteTests(unittest.TestCase):
+    def _write(self, state, k, v, sal):
+        from slot_memory import replace_step
+        keys, values, occ, score = state
+        b = k.shape[0]
+        out = replace_step(keys, values, occ, score, k, v, torch.full((b,), sal), k, 0.1, 1e-3, 0.99)
+        return out[:4], out[4]
+
+    def test_writes_replace_whole_slots_and_evict_lowest_score(self):
+        torch.manual_seed(0)
+        n, d = 4, 8
+        state = (torch.zeros(1, n, d), torch.zeros(1, n, d), torch.zeros(1, n), torch.zeros(1, n))
+        ks = [unit(torch.randn(1, d)) for _ in range(5)]
+        vs = [torch.randn(1, d) for _ in range(5)]
+        sal = [0.9, 0.6, 0.95, 0.8, 0.7]
+        for k, v, s in zip(ks[:4], vs[:4], sal[:4]):
+            state, _ = self._write(state, k, v, s)
+        self.assertTrue(torch.equal(state[2], torch.ones(1, n)))
+        stored = {tuple(state[1][0, i].tolist()) for i in range(n)}
+        self.assertEqual(stored, {tuple(v[0].tolist()) for v in vs[:4]})    # no blending
+        state, _ = self._write(state, ks[4], vs[4], sal[4])               # evicts salience 0.6
+        stored = {tuple(state[1][0, i].tolist()) for i in range(n)}
+        self.assertNotIn(tuple(vs[1][0].tolist()), stored)
+        self.assertIn(tuple(vs[4][0].tolist()), stored)
+
+    def test_low_salience_does_not_write(self):
+        n, d = 4, 8
+        state = (torch.zeros(1, n, d), torch.zeros(1, n, d), torch.zeros(1, n), torch.zeros(1, n))
+        state, _ = self._write(state, unit(torch.randn(1, d)), torch.randn(1, d), 0.3)
+        self.assertEqual(float(state[2].sum()), 0.0)
+
+    def test_replace_lm_is_causal(self):
+        torch.manual_seed(0)
+        model = lm.LM("window_sml", 48, 8, memory_layer=3, write_mode="replace", write_bias=0.0)
+        x = torch.randint(0, 256, (2, 48)); y = x.clone(); y[:, 30:] = 7
+        with torch.no_grad():
+            self.assertTrue(torch.equal(model(x)[:, :30], model(y)[:, :30]))
+
+
 if __name__ == "__main__":
     unittest.main()
