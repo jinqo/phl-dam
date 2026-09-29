@@ -166,13 +166,13 @@ class LM(nn.Module):
                 memory = SelectiveSSM(d, ssm_channels)
                 extra = sum(p.numel() for p in memory.parameters())
                 width = ffn - round(extra / (2 * d + 1))
-            if arm in ("window_sml", "window_sml_local") and i == memory_layer:
+            if arm in ("window_sml", "window_sml_local", "full_sml") and i == memory_layer:
                 memory = self.memory = SlotMemory(d, slots, d_mem, d_mem,
                                                   compile_step=compile_step)
                 # shrink this block's FFN to pay for the memory's parameters
                 extra = sum(p.numel() for p in memory.parameters())
                 width = ffn - round(extra / (2 * d + 1))
-            blocks.append(Block(d, heads, width, None if arm == "full" else window, memory))
+            blocks.append(Block(d, heads, width, None if arm.startswith("full") else window, memory))
         self.blocks = nn.ModuleList(blocks)
         self.norm = nn.RMSNorm(d)
         if self.surprise_gate:
@@ -195,7 +195,7 @@ class LM(nn.Module):
             with torch.no_grad():
                 self.memory.gates.bias.copy_(torch.tensor([-3.0, 0.0, 0.0]))
                 self.memory.read_gate.bias.fill_(1.0)
-        span = length if arm == "full" else window
+        span = length if arm.startswith("full") else window
         i = torch.arange(length)
         allowed = (i[None, :] <= i[:, None]) & (i[None, :] > i[:, None] - span)
         self.register_buffer("mask", allowed, persistent=False)
@@ -441,7 +441,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
     if save is not None:
         torch.save(model.state_dict(), save)
     ablated = (evaluate(model, *eval_sets, disable_memory=True)
-               if arm.startswith("window_s") else None)
+               if arm.startswith("window_s") or arm == "full_sml" else None)
     return {
         "experiment": "Slot memory in a Transformer LM - WikiText-2 bytes",
         "arm": arm, "seed": seed,
@@ -453,7 +453,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
                           "value_from_embedding": value_from_embedding, "copy_aux": copy_aux},
         "parameters": parameter_count(model),
         "memory_state_floats": model.memory_state_floats(),
-        "kv_cache_floats": 2 * 4 * 128 * (length if arm == "full" else window),
+        "kv_cache_floats": 2 * 4 * 128 * (length if arm.startswith("full") else window),
         "seconds_per_step": train_seconds / steps,
         "final": final, "memory_disabled": ablated, "history": history,
         "finite": all(torch.isfinite(p).all() for p in model.parameters()),
@@ -462,7 +462,7 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--arm", choices=("window", "window_sml", "window_sml_local", "window_ssm", "full"),
+    p.add_argument("--arm", choices=("window", "window_sml", "window_sml_local", "window_ssm", "full", "full_sml"),
                    required=True)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--steps", type=int, default=3000)

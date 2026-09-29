@@ -52,10 +52,11 @@ class SlotMemoryTests(unittest.TestCase):
 
 class HybridLMTests(unittest.TestCase):
     def test_arms_are_parameter_matched(self):
-        counts = {a: lm.parameter_count(lm.LM(a, 64, 16)) for a in ("window", "window_sml", "window_ssm", "full")}
+        counts = {a: lm.parameter_count(lm.LM(a, 64, 16)) for a in ("window", "window_sml", "window_ssm", "full", "full_sml")}
         self.assertEqual(counts["window"], counts["full"])
         self.assertLess(abs(counts["window_sml"] - counts["window"]) / counts["window"], 0.005)
         self.assertLess(abs(counts["window_ssm"] - counts["window"]) / counts["window"], 0.005)
+        self.assertEqual(counts["full_sml"], counts["window_sml"])
 
     def test_local_control_cannot_carry_memory_beyond_window(self):
         torch.manual_seed(0)
@@ -73,7 +74,7 @@ class HybridLMTests(unittest.TestCase):
             self.assertTrue(torch.equal(model(x)[:, :40], model(y)[:, :40]))
 
     def test_lm_is_causal_for_every_arm(self):
-        for arm in ("window", "window_sml", "window_sml_local", "window_ssm", "full"):
+        for arm in ("window", "window_sml", "window_sml_local", "window_ssm", "full", "full_sml"):
             torch.manual_seed(0)
             model = lm.LM(arm, 48, 8)
             x = torch.randint(0, 256, (2, 48)); y = x.clone(); y[:, 30:] = 7
