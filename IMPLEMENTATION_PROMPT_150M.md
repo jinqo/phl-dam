@@ -83,6 +83,19 @@ attention 5/6.
    CPU even though FLOPs were +3.9%. At scale the scan needs a fused kernel
    (section 4.4).
 5. **Weak comparison.** The SSM baseline was untuned.
+6. **It did not hold at 4× the context.** At 512 bytes with a window of 64
+   (round 3, seeds 6–8), memory beat window-only on only 1 of 3 seeds.
+   * Training of the memory arms was unstable: one seed stalled from the
+     start and ended at 2.56 bits/byte, against 1.85 for window-only.
+   * A memory reset every 64 bytes trained 0.45–0.6 bits/byte worse than
+     no memory at all.
+   * At your context length, **stability is the first thing to check**.
+     Compare early learning curves on several seeds before any long run. If
+     the memory arm lags, try a lower learning rate for the memory's
+     parameters, or a truncated backward pass through the scan.
+7. **No gain on top of full attention.** At 128 bytes (2 dev seeds), adding
+   memory to full attention gave nothing. The gain appeared only with
+   windowed attention + memory.
 
 What it plausibly buys a 150M model:
 
