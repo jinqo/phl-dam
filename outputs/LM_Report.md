@@ -6,6 +6,8 @@ real text: byte-level WikiText-2, `work/lm_hybrid.py`, module
 `work/slot_memory.py`. Every number below comes from preregistered runs on
 seeds that dev work never touched.
 
+> **Update — round 3:** the round-2 result below did **not** hold at 4× the context (512 bytes, window 64): 1/4 criteria, with unstable training in the memory arms. See the round-3 section. Treat round 2 as a result at 128 bytes only.
+
 ## Verdict — round 2 (`work/PREREGISTRATION_LM_round2.md`, seeds 3–5): worth using, **4/4 criteria pass**
 
 Question: when you add one cheap recurrent sublayer to a windowed Transformer,
@@ -73,6 +75,38 @@ Memory is also below full attention on 5/6 seeds, with pooled means of
   stronger SSM (larger state, several layers, Mamba's convolution) might do
   better. The claim is only: at equal parameters and placement, this SSM did not help
   and the memory did.
+
+## Round 3 (`work/PREREGISTRATION_LM_round3.md`, seeds 6–8): does it hold at 4× the context? **No — 1/4**
+
+Same models, context 512 bytes, window 64 (stacked reach 252), batch 8 (the
+same bytes per step), 4,000 steps, lr 3e-3; a new control wipes the memory
+every 64 bytes.
+
+| Arm | Bits/byte, seed 6 | Seed 7 | Seed 8 | Mean |
+|---|---:|---:|---:|---:|
+| window only | 1.8676 | 1.8530 | 1.8510 | **1.8572** |
+| window + SlotMemory | **1.8534** | 1.9075 | 2.5596 | 2.1068 |
+| memory wiped every 64 (control) | 2.3151 | 2.4308 | 2.4574 | 2.4011 |
+| full attention (512) | 1.8980 | 2.0299 | 1.8977 | 1.9419 |
+
+1. Helps text (< window, 3/3): **fail** (1/3).
+2. Gain needs memory beyond the window (< control, 3/3): **fail** as
+   preregistered (2/3; the control itself trained badly, see below).
+3. As good as full attention (mean): **fail**.
+4. Affordable: **pass** (1.035× FLOPs; 67,600-float state vs a 524,288-float
+   KV cache).
+
+What happened: at 512 bytes the memory arms often train badly. Seed 8
+stalls from the start (3.14 bits/byte at step 1,000 vs 2.49 for window-only)
+and never recovers; every run of the reset control ends 0.45–0.6 worse
+than window-only. The models do use the memory: switching it off at
+evaluation is worse still (e.g. seed 6: 1.853 → 2.056), so the trunk has
+co-adapted to a memory that helps less than attention alone would have.
+Full attention was also unstable on one seed (2.03), and window-only was
+the best arm, so at this scale and learning rate the longer context is hard
+for every arm — but hardest for the memory. **The round-2 result does not
+transfer to 4× the context as-is.** This is the main open problem before
+adopting the layer at a 2k context; diagnosis is in progress (dev seeds).
 
 ## Round 1 (`work/PREREGISTRATION_LM_round1.md`, seeds 0–2): not worth using, 1/4
 

@@ -1,0 +1,95 @@
+{
+  "complete": true,
+  "seeds": [
+    6,
+    7,
+    8
+  ],
+  "table": {
+    "window": {
+      "bits_per_byte": [
+        1.8676,
+        1.853,
+        1.851
+      ],
+      "passkey_digit_accuracy": [
+        0.094,
+        0.103,
+        0.095
+      ],
+      "cpu_seconds_per_step": [
+        0.514,
+        0.514,
+        0.507
+      ]
+    },
+    "window_sml": {
+      "bits_per_byte": [
+        1.8534,
+        1.9075,
+        2.5596
+      ],
+      "passkey_digit_accuracy": [
+        0.115,
+        0.105,
+        0.094
+      ],
+      "cpu_seconds_per_step": [
+        1.238,
+        1.238,
+        1.235
+      ]
+    },
+    "window_sml_local": {
+      "bits_per_byte": [
+        2.3151,
+        2.4308,
+        2.4574
+      ],
+      "passkey_digit_accuracy": [
+        0.087,
+        0.099,
+        0.098
+      ],
+      "cpu_seconds_per_step": [
+        1.33,
+        1.292,
+        1.302
+      ]
+    },
+    "full": {
+      "bits_per_byte": [
+        1.898,
+        2.0299,
+        1.8977
+      ],
+      "passkey_digit_accuracy": [
+        0.104,
+        0.1,
+        0.1
+      ],
+      "cpu_seconds_per_step": [
+        0.509,
+        0.691,
+        0.51
+      ]
+    }
+  },
+  "flops_per_step_batch4": {
+    "window": 10066329600,
+    "window_sml": 10419441664,
+    "full": 10066329600
+  },
+  "criteria": {
+    "1_helps_text": false,
+    "2_gain_needs_memory_beyond_window": false,
+    "3_as_good_as_full_attention": false,
+    "4_affordable": {
+      "flop_ratio": 1.0351,
+      "state_floats": 67600,
+      "full_kv_cache_floats": 524288,
+      "pass": true
+    }
+  },
+  "holds_at_4x_context": false
+}

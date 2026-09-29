@@ -115,7 +115,11 @@ Caveats: the effect is small (≈1.7%) and only tested at tiny scale. About
 half of it survives a control that wipes the memory every 16 bytes, so not
 all of it is long-range. A stated passkey is still not recalled reliably, and
 CPU wall-clock is 1.68× (a Python loop; it needs a fused scan).
-Full account: `outputs/LM_Report.md`.
+
+**It did not hold at 4× the context** (round 3: 512 bytes, window 64,
+seeds 6–8): the memory beat window-only on 1/3 seeds and trained unstably
+(one seed 2.56 bits/byte vs 1.85). Treat the round-2 result as a 128-byte
+result only. Full account: `outputs/LM_Report.md`.
 
 ## What was tested and rejected
 
