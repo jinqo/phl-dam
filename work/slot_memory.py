@@ -208,6 +208,8 @@ class SlotMemory(nn.Module):
         conf = (1.0 - torch.stack(entropy, 1) / math.log(n)).to(h.dtype)
         rho = torch.sigmoid(self.read_gate(torch.cat([h, r, conf[..., None]], -1)))
         m = rho * r
+        self.last_read_gate = rho.detach().mean()
+        self.last_retrieved_norm = r.detach().norm(dim=-1).mean()
         if disable:
             m = torch.zeros_like(m)
         return self.out(m), m

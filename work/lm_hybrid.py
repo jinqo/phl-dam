@@ -437,8 +437,15 @@ def run(arm: str, seed: int, steps: int, batch: int, length: int, window: int,
         train_seconds += time.perf_counter() - t0
         if step % eval_every == 0 or step == steps:
             metrics = evaluate(model, *eval_sets)
+            mem_stats = {}
+            if isinstance(model.memory, SlotMemory):
+                mem = model.memory
+                mem_stats = {"write_gate": float(mem.last_write_rate),
+                             "read_gate": float(mem.last_read_gate),
+                             "retrieved_norm": float(mem.last_retrieved_norm),
+                             "copy_scale": float(mem.copy_scale)}
             history.append({"step": step, "train_loss": loss.item(), "grad_norm": norm,
-                            "train_seconds": train_seconds, **metrics})
+                            "train_seconds": train_seconds, **metrics, **mem_stats})
             print(f"{arm} seed={seed} step={step} loss={loss.item():.3f} "
                   f"bpb={metrics['bits_per_byte']:.3f} rare={metrics['rare_word_repeat_bits_per_byte']:.3f} "
                   f"key={metrics['passkey_key_accuracy']:.2f} "
