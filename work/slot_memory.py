@@ -123,6 +123,7 @@ class SlotMemory(nn.Module):
         compile_step: bool = False,
         write_mode: str = "blend",
         replace_decay: float = 0.99,
+        detach_gate_input: bool = False,
     ) -> None:
         super().__init__()
         self.num_slots, self.d_key, self.d_value = num_slots, d_key, d_value
@@ -130,6 +131,8 @@ class SlotMemory(nn.Module):
         self.occupancy_floor = occupancy_floor
         self.compile_step = compile_step
         self.write_mode, self.replace_decay = write_mode, replace_decay
+        # keep the (straight-through, noisy) gate gradient out of the trunk
+        self.detach_gate_input = detach_gate_input
         self.key = nn.Linear(d_model, d_key, bias=False)        # tied key/query
         self.value = nn.Linear(d_model, d_value, bias=False)
         self.gates = nn.Linear(d_model, 3)                       # write, alloc, sharpness
@@ -157,7 +160,7 @@ class SlotMemory(nn.Module):
         # memory of context -> token): the copy readout, which scores against
         # value(E), then decodes a clean retrieval correctly from initialisation.
         cand_values = self.value(token_embedding if token_embedding is not None else h).float()
-        gates = self.gates(h).float()
+        gates = self.gates(h.detach() if self.detach_gate_input else h).float()
         write_logit = gates[..., 0]
         if surprise is not None:
             # Surprise-gated writing: unpredictable tokens (a stated passkey,
