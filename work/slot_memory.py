@@ -124,6 +124,7 @@ class SlotMemory(nn.Module):
         write_mode: str = "blend",
         replace_decay: float = 0.99,
         detach_gate_input: bool = False,
+        tbptt: int = 0,
     ) -> None:
         super().__init__()
         self.num_slots, self.d_key, self.d_value = num_slots, d_key, d_value
@@ -133,6 +134,9 @@ class SlotMemory(nn.Module):
         self.write_mode, self.replace_decay = write_mode, replace_decay
         # keep the (straight-through, noisy) gate gradient out of the trunk
         self.detach_gate_input = detach_gate_input
+        # truncated backprop through the scan: cut the state's gradient every
+        # `tbptt` positions (0 = full backprop); the forward is unchanged
+        self.tbptt = tbptt
         self.key = nn.Linear(d_model, d_key, bias=False)        # tied key/query
         self.value = nn.Linear(d_model, d_value, bias=False)
         self.gates = nn.Linear(d_model, 3)                       # write, alloc, sharpness
@@ -185,6 +189,8 @@ class SlotMemory(nn.Module):
         else:
             step = compiled_memory_step() if self.compile_step else memory_step
         for t in range(length):
+            if self.tbptt and t and t % self.tbptt == 0:
+                keys, values, occ = keys.detach(), values.detach(), occ.detach()
             if reset is not None:
                 keep = (~reset[:, t]).float()
                 keys, values = keys * keep[:, None, None], values * keep[:, None, None]
