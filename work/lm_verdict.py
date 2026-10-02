@@ -4,6 +4,7 @@
     python3 lm_verdict.py               # criteria 1-4, pass or fail
     python3 lm_verdict.py --round 2     # PREREGISTRATION_LM_round2.md
     python3 lm_verdict.py --round 3     # PREREGISTRATION_LM_round3.md
+    python3 lm_verdict.py --round 4     # PREREGISTRATION_LM_round4.md
 """
 
 from __future__ import annotations
@@ -95,9 +96,11 @@ def round2() -> None:
     print("WORTH USING:", verdict["worth_using"], "(complete)" if complete else "(incomplete)")
 
 
-def round3() -> None:
-    arms, seeds_all = ("window", "window_sml", "window_sml_local", "full"), (6, 7, 8)
-    path = lambda arm, s: OUT / f"lm_round3_{arm}_seed{s}.json"
+def round_long(number: int = 3) -> None:
+    """Rounds 3 and 4: 512-byte context (window 64 in round 3, 16 in round 4)."""
+    seeds_all, window = {3: ((6, 7, 8), 64), 4: ((9, 10, 11), 16)}[number]
+    arms = ("window", "window_sml", "window_sml_local", "full")
+    path = lambda arm, s: OUT / f"lm_round{number}_{arm}_seed{s}.json"
     runs = {arm: {s: json.loads(path(arm, s).read_text()) for s in seeds_all if path(arm, s).exists()}
             for arm in arms}
     seeds = [s for s in seeds_all if all(s in runs[arm] for arm in arms)]
@@ -113,7 +116,7 @@ def round3() -> None:
     c2 = bool(seeds) and all(bpb("window_sml", s) < bpb("window_sml_local", s) for s in seeds)
     c3 = bool(seeds) and (statistics.fmean(bpb("window_sml", s) for s in seeds)
                           <= statistics.fmean(bpb("full", s) for s in seeds))
-    f = {arm: flops(arm, length=512, window=64) for arm in ("window", "window_sml", "full")}
+    f = {arm: flops(arm, length=512, window=window) for arm in ("window", "window_sml", "full")}
     c4 = None
     if seeds:
         sample = runs["window_sml"][seeds[0]]
@@ -127,7 +130,7 @@ def round3() -> None:
                "criteria": {"1_helps_text": c1, "2_gain_needs_memory_beyond_window": c2,
                             "3_as_good_as_full_attention": c3, "4_affordable": c4},
                "holds_at_4x_context": bool(complete and c1 and c2 and c3 and c4 and c4["pass"])}
-    (OUT / "lm_round3_verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
+    (OUT / f"lm_round{number}_verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
     for arm, row in table.items():
         print(f"{arm:17s} " + "  ".join(f"{k}={v}" for k, v in row.items()))
     print(json.dumps(verdict["criteria"], indent=1))
@@ -138,10 +141,13 @@ def round3() -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--timing", action="store_true")
-    p.add_argument("--round", type=int, default=1, choices=(1, 2, 3))
+    p.add_argument("--round", type=int, default=1, choices=(1, 2, 3, 4))
     a = p.parse_args()
-    if a.round in (2, 3):
-        (round2 if a.round == 2 else round3)()
+    if a.round == 2:
+        round2()
+        return
+    if a.round in (3, 4):
+        round_long(a.round)
         return
     if a.timing:
         result = timing()
