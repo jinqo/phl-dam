@@ -83,26 +83,36 @@ attention 5/6.
    CPU even though FLOPs were +3.9%. At scale the scan needs a fused kernel
    (section 4.4).
 5. **Weak comparison.** The SSM baseline was untuned.
-6. **It did not hold at 4× the context.** At 512 bytes with a window of 64
-   (round 3, seeds 6–8), memory beat window-only on only 1 of 3 seeds.
-   * Training of the memory arms was unstable: one seed stalled from the
-     start and ended at 2.56 bits/byte, against 1.85 for window-only.
-   * A memory reset every 64 bytes trained 0.45–0.6 bits/byte worse than
-     no memory at all.
-   * At your context length, **stability is the first thing to check**.
-     Compare early learning curves on several seeds before any long run. If
-     the memory arm lags, try a lower learning rate for the memory's
-     parameters, or a truncated backward pass through the scan.
-7. **No gain on top of full attention.** At 128 bytes (2 dev seeds), adding
-   memory to full attention gave nothing. The gain appeared only with
-   windowed attention + memory.
+6. **The gain is local capacity, not long-range memory.** At 512 bytes
+   with a 16-byte window (round 4, seeds 9–11), memory beat window-only on
+   3/3 seeds (1.7510 vs 1.7753 bits/byte mean). But a control whose memory is
+   wiped every 16 bytes, so it can hold nothing beyond the attention window,
+   did just as well (1.7524). At 128 bytes the same control kept about half
+   the gain. The layer helps as a cheap extra *local* mixing path. It does
+   not carry information across long distances at this scale.
+7. **A wide window breaks it.** With a 64-byte window at 512 bytes
+   (round 3), the learned write gate climbed to 0.8–0.96. The memory became
+   a few-position recency cache and did not help: 1/3 seeds, with unstable
+   training. A lower learning rate and truncated backprop did not fix it.
+   **Log the mean write gate. If it climbs towards 1, the memory has
+   degenerated.**
+8. **No gain on top of full attention.** At 128 bytes (2 dev seeds), adding
+   memory to full attention gave nothing.
 
-What it plausibly buys a 150M model:
+**Bottom line for a 150M model.** The evidence does *not* support this layer
+as a long-range memory. What it showed is a small gain from extra local
+capacity next to a narrow attention window. A 150M model with full or wide
+attention likely already has that capacity. Adopt it only if Stage A
+(section 8) shows a gain on *your* model that beats the local-reset control.
+If the control matches it, the memory is not doing memory's job: a cheaper
+local layer (an extra narrow attention head, a short convolution) is the
+honest alternative to test.
 
-* recall beyond the attention window with a constant-size state;
-* a windowed-attention + memory model that matches full attention at a
-  fraction of the KV cache;
-* possibly a small perplexity gain.
+What it might still buy, to be tested, not assumed:
+
+* a narrow-window attention + memory model that beats full attention per
+  FLOP, with a tiny inference state (seen at 128 and 512 bytes);
+* a small perplexity gain next to narrow windows.
 
 Design the evaluation to detect those, and to detect harm.
 

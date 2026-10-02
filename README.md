@@ -116,10 +116,13 @@ half of it survives a control that wipes the memory every 16 bytes, so not
 all of it is long-range. A stated passkey is still not recalled reliably, and
 CPU wall-clock is 1.68× (a Python loop; it needs a fused scan).
 
-**It did not hold at 4× the context** (round 3: 512 bytes, window 64,
-seeds 6–8): the memory beat window-only on 1/3 seeds and trained unstably
-(one seed 2.56 bits/byte vs 1.85). Treat the round-2 result as a 128-byte
-result only. Full account: `outputs/LM_Report.md`.
+**At 4× the context the gain turns out not to be long-range memory.** With a
+16-byte window at 512 bytes (round 4, seeds 9–11) the memory beats
+window-only on 3/3 seeds (1.7510 vs 1.7753 bits/byte), but a control whose
+memory is wiped every 16 bytes does as well (1.7524). The layer helps as cheap
+local capacity, not by remembering beyond the window. With a 64-byte window
+(round 3) the write gate saturates and it does not help at all. Full account:
+`outputs/LM_Report.md`.
 
 ## What was tested and rejected
 

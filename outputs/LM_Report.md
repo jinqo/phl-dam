@@ -6,7 +6,7 @@ real text: byte-level WikiText-2, `work/lm_hybrid.py`, module
 `work/slot_memory.py`. Every number below comes from preregistered runs on
 seeds that dev work never touched.
 
-> **Update — round 3:** the round-2 result below did **not** hold at 4× the context (512 bytes, window 64): 1/4 criteria, with unstable training in the memory arms. See the round-3 section. Treat round 2 as a result at 128 bytes only.
+> **Update — rounds 3 and 4 (512 bytes):** the memory still beats window-only attention with a 16-byte window (round 4, 3/3 seeds), but **a control whose memory is wiped every 16 bytes matches it** (1.7524 vs 1.7510 mean). The gain is local capacity, not long-range memory. With a 64-byte window (round 3) the memory degenerates and does not help. See the round-4 and round-3 sections.
 
 ## Verdict — round 2 (`work/PREREGISTRATION_LM_round2.md`, seeds 3–5): worth using, **4/4 criteria pass**
 
@@ -75,6 +75,35 @@ Memory is also below full attention on 5/6 seeds, with pooled means of
   stronger SSM (larger state, several layers, Mamba's convolution) might do
   better. The claim is only: at equal parameters and placement, this SSM did not help
   and the memory did.
+
+## Round 4 (`work/PREREGISTRATION_LM_round4.md`, seeds 9–11): 512 bytes, window 16 — **3/4; the gain is not long-range**
+
+Round 3's failure was diagnosed on dev seeds as the 64-byte window driving
+the write gate to 0.8–0.96. Round 4 kept round 2's 16-byte window at 512
+bytes.
+
+| Arm | Bits/byte, seed 9 | Seed 10 | Seed 11 | Mean |
+|---|---:|---:|---:|---:|
+| window only | 1.7749 | 1.7777 | 1.7732 | 1.7753 |
+| window + SlotMemory | 1.7529 | **1.7443** | 1.7557 | **1.7510** |
+| memory wiped every 16 (control) | **1.7513** | 1.7552 | **1.7507** | 1.7524 |
+| full attention (512) | 1.8919 | 2.0468 | 1.9369 | 1.9585 |
+
+1. Helps text (< window, 3/3): **pass** (−0.024 mean).
+2. Gain needs memory beyond the window (< control, 3/3): **fail** — 1/3,
+   means 1.7510 vs 1.7524.
+3. As good as full attention: **pass** (full attention trains badly at 512
+   bytes at this scale).
+4. Affordable: **pass** (1.035× FLOPs; 18,448-float state vs 524,288).
+
+**This is the decisive result of the LM study.** A memory that is wiped every
+16 bytes — so it can hold nothing the attention window cannot already see —
+gives the same gain as the full memory. At this scale the layer helps
+because it adds cheap *local* capacity (an extra recurrent mixing path over
+the last few positions), not because it carries information across long
+distances. Round 1 already hinted at this (the control kept about half the
+gain at 128 bytes); at 512 bytes it keeps all of it. Passkey recall stays at
+chance for every arm except full attention on some seeds.
 
 ## Round 3 (`work/PREREGISTRATION_LM_round3.md`, seeds 6–8): does it hold at 4× the context? **No — 1/4**
 
